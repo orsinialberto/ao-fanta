@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import * as XLSX from "xlsx";
 import { prisma } from "@/lib/prisma";
+import { normalize } from "@/lib/normalize";
 
 const VALID_ROLES = ["GK", "DEF", "MID", "FWD"];
 
@@ -21,8 +22,29 @@ export async function POST(req: NextRequest) {
 
   const buffer = Buffer.from(await file.arrayBuffer());
   const workbook = XLSX.read(buffer, { type: "buffer" });
-  const sheet = workbook.Sheets[workbook.SheetNames[0]];
+  const sheetName = workbook.SheetNames[0];
+
+  if (!sheetName) {
+    return NextResponse.json(
+      { error: "Il file non contiene fogli leggibili" },
+      { status: 400 }
+    );
+  }
+
+  const sheet = workbook.Sheets[sheetName];
   const rows: Record<string, unknown>[] = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+
+  // Upsert-by-name must be accent-insensitive too (SQLite LIKE/equality
+  // folds ASCII case but not diacritics), otherwise re-importing with a
+  // differently-accented name creates a duplicate instead of updating.
+  // Dataset is small (~600 players), so load all names once and compare
+  // normalized in JS rather than an exact-match findFirst per row.
+  const existingPlayers = await prisma.player.findMany({
+    select: { id: true, name: true },
+  });
+  const existingByNormalizedName = new Map(
+    existingPlayers.map((p) => [normalize(p.name), p.id])
+  );
 
   let imported = 0;
   const errors: string[] = [];
@@ -46,16 +68,17 @@ export async function POST(req: NextRequest) {
       continue;
     }
 
-    const existing = await prisma.player.findFirst({ where: { name } });
-    if (existing) {
+    const existingId = existingByNormalizedName.get(normalize(name));
+    if (existingId) {
       await prisma.player.update({
-        where: { id: existing.id },
+        where: { id: existingId },
         data: { role: roleRaw, serieATeam },
       });
     } else {
-      await prisma.player.create({
+      const created = await prisma.player.create({
         data: { name, role: roleRaw, serieATeam },
       });
+      existingByNormalizedName.set(normalize(name), created.id);
     }
     imported++;
   }
