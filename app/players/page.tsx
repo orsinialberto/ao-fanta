@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { getFilteredPlayers } from "@/lib/players";
-import { getTeamsWithRoster } from "@/lib/teams";
+import { getTeamsWithRoster, getDistinctSerieATeams } from "@/lib/teams";
 import PlayerFilters from "./PlayerFilters";
 import PlayersTable from "./PlayersTable";
 import AddPlayerForm from "./AddPlayerForm";
+import WipePlayersButton from "./WipePlayersButton";
 
 export const dynamic = "force-dynamic";
 
@@ -22,9 +23,10 @@ export default async function PlayersPage({
     search: params.search,
   };
 
-  const [players, teams] = await Promise.all([
+  const [players, teams, serieATeams] = await Promise.all([
     getFilteredPlayers(filters),
     getTeamsWithRoster(),
+    getDistinctSerieATeams(),
   ]);
 
   return (
@@ -36,9 +38,10 @@ export default async function PlayersPage({
             Import
           </Link>
           <AddPlayerForm />
+          <WipePlayersButton />
         </div>
       </div>
-      <PlayerFilters />
+      <PlayerFilters serieATeams={serieATeams} />
       <PlayersTable
         players={players}
         teams={teams.map((t) => ({
