@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import type { PlayerWithTeam, TeamSummary } from "@/lib/types";
 import { errorMessage } from "@/lib/http";
 import { ROLE_LABELS, isValidRole, ROLE_ORDER, type Role } from "@/lib/roles";
+import AssignDialog from "@/app/components/AssignDialog";
 
 type SortKey = "name" | "role" | "serieATeam" | "starter" | "fantasyTeam" | "cost" | "watchlist";
 type SortState = { key: SortKey; dir: "asc" | "desc" };
@@ -20,6 +21,7 @@ export default function PlayersTable({
 }) {
   const router = useRouter();
   const [assigning, setAssigning] = useState<PlayerWithTeam | null>(null);
+  const [assignOpen, setAssignOpen] = useState(false);
   const [sort, setSort] = useState<SortState | null>(null);
 
   const sortedPlayers = useMemo(() => {
@@ -226,7 +228,7 @@ export default function PlayersTable({
                     Svincola
                   </button>
                 ) : teams.length > 0 ? (
-                  <button type="button" onClick={() => setAssigning(p)} className="text-blue-600 text-xs">
+                  <button type="button" onClick={() => { setAssigning(p); setAssignOpen(true); }} className="text-blue-600 text-xs">
                     Assegna
                   </button>
                 ) : (
@@ -238,115 +240,17 @@ export default function PlayersTable({
         </tbody>
       </table>
 
-      {assigning && (
-        <AssignModal
-          player={assigning}
-          teams={teams}
-          roleLimits={roleLimits}
-          onClose={() => setAssigning(null)}
-          onAssigned={() => {
-            setAssigning(null);
-            router.refresh();
-          }}
-        />
-      )}
+      <AssignDialog
+        player={assigning}
+        teams={teams}
+        roleLimits={roleLimits}
+        open={assignOpen}
+        onOpenChange={setAssignOpen}
+        onAssigned={() => {
+          setAssignOpen(false);
+          router.refresh();
+        }}
+      />
     </>
-  );
-}
-
-function AssignModal({
-  player,
-  teams,
-  roleLimits,
-  onClose,
-  onAssigned,
-}: {
-  player: PlayerWithTeam;
-  teams: TeamSummary[];
-  roleLimits: Record<Role, number>;
-  onClose: () => void;
-  onAssigned: () => void;
-}) {
-  const [teamId, setTeamId] = useState(teams[0]?.id ?? "");
-  const [cost, setCost] = useState(0);
-  const [error, setError] = useState<string | null>(null);
-
-  const selectedTeam = teams.find((t) => t.id === teamId);
-  const overBudget = selectedTeam ? cost > selectedTeam.remainingCredits : false;
-  const role = isValidRole(player.role) ? player.role : null;
-  const roleFull =
-    selectedTeam && role ? selectedTeam.roleCounts[role] >= roleLimits[role] : false;
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setError(null);
-
-    const res = await fetch(`/api/players/${player.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ fantasyTeamId: teamId, cost }),
-    });
-
-    if (!res.ok) {
-      setError(await errorMessage(res));
-      return;
-    }
-
-    onAssigned();
-  }
-
-  return (
-    <form
-      onSubmit={handleSubmit}
-      className="fixed inset-0 bg-black/30 flex items-center justify-center z-10"
-    >
-      <div className="bg-white rounded-lg p-6 space-y-3 w-80">
-        <h2 className="font-semibold">Assegna {player.name}</h2>
-        <select
-          value={teamId}
-          onChange={(e) => setTeamId(e.target.value)}
-          required
-          className="border rounded px-2 py-1 w-full text-sm"
-        >
-          {teams.map((t) => (
-            <option key={t.id} value={t.id}>
-              {t.name} (residui: {t.remainingCredits})
-            </option>
-          ))}
-        </select>
-        <input
-          type="number"
-          value={cost}
-          onChange={(e) => setCost(Number(e.target.value))}
-          min={0}
-          required
-          className="border rounded px-2 py-1 w-full text-sm"
-        />
-        {overBudget && (
-          <p className="text-orange-600 text-sm">
-            Attenzione: costo superiore ai crediti residui della squadra.
-          </p>
-        )}
-        {roleFull && role && (
-          <p className="text-red-600 text-sm">
-            Limite raggiunto per ruolo {ROLE_LABELS[role]} ({selectedTeam!.roleCounts[role]}/
-            {roleLimits[role]}).
-          </p>
-        )}
-        {error && <p className="text-red-600 text-sm">{error}</p>}
-        <div className="flex gap-2 justify-end">
-          <button type="button" onClick={onClose} className="text-sm text-gray-500">
-            Annulla
-          </button>
-          <button
-            type="submit"
-            disabled={roleFull}
-            className="px-3 py-1 bg-green-600 text-white rounded text-sm disabled:opacity-40"
-          >
-            Conferma
-          </button>
-        </div>
-      </div>
-    </form>
   );
 }
