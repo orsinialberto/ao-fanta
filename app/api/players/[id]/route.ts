@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+const VALID_ROLES = ["GK", "DEF", "MID", "FWD"];
+
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -10,7 +12,12 @@ export async function PATCH(
   const data: Record<string, unknown> = {};
 
   if (body.name !== undefined) data.name = body.name;
-  if (body.role !== undefined) data.role = body.role;
+  if (body.role !== undefined) {
+    if (!VALID_ROLES.includes(body.role)) {
+      return NextResponse.json({ error: "Invalid role" }, { status: 400 });
+    }
+    data.role = body.role;
+  }
   if (body.serieATeam !== undefined) data.serieATeam = body.serieATeam;
   if (body.starter !== undefined) data.starter = !!body.starter;
   if (body.watchlist !== undefined) data.watchlist = !!body.watchlist;
@@ -31,6 +38,13 @@ export async function PATCH(
     }
   }
 
-  const player = await prisma.player.update({ where: { id }, data });
-  return NextResponse.json(player);
+  try {
+    const player = await prisma.player.update({ where: { id }, data });
+    return NextResponse.json(player);
+  } catch (error: unknown) {
+    if (error instanceof Error && "code" in error && error.code === "P2025") {
+      return NextResponse.json({ error: "Player not found" }, { status: 404 });
+    }
+    throw error;
+  }
 }
