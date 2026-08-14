@@ -1,14 +1,21 @@
 import { getFilteredPlayers } from "@/lib/players";
 import { getTeamsWithRoster } from "@/lib/teams";
+import { getLeagueSettings, getRoleLimit } from "@/lib/leagueSettings";
+import { ROLE_ORDER, type Role } from "@/lib/roles";
 import PlayersTable from "../players/PlayersTable";
 
 export const dynamic = "force-dynamic";
 
 export default async function WatchlistPage() {
-  const [players, teams] = await Promise.all([
+  const [players, teams, leagueSettings] = await Promise.all([
     getFilteredPlayers({ watchlistOnly: true, freeAgentOnly: true }),
     getTeamsWithRoster(),
+    getLeagueSettings(),
   ]);
+
+  const roleLimits = Object.fromEntries(
+    ROLE_ORDER.map((r) => [r, getRoleLimit(leagueSettings, r)])
+  ) as Record<Role, number>;
 
   return (
     <div className="space-y-4">
@@ -21,6 +28,7 @@ export default async function WatchlistPage() {
           remainingCredits: t.remainingCredits,
           roleCounts: t.roleCounts,
         }))}
+        roleLimits={roleLimits}
       />
     </div>
   );

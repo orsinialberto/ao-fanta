@@ -8,13 +8,6 @@ export const ROLE_LABELS: Record<Role, string> = {
   A: "Attaccanti",
 };
 
-export const ROLE_LIMITS: Record<Role, number> = {
-  P: 3,
-  D: 8,
-  C: 8,
-  A: 6,
-};
-
 export function isValidRole(value: string): value is Role {
   return (ROLE_ORDER as readonly string[]).includes(value);
 }

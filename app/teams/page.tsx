@@ -1,5 +1,6 @@
 import { getTeamsWithRoster } from "@/lib/teams";
-import { ROLE_ORDER, ROLE_LABELS, ROLE_LIMITS } from "@/lib/roles";
+import { ROLE_ORDER, ROLE_LABELS } from "@/lib/roles";
+import { getLeagueSettings, getRoleLimit } from "@/lib/leagueSettings";
 import TeamForm from "./TeamForm";
 import DeleteTeamButton from "./DeleteTeamButton";
 import ReleasePlayerButton from "./ReleasePlayerButton";
@@ -8,7 +9,10 @@ import ReleaseAllButton from "./ReleaseAllButton";
 export const dynamic = "force-dynamic";
 
 export default async function TeamsPage() {
-  const teams = await getTeamsWithRoster();
+  const [teams, leagueSettings] = await Promise.all([
+    getTeamsWithRoster(),
+    getLeagueSettings(),
+  ]);
 
   return (
     <div className="space-y-8">
@@ -33,7 +37,7 @@ export default async function TeamsPage() {
                 <p className="text-sm text-gray-500 space-x-2">
                   {ROLE_ORDER.map((role) => (
                     <span key={role} title={ROLE_LABELS[role]}>
-                      {role} {team.roleCounts[role]}/{ROLE_LIMITS[role]}
+                      {role} {team.roleCounts[role]}/{getRoleLimit(leagueSettings, role)}
                     </span>
                   ))}
                 </p>

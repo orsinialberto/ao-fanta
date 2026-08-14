@@ -4,7 +4,7 @@ import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import type { PlayerWithTeam, TeamSummary } from "@/lib/types";
 import { errorMessage } from "@/lib/http";
-import { ROLE_LABELS, ROLE_LIMITS, isValidRole, ROLE_ORDER } from "@/lib/roles";
+import { ROLE_LABELS, isValidRole, ROLE_ORDER, type Role } from "@/lib/roles";
 
 type SortKey = "name" | "role" | "serieATeam" | "starter" | "fantasyTeam" | "cost" | "watchlist";
 type SortState = { key: SortKey; dir: "asc" | "desc" };
@@ -12,9 +12,11 @@ type SortState = { key: SortKey; dir: "asc" | "desc" };
 export default function PlayersTable({
   players,
   teams,
+  roleLimits,
 }: {
   players: PlayerWithTeam[];
   teams: TeamSummary[];
+  roleLimits: Record<Role, number>;
 }) {
   const router = useRouter();
   const [assigning, setAssigning] = useState<PlayerWithTeam | null>(null);
@@ -240,6 +242,7 @@ export default function PlayersTable({
         <AssignModal
           player={assigning}
           teams={teams}
+          roleLimits={roleLimits}
           onClose={() => setAssigning(null)}
           onAssigned={() => {
             setAssigning(null);
@@ -254,11 +257,13 @@ export default function PlayersTable({
 function AssignModal({
   player,
   teams,
+  roleLimits,
   onClose,
   onAssigned,
 }: {
   player: PlayerWithTeam;
   teams: TeamSummary[];
+  roleLimits: Record<Role, number>;
   onClose: () => void;
   onAssigned: () => void;
 }) {
@@ -270,7 +275,7 @@ function AssignModal({
   const overBudget = selectedTeam ? cost > selectedTeam.remainingCredits : false;
   const role = isValidRole(player.role) ? player.role : null;
   const roleFull =
-    selectedTeam && role ? selectedTeam.roleCounts[role] >= ROLE_LIMITS[role] : false;
+    selectedTeam && role ? selectedTeam.roleCounts[role] >= roleLimits[role] : false;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -325,7 +330,7 @@ function AssignModal({
         {roleFull && role && (
           <p className="text-red-600 text-sm">
             Limite raggiunto per ruolo {ROLE_LABELS[role]} ({selectedTeam!.roleCounts[role]}/
-            {ROLE_LIMITS[role]}).
+            {roleLimits[role]}).
           </p>
         )}
         {error && <p className="text-red-600 text-sm">{error}</p>}

@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { getFilteredPlayers } from "@/lib/players";
 import { getTeamsWithRoster, getDistinctSerieATeams } from "@/lib/teams";
+import { getLeagueSettings, getRoleLimit } from "@/lib/leagueSettings";
+import { ROLE_ORDER, type Role } from "@/lib/roles";
 import PlayerFilters from "./PlayerFilters";
 import PlayersTable from "./PlayersTable";
 import AddPlayerForm from "./AddPlayerForm";
@@ -23,11 +25,16 @@ export default async function PlayersPage({
     search: params.search,
   };
 
-  const [players, teams, serieATeams] = await Promise.all([
+  const [players, teams, serieATeams, leagueSettings] = await Promise.all([
     getFilteredPlayers(filters),
     getTeamsWithRoster(),
     getDistinctSerieATeams(),
+    getLeagueSettings(),
   ]);
+
+  const roleLimits = Object.fromEntries(
+    ROLE_ORDER.map((r) => [r, getRoleLimit(leagueSettings, r)])
+  ) as Record<Role, number>;
 
   return (
     <div className="space-y-4">
@@ -50,6 +57,7 @@ export default async function PlayersPage({
           remainingCredits: t.remainingCredits,
           roleCounts: t.roleCounts,
         }))}
+        roleLimits={roleLimits}
       />
     </div>
   );

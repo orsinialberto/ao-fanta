@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { isValidRole, ROLE_LABELS, ROLE_LIMITS, type Role } from "@/lib/roles";
+import { isValidRole, ROLE_LABELS, type Role } from "@/lib/roles";
+import { getLeagueSettings, getRoleLimit } from "@/lib/leagueSettings";
+import { evaluateRoleLimit } from "@/lib/roleLimit";
 
 async function checkRoleLimit(
   playerTeamId: string | null,
@@ -17,14 +19,9 @@ async function checkRoleLimit(
     },
   });
 
-  const limit = ROLE_LIMITS[newRole as Role];
-  if (count >= limit) {
-    return {
-      ok: false,
-      error: `Limite raggiunto per ruolo ${ROLE_LABELS[newRole]} (${limit}/${limit})`,
-    };
-  }
-  return { ok: true };
+  const settings = await getLeagueSettings();
+  const limit = getRoleLimit(settings, newRole as Role);
+  return evaluateRoleLimit(count, limit, ROLE_LABELS[newRole as Role]);
 }
 
 export async function PATCH(
@@ -66,6 +63,7 @@ export async function PATCH(
     if (body.fantasyTeamId === null) {
       data.fantasyTeamId = null;
       data.cost = null;
+      data.assignedAt = null;
     } else {
       if (typeof body.cost !== "number" || body.cost < 0) {
         return NextResponse.json(
@@ -83,19 +81,17 @@ export async function PATCH(
         const roleCount = await prisma.player.count({
           where: { fantasyTeamId: body.fantasyTeamId, role, id: { not: id } },
         });
-        const limit = ROLE_LIMITS[role];
-        if (roleCount >= limit) {
-          return NextResponse.json(
-            {
-              error: `Limite raggiunto per ruolo ${ROLE_LABELS[role]} (${limit}/${limit})`,
-            },
-            { status: 400 }
-          );
+        const settings = await getLeagueSettings();
+        const limit = getRoleLimit(settings, role);
+        const check = evaluateRoleLimit(roleCount, limit, ROLE_LABELS[role]);
+        if (!check.ok) {
+          return NextResponse.json({ error: check.error }, { status: 400 });
         }
       }
 
       data.fantasyTeamId = body.fantasyTeamId;
       data.cost = body.cost;
+      data.assignedAt = new Date();
     }
   }
 
