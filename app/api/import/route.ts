@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import * as XLSX from "xlsx";
 import { prisma } from "@/lib/prisma";
 import { normalize } from "@/lib/normalize";
-
-const VALID_ROLES = ["GK", "DEF", "MID", "FWD"];
+import { sheetToRows, normalizeRole } from "@/lib/xlsxImport";
 
 export async function POST(req: NextRequest) {
   const formData = await req.formData();
@@ -32,7 +31,7 @@ export async function POST(req: NextRequest) {
   }
 
   const sheet = workbook.Sheets[sheetName];
-  const rows: Record<string, unknown>[] = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+  const rows = sheetToRows(sheet);
 
   // Upsert-by-name must be accent-insensitive too (SQLite LIKE/equality
   // folds ASCII case but not diacritics), otherwise re-importing with a
@@ -51,7 +50,7 @@ export async function POST(req: NextRequest) {
 
   for (const [index, row] of rows.entries()) {
     const name = String(row[mapping.name] ?? "").trim();
-    const roleRaw = String(row[mapping.role] ?? "").trim().toUpperCase();
+    const roleRaw = String(row[mapping.role] ?? "").trim();
     const serieATeam = String(row[mapping.serieATeam] ?? "").trim();
     const rowNumber = index + 2; // header row is row 1
 
@@ -59,7 +58,8 @@ export async function POST(req: NextRequest) {
       errors.push(`Riga ${rowNumber}: nome mancante`);
       continue;
     }
-    if (!VALID_ROLES.includes(roleRaw)) {
+    const role = normalizeRole(roleRaw);
+    if (!role) {
       errors.push(`Riga ${rowNumber}: ruolo non valido "${roleRaw}"`);
       continue;
     }
@@ -72,11 +72,11 @@ export async function POST(req: NextRequest) {
     if (existingId) {
       await prisma.player.update({
         where: { id: existingId },
-        data: { role: roleRaw, serieATeam },
+        data: { role, serieATeam },
       });
     } else {
       const created = await prisma.player.create({
-        data: { name, role: roleRaw, serieATeam },
+        data: { name, role, serieATeam },
       });
       existingByNormalizedName.set(normalize(name), created.id);
     }

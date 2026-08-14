@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import * as XLSX from "xlsx";
+import { sheetToRows, normalizeRole } from "@/lib/xlsxImport";
 
 type ImportResult = { imported: number; skipped: number; errors: string[] };
 
@@ -28,7 +29,7 @@ export default function ImportPage() {
       const buffer = await selected.arrayBuffer();
       const workbook = XLSX.read(buffer, { type: "array" });
       const sheet = workbook.Sheets[workbook.SheetNames[0]];
-      const rows: Record<string, unknown>[] = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+      const rows = sheetToRows(sheet);
       const cols = rows.length > 0 ? Object.keys(rows[0]) : [];
       setHeaders(cols);
       setPreviewRows(rows.slice(0, 3));
@@ -95,7 +96,7 @@ export default function ImportPage() {
             </div>
           ))}
           <p className="text-xs text-gray-400">
-            Ruolo atteso nel file: GK, DEF, MID o FWD (case-insensitive).
+            Ruolo atteso nel file: GK/DEF/MID/FWD oppure P/D/C/A (case-insensitive).
           </p>
 
           {previewRows.length > 0 && (
@@ -119,7 +120,10 @@ export default function ImportPage() {
                           {mapping.name ? String(row[mapping.name] ?? "") : "—"}
                         </td>
                         <td className="py-1 pr-3">
-                          {mapping.role ? String(row[mapping.role] ?? "") : "—"}
+                          {mapping.role
+                            ? normalizeRole(String(row[mapping.role] ?? "")) ??
+                              `${String(row[mapping.role] ?? "")} (non valido)`
+                            : "—"}
                         </td>
                         <td className="py-1 pr-3">
                           {mapping.serieATeam ? String(row[mapping.serieATeam] ?? "") : "—"}
