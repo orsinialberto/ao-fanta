@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { getFilteredPlayers } from "@/lib/players";
 import { getTeamsWithRoster, getDistinctSerieATeams } from "@/lib/teams";
 import { getLeagueSettings, getRoleLimit } from "@/lib/leagueSettings";
@@ -6,7 +5,6 @@ import { ROLE_ORDER, type Role } from "@/lib/roles";
 import PlayerFilters from "./PlayerFilters";
 import PlayersTable from "./PlayersTable";
 import AddPlayerForm from "./AddPlayerForm";
-import WipePlayersButton from "./WipePlayersButton";
 
 export const dynamic = "force-dynamic";
 
@@ -41,11 +39,7 @@ export default async function PlayersPage({
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Giocatori</h1>
         <div className="flex gap-2">
-          <Link href="/players/import" className="px-3 py-1.5 border rounded text-sm">
-            Import
-          </Link>
           <AddPlayerForm />
-          <WipePlayersButton />
         </div>
       </div>
       <PlayerFilters serieATeams={serieATeams} />

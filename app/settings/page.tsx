@@ -1,5 +1,6 @@
 import { getLeagueSettings } from "@/lib/leagueSettings";
 import LeagueRulesCard from "./LeagueRulesCard";
+import ListoneCard from "./ListoneCard";
 
 export const dynamic = "force-dynamic";
 
@@ -13,6 +14,7 @@ export default async function SettingsPage() {
         <p className="text-sm text-ink-dim">Configurazione della lega e gestione dei dati.</p>
       </div>
       <div className="grid grid-cols-2 gap-4">
+        <ListoneCard />
         <LeagueRulesCard settings={settings} />
       </div>
     </div>
