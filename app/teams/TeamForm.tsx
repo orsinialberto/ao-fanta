@@ -46,7 +46,7 @@ export default function TeamForm({
     return (
       <button
         onClick={() => setOpen(true)}
-        className="px-3 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+        className="rounded-lg bg-indigo px-3 py-1.5 text-[12px] font-bold text-white"
       >
         {mode === "create" ? "Nuova squadra" : "Modifica"}
       </button>
@@ -54,20 +54,20 @@ export default function TeamForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex gap-2 items-center flex-wrap">
+    <form onSubmit={handleSubmit} className="flex flex-wrap items-center gap-2">
       <input
         value={name}
         onChange={(e) => setName(e.target.value)}
         placeholder="Nome squadra"
         required
-        className="border rounded px-2 py-1 text-sm"
+        className="rounded-lg border border-border px-2 py-1 text-[12.5px]"
       />
       <input
         value={coach}
         onChange={(e) => setCoach(e.target.value)}
         placeholder="Allenatore"
         required
-        className="border rounded px-2 py-1 text-sm"
+        className="rounded-lg border border-border px-2 py-1 text-[12.5px]"
       />
       <input
         type="number"
@@ -75,15 +75,15 @@ export default function TeamForm({
         onChange={(e) => setTotalCredits(Number(e.target.value))}
         min={0}
         required
-        className="border rounded px-2 py-1 text-sm w-24"
+        className="w-24 rounded-lg border border-border px-2 py-1 text-[12.5px]"
       />
-      <button type="submit" className="px-3 py-1 bg-green-600 text-white rounded text-sm">
+      <button type="submit" className="rounded-lg bg-teal px-3 py-1 text-[12px] font-bold text-white">
         Salva
       </button>
-      <button type="button" onClick={() => setOpen(false)} className="text-sm text-gray-500">
+      <button type="button" onClick={() => setOpen(false)} className="text-[12px] font-semibold text-ink-dim">
         Annulla
       </button>
-      {error && <span className="text-red-600 text-sm">{error}</span>}
+      {error && <span className="text-[12px] font-semibold text-coral">{error}</span>}
     </form>
   );
 }

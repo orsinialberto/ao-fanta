@@ -28,7 +28,7 @@ export default function DeleteTeamButton({
       onClick={handleDelete}
       disabled={disabled}
       title={disabled ? "Svincola prima tutti i giocatori" : undefined}
-      className="px-3 py-1.5 border border-red-300 text-red-600 rounded text-sm disabled:opacity-40 disabled:cursor-not-allowed"
+      className="rounded-lg border border-border px-3 py-1.5 text-[12px] font-bold text-ink-dim disabled:opacity-40 disabled:cursor-not-allowed"
     >
       Elimina
     </button>

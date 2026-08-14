@@ -1,6 +1,7 @@
 import { Users, Trash2 } from "lucide-react";
 import { getTeamsWithRoster } from "@/lib/teams";
 import TeamForm from "@/app/teams/TeamForm";
+import ReleaseAllButton from "@/app/teams/ReleaseAllButton";
 import DeleteTeamButton from "@/app/teams/DeleteTeamButton";
 
 export default async function TeamsCard() {
@@ -14,15 +15,21 @@ export default async function TeamsCard() {
         </div>
         <div>
           <h3 className="text-[14.5px] font-extrabold">Squadre</h3>
-          <p className="text-xs text-ink-dim">Crea ed elimina squadre di lega</p>
+          <p className="text-xs text-ink-dim">Crea, modifica ed elimina squadre di lega</p>
         </div>
       </div>
 
       <div className="flex flex-col gap-1.5">
         {teams.map((t) => (
-          <div key={t.id} className="flex items-center gap-2.5 rounded-lg bg-surface-2 px-2.5 py-2">
+          <div key={t.id} className="flex flex-wrap items-center gap-2.5 rounded-lg bg-surface-2 px-2.5 py-2">
             <span className="flex-1 text-[12.5px] font-bold">{t.name}</span>
             <span className="font-mono text-[11px] tabular-nums text-ink-dim">{t.totalCredits} cr</span>
+            <TeamForm mode="edit" team={t} />
+            <ReleaseAllButton
+              teamId={t.id}
+              teamName={t.name}
+              isDisabled={t.players.length === 0}
+            />
             <DeleteTeamButton teamId={t.id} disabled={t.players.length > 0} />
           </div>
         ))}

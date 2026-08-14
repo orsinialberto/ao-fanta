@@ -35,7 +35,7 @@ export default function ReleaseAllButton({
       type="button"
       onClick={handleReleaseAll}
       disabled={isDisabled}
-      className="px-3 py-1.5 border border-orange-300 text-orange-600 rounded text-sm disabled:opacity-40 disabled:cursor-not-allowed"
+      className="rounded-lg border border-coral px-3 py-1.5 text-[12px] font-bold text-coral disabled:opacity-40 disabled:cursor-not-allowed"
     >
       Svincola tutto
     </button>
