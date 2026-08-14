@@ -11,7 +11,7 @@ import AssignDialog from "@/app/components/AssignDialog";
 type SortKey = "name" | "role" | "serieATeam" | "starter" | "fantasyTeam" | "cost" | "watchlist";
 type SortState = { key: SortKey; dir: "asc" | "desc" };
 
-const COLUMNS: { key: SortKey; label: string }[] = [
+const ALL_COLUMNS: { key: SortKey; label: string }[] = [
   { key: "name", label: "Nome" },
   { key: "role", label: "Ruolo" },
   { key: "serieATeam", label: "Squadra Serie A" },
@@ -25,11 +25,14 @@ export default function PlayersTable({
   players,
   teams,
   roleLimits,
+  showCost = true,
 }: {
   players: PlayerWithTeam[];
   teams: TeamSummary[];
   roleLimits: Record<Role, number>;
+  showCost?: boolean;
 }) {
+  const COLUMNS = showCost ? ALL_COLUMNS : ALL_COLUMNS.filter((c) => c.key !== "cost");
   const router = useRouter();
   const [assigning, setAssigning] = useState<PlayerWithTeam | null>(null);
   const [assignOpen, setAssignOpen] = useState(false);
@@ -172,9 +175,11 @@ export default function PlayersTable({
                       {p.fantasyTeam ? p.fantasyTeam.name : "Svincolato"}
                     </span>
                   </td>
-                  <td className="border-b border-border px-3.5 py-2.5 align-middle font-mono font-bold tabular-nums">
-                    {p.cost ?? "—"}
-                  </td>
+                  {showCost && (
+                    <td className="border-b border-border px-3.5 py-2.5 align-middle font-mono font-bold tabular-nums">
+                      {p.cost ?? "—"}
+                    </td>
+                  )}
                   <td className="border-b border-border px-3.5 py-2.5 align-middle">
                     <button
                       type="button"
