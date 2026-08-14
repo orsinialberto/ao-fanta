@@ -4,7 +4,6 @@ import { getLeagueSettings, getRoleLimit } from "@/lib/leagueSettings";
 import { ROLE_ORDER, type Role } from "@/lib/roles";
 import PlayerFilters from "./PlayerFilters";
 import PlayersTable from "./PlayersTable";
-import AddPlayerForm from "./AddPlayerForm";
 
 export const dynamic = "force-dynamic";
 
@@ -38,9 +37,6 @@ export default async function PlayersPage({
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Giocatori</h1>
-        <div className="flex gap-2">
-          <AddPlayerForm />
-        </div>
       </div>
       <PlayerFilters serieATeams={serieATeams} />
       <PlayersTable
