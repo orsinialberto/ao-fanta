@@ -10,6 +10,7 @@ export default function ImportPage() {
   const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
   const [headers, setHeaders] = useState<string[]>([]);
+  const [previewRows, setPreviewRows] = useState<Record<string, unknown>[]>([]);
   const [mapping, setMapping] = useState({ name: "", role: "", serieATeam: "" });
   const [result, setResult] = useState<ImportResult | null>(null);
   const [loading, setLoading] = useState(false);
@@ -30,11 +31,13 @@ export default function ImportPage() {
       const rows: Record<string, unknown>[] = XLSX.utils.sheet_to_json(sheet, { defval: "" });
       const cols = rows.length > 0 ? Object.keys(rows[0]) : [];
       setHeaders(cols);
+      setPreviewRows(rows.slice(0, 3));
       setMapping({ name: cols[0] ?? "", role: cols[1] ?? "", serieATeam: cols[2] ?? "" });
     } catch (err) {
       const message = err instanceof Error ? err.message : "Errore durante la lettura del file";
       setError(message);
       setHeaders([]);
+      setPreviewRows([]);
       setFile(null);
     }
   }
@@ -94,6 +97,41 @@ export default function ImportPage() {
           <p className="text-xs text-gray-400">
             Ruolo atteso nel file: GK, DEF, MID o FWD (case-insensitive).
           </p>
+
+          {previewRows.length > 0 && (
+            <div className="space-y-1">
+              <p className="text-sm text-gray-500">
+                Anteprima (prime {previewRows.length} righe con la mappatura attuale):
+              </p>
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs border-collapse">
+                  <thead>
+                    <tr className="text-left border-b">
+                      <th className="py-1 pr-3">name</th>
+                      <th className="py-1 pr-3">role</th>
+                      <th className="py-1 pr-3">serieATeam</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {previewRows.map((row, i) => (
+                      <tr key={i} className="border-b">
+                        <td className="py-1 pr-3">
+                          {mapping.name ? String(row[mapping.name] ?? "") : "—"}
+                        </td>
+                        <td className="py-1 pr-3">
+                          {mapping.role ? String(row[mapping.role] ?? "") : "—"}
+                        </td>
+                        <td className="py-1 pr-3">
+                          {mapping.serieATeam ? String(row[mapping.serieATeam] ?? "") : "—"}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
           <button
             onClick={handleImport}
             disabled={loading || !mapping.name || !mapping.role || !mapping.serieATeam}
