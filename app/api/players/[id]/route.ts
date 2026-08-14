@@ -1,6 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { isValidRole, ROLE_LABELS, ROLE_LIMITS } from "@/lib/roles";
+import { isValidRole, ROLE_LABELS, ROLE_LIMITS, type Role } from "@/lib/roles";
+
+async function checkRoleLimit(
+  playerTeamId: string | null,
+  newRole: string,
+  playerId: string
+): Promise<{ ok: boolean; error?: string }> {
+  if (!playerTeamId || !isValidRole(newRole)) return { ok: true };
+
+  const count = await prisma.player.count({
+    where: {
+      fantasyTeamId: playerTeamId,
+      role: newRole,
+      id: { not: playerId },
+    },
+  });
+
+  const limit = ROLE_LIMITS[newRole as Role];
+  if (count >= limit) {
+    return {
+      ok: false,
+      error: `Limite raggiunto per ruolo ${ROLE_LABELS[newRole]} (${limit}/${limit})`,
+    };
+  }
+  return { ok: true };
+}
 
 export async function PATCH(
   req: NextRequest,
@@ -15,6 +40,22 @@ export async function PATCH(
     if (!isValidRole(body.role)) {
       return NextResponse.json({ error: "Invalid role" }, { status: 400 });
     }
+
+    // If this is a pure role change (no fantasyTeamId change) on an assigned player,
+    // check if the new role would exceed the team's limits
+    if (body.fantasyTeamId === undefined) {
+      const player = await prisma.player.findUnique({
+        where: { id },
+        select: { fantasyTeamId: true },
+      });
+      if (player?.fantasyTeamId) {
+        const check = await checkRoleLimit(player.fantasyTeamId, body.role, id);
+        if (!check.ok) {
+          return NextResponse.json({ error: check.error }, { status: 400 });
+        }
+      }
+    }
+
     data.role = body.role;
   }
   if (body.serieATeam !== undefined) data.serieATeam = body.serieATeam;
