@@ -19,7 +19,7 @@ export default function TeamCard({
         <span className="text-xs text-ink-dim">{team.coach}</span>
       </div>
 
-      <div className="font-mono text-[13px] font-bold tabular-nums">
+      <div className="text-right font-mono text-[13px] font-bold tabular-nums">
         {team.remainingCredits}
         <span className="text-ink-dim"> / {team.totalCredits}</span>
       </div>
