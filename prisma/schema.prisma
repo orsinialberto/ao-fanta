@@ -19,7 +19,7 @@ model Team {
 model Player {
   id            String   @id @default(uuid())
   name          String
-  role          String   // GK, DEF, MID, FWD
+  role          String   // P, D, C, A
   serieATeam    String
   fantasyTeamId String?
   fantasyTeam   Team?    @relation(fields: [fantasyTeamId], references: [id])

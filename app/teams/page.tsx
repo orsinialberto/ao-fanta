@@ -4,12 +4,12 @@ import DeleteTeamButton from "./DeleteTeamButton";
 
 export const dynamic = "force-dynamic";
 
-const ROLE_ORDER = ["GK", "DEF", "MID", "FWD"] as const;
+const ROLE_ORDER = ["P", "D", "C", "A"] as const;
 const ROLE_LABELS: Record<string, string> = {
-  GK: "Portieri",
-  DEF: "Difensori",
-  MID: "Centrocampisti",
-  FWD: "Attaccanti",
+  P: "Portieri",
+  D: "Difensori",
+  C: "Centrocampisti",
+  A: "Attaccanti",
 };
 
 export default async function TeamsPage() {

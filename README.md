@@ -54,5 +54,5 @@ Gestionale locale per aste di fantacalcio. Next.js 15 + Prisma + SQLite.
 
 ## Note
 
-- Ruolo giocatore atteso nel file di import: `GK`, `DEF`, `MID`, `FWD` (case-insensitive). Se il listone reale usa i codici italiani (P/D/C/A) va adattato il mapping in `app/players/import/page.tsx`.
+- Ruolo giocatore: `P`, `D`, `C`, `A` (case-insensitive nel file di import; accetta anche GK/DEF/MID/FWD in input per compatibilità).
 - Database SQLite locale (`dev.db`), pensato per uso singolo-utente in locale, non per deploy multi-utente.

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getFilteredPlayers } from "@/lib/players";
 
-const VALID_ROLES = ["GK", "DEF", "MID", "FWD"];
+const VALID_ROLES = ["P", "D", "C", "A"];
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);

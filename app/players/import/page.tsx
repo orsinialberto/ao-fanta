@@ -96,7 +96,7 @@ export default function ImportPage() {
             </div>
           ))}
           <p className="text-xs text-gray-400">
-            Ruolo atteso nel file: GK/DEF/MID/FWD oppure P/D/C/A (case-insensitive).
+            Ruolo atteso nel file: P/D/C/A (case-insensitive).
           </p>
 
           {previewRows.length > 0 && (

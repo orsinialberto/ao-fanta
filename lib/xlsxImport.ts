@@ -29,23 +29,23 @@ export function sheetToRows(sheet: XLSX.WorkSheet): Record<string, unknown>[] {
 }
 
 const ROLE_ALIASES: Record<string, string> = {
-  GK: "GK",
-  DEF: "DEF",
-  MID: "MID",
-  FWD: "FWD",
-  // Italian Fantacalcio quotazioni codes
-  P: "GK",
-  POR: "GK",
-  D: "DEF",
-  DIF: "DEF",
-  C: "MID",
-  CEN: "MID",
-  CC: "MID",
-  A: "FWD",
-  ATT: "FWD",
+  P: "P",
+  POR: "P",
+  D: "D",
+  DIF: "D",
+  C: "C",
+  CEN: "C",
+  CC: "C",
+  A: "A",
+  ATT: "A",
+  // English aliases, kept for backward compatibility
+  GK: "P",
+  DEF: "D",
+  MID: "C",
+  FWD: "A",
 };
 
-/** Maps a raw role code (English or Italian Fantacalcio notation) to the app's canonical GK/DEF/MID/FWD, or null if unrecognized. */
+/** Maps a raw role code (Italian Fantacalcio notation or English) to the app's canonical P/D/C/A, or null if unrecognized. */
 export function normalizeRole(raw: string): string | null {
   return ROLE_ALIASES[raw.trim().toUpperCase()] ?? null;
 }

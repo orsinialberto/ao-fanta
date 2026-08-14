@@ -4,13 +4,13 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { errorMessage } from "@/lib/http";
 
-const ROLES = ["GK", "DEF", "MID", "FWD"];
+const ROLES = ["P", "D", "C", "A"];
 
 export default function AddPlayerForm() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
-  const [role, setRole] = useState("GK");
+  const [role, setRole] = useState("P");
   const [serieATeam, setSerieATeam] = useState("");
   const [starter, setStarter] = useState(false);
   const [error, setError] = useState<string | null>(null);

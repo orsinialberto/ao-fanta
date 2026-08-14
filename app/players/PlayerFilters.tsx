@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 
-const ROLES = ["GK", "DEF", "MID", "FWD"];
+const ROLES = ["P", "D", "C", "A"];
 const DEBOUNCE_MS = 250;
 
 export default function PlayerFilters() {
