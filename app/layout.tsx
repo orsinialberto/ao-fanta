@@ -1,5 +1,6 @@
 import "./globals.css";
 import Link from "next/link";
+import { manrope, jetbrainsMono } from "@/lib/fonts";
 
 export const metadata = {
   title: "Fantacalcio Auction Manager",
@@ -7,8 +8,8 @@ export const metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="it">
-      <body>
+    <html lang="it" className={`${manrope.variable} ${jetbrainsMono.variable}`}>
+      <body className="bg-page text-ink font-sans">
         <nav className="border-b border-gray-200 px-6 py-3 flex gap-6">
           <Link href="/players" className="font-medium hover:underline">
             Giocatori
