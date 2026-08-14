@@ -43,10 +43,7 @@ export default function TeamCard({
                 <ul className="flex flex-col gap-0.5">
                   {rolePlayers.map((p) => (
                     <li key={p.id} className="flex items-center justify-between gap-2 py-0.5">
-                      <span className="min-w-0 truncate text-[12.5px] font-bold">
-                        {p.name}{" "}
-                        <span className="font-semibold text-ink-dim">({p.serieATeam})</span>
-                      </span>
+                      <span className="min-w-0 truncate text-[12.5px] font-bold">{p.name}</span>
                       <span className="flex flex-shrink-0 items-center gap-2">
                         <span className="font-mono text-[12px] font-bold tabular-nums">{p.cost}</span>
                         <ReleasePlayerButton playerId={p.id} playerName={p.name} />
