@@ -5,7 +5,7 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { ROLE_ORDER } from "@/lib/roles";
 const DEBOUNCE_MS = 250;
 
-export default function PlayerFilters() {
+export default function PlayerFilters({ serieATeams }: { serieATeams: string[] }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -14,14 +14,9 @@ export default function PlayerFilters() {
   // changes searchParams without the input ever firing onChange) updates
   // what's displayed, not just what's applied.
   const [search, setSearch] = useState(searchParams.get("search") ?? "");
-  const [serieATeam, setSerieATeam] = useState(searchParams.get("serieATeam") ?? "");
 
   useEffect(() => {
     setSearch(searchParams.get("search") ?? "");
-  }, [searchParams]);
-
-  useEffect(() => {
-    setSerieATeam(searchParams.get("serieATeam") ?? "");
   }, [searchParams]);
 
   // Per-field debounce timers (keyed by filter key) so typing in one text
@@ -79,15 +74,18 @@ export default function PlayerFilters() {
           </option>
         ))}
       </select>
-      <input
-        placeholder="Squadra Serie A"
-        value={serieATeam}
-        onChange={(e) => {
-          setSerieATeam(e.target.value);
-          updateDebounced("serieATeam", e.target.value);
-        }}
+      <select
+        value={searchParams.get("serieATeam") ?? ""}
+        onChange={(e) => update("serieATeam", e.target.value)}
         className="border rounded px-2 py-1 text-sm"
-      />
+      >
+        <option value="">Tutte le squadre</option>
+        {serieATeams.map((team) => (
+          <option key={team} value={team}>
+            {team}
+          </option>
+        ))}
+      </select>
       <label className="text-sm flex items-center gap-1">
         <input
           type="checkbox"
