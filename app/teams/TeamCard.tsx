@@ -29,7 +29,7 @@ export default function TeamCard({
           const rolePlayers = team.players.filter((p) => p.role === role);
           return (
             <div key={role}>
-              <div className="mb-1 flex items-center gap-1.5">
+              <div className="mb-1 flex items-center justify-between gap-1.5">
                 <h3 className="text-[10.5px] font-bold uppercase tracking-[0.04em] text-ink-faint">
                   {ROLE_LABELS[role]}
                 </h3>
