@@ -96,7 +96,7 @@ export default function AssignDialog({
               value={teamId}
               onChange={(e) => setTeamId(e.target.value)}
               required
-              className="w-full rounded-lg border border-border bg-surface-2 px-3 py-2.5 text[13.5px]"
+              className="w-full rounded-lg border border-border bg-surface-2 px-3 py-2.5 text-[13.5px]"
             >
               {teams.map((t) => (
                 <option key={t.id} value={t.id}>
