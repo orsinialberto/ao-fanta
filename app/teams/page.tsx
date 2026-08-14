@@ -2,7 +2,6 @@ import { getTeamsWithRoster } from "@/lib/teams";
 import { ROLE_ORDER, ROLE_LABELS } from "@/lib/roles";
 import { getLeagueSettings, getRoleLimit } from "@/lib/leagueSettings";
 import TeamForm from "./TeamForm";
-import DeleteTeamButton from "./DeleteTeamButton";
 import ReleasePlayerButton from "./ReleasePlayerButton";
 import ReleaseAllButton from "./ReleaseAllButton";
 
@@ -18,7 +17,6 @@ export default async function TeamsPage() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Squadre</h1>
-        <TeamForm mode="create" />
       </div>
 
       {teams.map((team) => (
@@ -48,7 +46,6 @@ export default async function TeamsPage() {
                 teamName={team.name}
                 isDisabled={team.players.length === 0}
               />
-              <DeleteTeamButton teamId={team.id} disabled={team.players.length > 0} />
             </div>
           </div>
 
