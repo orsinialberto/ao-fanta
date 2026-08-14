@@ -39,34 +39,46 @@ export default async function AstaPage() {
           Crediti squadre
         </div>
         <div className="grid grid-cols-3 gap-3.5">
-          {teams.map((t) => (
-            <div key={t.id} className="rounded-2xl border border-border bg-surface p-4.5 shadow-sm">
-              <div className="mb-3.5 flex items-start justify-between">
-                <div>
-                  <div className="text-sm font-extrabold">{t.name}</div>
-                  <div className="text-[11.5px] text-ink-dim">{t.players.length} giocatori</div>
-                </div>
-                <div className="text-right font-mono text-[22px] font-bold">
-                  {t.remainingCredits}
-                  <span className="block font-sans text-[11px] font-semibold text-ink-dim">
-                    / {t.totalCredits} cr
-                  </span>
-                </div>
-              </div>
-              <div className="mb-3.5 grid grid-cols-4 gap-1.5">
-                {ROLE_ORDER.map((role) => (
-                  <div
-                    key={role}
-                    className={`rounded-lg py-1.5 text-center font-mono text-[11px] font-bold ${
-                      { P: "bg-teal-soft text-teal", D: "bg-indigo-soft text-indigo", C: "bg-amber-soft text-amber", A: "bg-coral-soft text-coral" }[role]
-                    }`}
-                  >
-                    {role} {t.roleCounts[role]}/{roleLimits[role]}
+          {teams.map((t) => {
+            const spentPct =
+              t.totalCredits > 0
+                ? Math.round(((t.totalCredits - t.remainingCredits) / t.totalCredits) * 100)
+                : 0;
+            return (
+              <div key={t.id} className="rounded-2xl border border-border bg-surface p-4.5 shadow-sm">
+                <div className="mb-3.5 flex items-start justify-between">
+                  <div>
+                    <div className="text-sm font-extrabold">{t.name}</div>
+                    <div className="text-[11.5px] text-ink-dim">{t.players.length} giocatori</div>
                   </div>
-                ))}
+                  <div className="text-right font-mono text-[22px] font-bold">
+                    {t.remainingCredits}
+                    <span className="block font-sans text-[11px] font-semibold text-ink-dim">
+                      / {t.totalCredits} cr
+                    </span>
+                  </div>
+                </div>
+                <div className="mb-3.5 h-[5px] overflow-hidden rounded-full bg-surface-2">
+                  <div className="h-full rounded-full bg-indigo" style={{ width: `${spentPct}%` }} />
+                </div>
+                <div className="grid grid-cols-4 gap-1.5">
+                  {ROLE_ORDER.map((role) => {
+                    const full = t.roleCounts[role] >= roleLimits[role];
+                    return (
+                      <div
+                        key={role}
+                        className={`rounded-lg py-1.5 text-center font-mono text-[11px] font-bold ${
+                          { P: "bg-teal-soft text-teal", D: "bg-indigo-soft text-indigo", C: "bg-amber-soft text-amber", A: "bg-coral-soft text-coral" }[role]
+                        } ${full ? "outline outline-[1.5px] -outline-offset-1" : ""}`}
+                      >
+                        {role} {t.roleCounts[role]}/{roleLimits[role]}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
           {teams.length === 0 && (
             <p className="col-span-3 text-sm text-ink-dim">
               Nessuna squadra ancora — creane una in Impostazioni.
