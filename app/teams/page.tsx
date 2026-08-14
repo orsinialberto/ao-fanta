@@ -2,6 +2,8 @@ import { getTeamsWithRoster } from "@/lib/teams";
 import TeamForm from "./TeamForm";
 import DeleteTeamButton from "./DeleteTeamButton";
 
+export const dynamic = "force-dynamic";
+
 const ROLE_ORDER = ["GK", "DEF", "MID", "FWD"] as const;
 const ROLE_LABELS: Record<string, string> = {
   GK: "Portieri",
