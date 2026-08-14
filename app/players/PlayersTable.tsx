@@ -66,10 +66,12 @@ export default function PlayersTable({
                   <button onClick={() => unassign(p)} className="text-red-600 text-xs">
                     Svincola
                   </button>
-                ) : (
+                ) : teams.length > 0 ? (
                   <button onClick={() => setAssigning(p)} className="text-blue-600 text-xs">
                     Assegna
                   </button>
+                ) : (
+                  <span className="text-gray-400 text-xs">Crea prima una squadra</span>
                 )}
               </td>
             </tr>
@@ -139,6 +141,7 @@ function AssignModal({
         <select
           value={teamId}
           onChange={(e) => setTeamId(e.target.value)}
+          required
           className="border rounded px-2 py-1 w-full text-sm"
         >
           {teams.map((t) => (
