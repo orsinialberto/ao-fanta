@@ -25,7 +25,11 @@ export default function PlayerFilters() {
     setSerieATeam(searchParams.get("serieATeam") ?? "");
   }, [searchParams]);
 
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Per-field debounce timers (keyed by filter key) so typing in one text
+  // input never cancels a pending commit from the other — a single shared
+  // timer would let a click into serieATeam wipe out an in-flight search
+  // update before it ever reached the URL.
+  const debounceTimers = useRef(new Map<string, ReturnType<typeof setTimeout>>());
 
   function update(key: string, value: string) {
     const params = new URLSearchParams(searchParams.toString());
@@ -40,8 +44,12 @@ export default function PlayerFilters() {
   }
 
   function updateDebounced(key: string, value: string) {
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => update(key, value), DEBOUNCE_MS);
+    const existing = debounceTimers.current.get(key);
+    if (existing) clearTimeout(existing);
+    debounceTimers.current.set(
+      key,
+      setTimeout(() => update(key, value), DEBOUNCE_MS)
+    );
   }
 
   function toggle(key: string) {
