@@ -45,6 +45,9 @@ export async function PATCH(
     if (error instanceof Error && "code" in error && error.code === "P2025") {
       return NextResponse.json({ error: "Player not found" }, { status: 404 });
     }
+    if (error instanceof Error && "code" in error && error.code === "P2003") {
+      return NextResponse.json({ error: "Squadra non valida" }, { status: 400 });
+    }
     throw error;
   }
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { errorMessage } from "@/lib/http";
 
 export default function DeleteTeamButton({
   teamId,
@@ -16,8 +17,7 @@ export default function DeleteTeamButton({
 
     const res = await fetch(`/api/teams/${teamId}`, { method: "DELETE" });
     if (!res.ok) {
-      const body = await res.json();
-      alert(body.error ?? "Errore");
+      alert(await errorMessage(res));
       return;
     }
     router.refresh();

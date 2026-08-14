@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { errorMessage } from "@/lib/http";
 
 type Team = { id: string; name: string; coach: string; totalCredits: number };
 
@@ -33,8 +34,7 @@ export default function TeamForm({
     });
 
     if (!res.ok) {
-      const body = await res.json();
-      setError(body.error ?? "Errore");
+      setError(await errorMessage(res));
       return;
     }
 

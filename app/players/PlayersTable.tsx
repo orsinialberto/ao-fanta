@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { PlayerWithTeam, TeamSummary } from "@/lib/types";
+import { errorMessage } from "@/lib/http";
 
 export default function PlayersTable({
   players,
@@ -15,20 +16,41 @@ export default function PlayersTable({
   const [assigning, setAssigning] = useState<PlayerWithTeam | null>(null);
 
   async function toggleWatchlist(player: PlayerWithTeam) {
-    await fetch(`/api/players/${player.id}`, {
+    const res = await fetch(`/api/players/${player.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ watchlist: !player.watchlist }),
     });
+    if (!res.ok) {
+      alert(await errorMessage(res));
+      return;
+    }
+    router.refresh();
+  }
+
+  async function toggleStarter(player: PlayerWithTeam) {
+    const res = await fetch(`/api/players/${player.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ starter: !player.starter }),
+    });
+    if (!res.ok) {
+      alert(await errorMessage(res));
+      return;
+    }
     router.refresh();
   }
 
   async function unassign(player: PlayerWithTeam) {
-    await fetch(`/api/players/${player.id}`, {
+    const res = await fetch(`/api/players/${player.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ fantasyTeamId: null }),
     });
+    if (!res.ok) {
+      alert(await errorMessage(res));
+      return;
+    }
     router.refresh();
   }
 
@@ -53,21 +75,30 @@ export default function PlayersTable({
               <td className="py-1.5">{p.name}</td>
               <td>{p.role}</td>
               <td>{p.serieATeam}</td>
-              <td>{p.starter ? "Sì" : "-"}</td>
+              <td>
+                <button
+                  type="button"
+                  onClick={() => toggleStarter(p)}
+                  title="Titolare (clicca per cambiare)"
+                  className="text-xs"
+                >
+                  {p.starter ? "Sì" : "-"}
+                </button>
+              </td>
               <td>{p.fantasyTeam ? p.fantasyTeam.name : "Svincolato"}</td>
               <td>{p.cost ?? "-"}</td>
               <td>
-                <button onClick={() => toggleWatchlist(p)} title="Watchlist">
+                <button type="button" onClick={() => toggleWatchlist(p)} title="Watchlist">
                   {p.watchlist ? "★" : "☆"}
                 </button>
               </td>
               <td>
                 {p.fantasyTeam ? (
-                  <button onClick={() => unassign(p)} className="text-red-600 text-xs">
+                  <button type="button" onClick={() => unassign(p)} className="text-red-600 text-xs">
                     Svincola
                   </button>
                 ) : teams.length > 0 ? (
-                  <button onClick={() => setAssigning(p)} className="text-blue-600 text-xs">
+                  <button type="button" onClick={() => setAssigning(p)} className="text-blue-600 text-xs">
                     Assegna
                   </button>
                 ) : (
@@ -123,8 +154,7 @@ function AssignModal({
     });
 
     if (!res.ok) {
-      const body = await res.json();
-      setError(body.error ?? "Errore");
+      setError(await errorMessage(res));
       return;
     }
 

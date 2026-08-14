@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { errorMessage } from "@/lib/http";
 
 const ROLES = ["GK", "DEF", "MID", "FWD"];
 
@@ -25,8 +26,7 @@ export default function AddPlayerForm() {
     });
 
     if (!res.ok) {
-      const body = await res.json();
-      setError(body.error ?? "Errore");
+      setError(await errorMessage(res));
       return;
     }
 
