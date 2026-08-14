@@ -24,46 +24,42 @@ export default function TeamCard({
         <span className="text-ink-dim"> / {team.totalCredits}</span>
       </div>
 
-      <div className="flex flex-wrap gap-1.5">
-        {ROLE_ORDER.map((role) => (
-          <div
-            key={role}
-            className={`rounded-lg px-2 py-1 text-center font-mono text-[11px] font-bold tabular-nums ${ROLE_PILL_BG[role]}`}
-          >
-            {role} {team.roleCounts[role]}/{roleLimits[role]}
-          </div>
-        ))}
-      </div>
-
       <div className="flex flex-col gap-3">
         {ROLE_ORDER.map((role) => {
           const rolePlayers = team.players.filter((p) => p.role === role);
-          if (rolePlayers.length === 0) return null;
           return (
             <div key={role}>
-              <h3 className="mb-1 text-[10.5px] font-bold uppercase tracking-[0.04em] text-ink-faint">
-                {ROLE_LABELS[role]}
-              </h3>
-              <ul className="flex flex-col gap-0.5">
-                {rolePlayers.map((p) => (
-                  <li key={p.id} className="flex items-center justify-between gap-2 py-0.5">
-                    <span className="min-w-0 truncate text-[12.5px] font-bold">
-                      {p.name}{" "}
-                      <span className="font-semibold text-ink-dim">({p.serieATeam})</span>
-                    </span>
-                    <span className="flex flex-shrink-0 items-center gap-2">
-                      <span className="font-mono text-[12px] font-bold tabular-nums">{p.cost}</span>
-                      <ReleasePlayerButton playerId={p.id} playerName={p.name} />
-                    </span>
-                  </li>
-                ))}
-              </ul>
+              <div className="mb-1 flex items-center gap-1.5">
+                <h3 className="text-[10.5px] font-bold uppercase tracking-[0.04em] text-ink-faint">
+                  {ROLE_LABELS[role]}
+                </h3>
+                <span
+                  className={`rounded-lg px-2 py-0.5 text-center font-mono text-[10.5px] font-bold tabular-nums ${ROLE_PILL_BG[role]}`}
+                >
+                  {role} {team.roleCounts[role]}/{roleLimits[role]}
+                </span>
+              </div>
+              {rolePlayers.length > 0 ? (
+                <ul className="flex flex-col gap-0.5">
+                  {rolePlayers.map((p) => (
+                    <li key={p.id} className="flex items-center justify-between gap-2 py-0.5">
+                      <span className="min-w-0 truncate text-[12.5px] font-bold">
+                        {p.name}{" "}
+                        <span className="font-semibold text-ink-dim">({p.serieATeam})</span>
+                      </span>
+                      <span className="flex flex-shrink-0 items-center gap-2">
+                        <span className="font-mono text-[12px] font-bold tabular-nums">{p.cost}</span>
+                        <ReleasePlayerButton playerId={p.id} playerName={p.name} />
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-[11px] text-ink-dim">Nessuno.</p>
+              )}
             </div>
           );
         })}
-        {team.players.length === 0 && (
-          <p className="text-xs text-ink-dim">Nessun giocatore assegnato.</p>
-        )}
       </div>
     </div>
   );
