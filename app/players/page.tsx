@@ -1,7 +1,7 @@
 import { getFilteredPlayers } from "@/lib/players";
 import { getTeamsWithRoster, getDistinctSerieATeams } from "@/lib/teams";
 import { getLeagueSettings, getRoleLimit } from "@/lib/leagueSettings";
-import { ROLE_ORDER, type Role } from "@/lib/roles";
+import { ROLE_ORDER, type Role, parseRoleParam } from "@/lib/roles";
 import PlayerFilters from "./PlayerFilters";
 import PlayersTable from "./PlayersTable";
 
@@ -14,7 +14,7 @@ export default async function PlayersPage({
 }) {
   const params = await searchParams;
   const filters = {
-    role: params.role,
+    role: parseRoleParam(params.role),
     serieATeam: params.serieATeam,
     freeAgentOnly: params.freeAgentOnly === "true",
     starterOnly: params.starterOnly === "true",

@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getFilteredPlayers } from "@/lib/players";
-import { isValidRole } from "@/lib/roles";
+import { isValidRole, parseRoleParam } from "@/lib/roles";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
 
   const players = await getFilteredPlayers({
-    role: searchParams.get("role") ?? undefined,
+    role: parseRoleParam(searchParams.get("role")),
     serieATeam: searchParams.get("serieATeam") ?? undefined,
     freeAgentOnly: searchParams.get("freeAgentOnly") === "true",
     starterOnly: searchParams.get("starterOnly") === "true",

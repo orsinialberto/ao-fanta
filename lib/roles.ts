@@ -11,3 +11,8 @@ export const ROLE_LABELS: Record<Role, string> = {
 export function isValidRole(value: string): value is Role {
   return (ROLE_ORDER as readonly string[]).includes(value);
 }
+
+export function parseRoleParam(value?: string | null): Role[] {
+  if (!value) return [];
+  return value.split(",").filter(isValidRole);
+}

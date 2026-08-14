@@ -3,7 +3,7 @@ import type { Prisma } from "@prisma/client";
 import { normalize } from "@/lib/normalize";
 
 export type PlayerFilters = {
-  role?: string;
+  role?: string[];
   serieATeam?: string;
   freeAgentOnly?: boolean;
   starterOnly?: boolean;
@@ -14,7 +14,7 @@ export type PlayerFilters = {
 export async function getFilteredPlayers(filters: PlayerFilters) {
   const where: Prisma.PlayerWhereInput = {};
 
-  if (filters.role) where.role = filters.role;
+  if (filters.role && filters.role.length > 0) where.role = { in: filters.role };
   if (filters.serieATeam) where.serieATeam = filters.serieATeam;
   if (filters.freeAgentOnly) where.fantasyTeamId = null;
   if (filters.starterOnly) where.starter = true;
@@ -35,4 +35,13 @@ export async function getFilteredPlayers(filters: PlayerFilters) {
 
   const needle = normalize(filters.search);
   return players.filter((p) => normalize(p.name).includes(needle));
+}
+
+export async function getRecentAcquisitions(limit = 5) {
+  return prisma.player.findMany({
+    where: { fantasyTeamId: { not: null } },
+    include: { fantasyTeam: { select: { id: true, name: true } } },
+    orderBy: { assignedAt: "desc" },
+    take: limit,
+  });
 }
