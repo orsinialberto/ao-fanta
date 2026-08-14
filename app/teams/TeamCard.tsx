@@ -19,11 +19,6 @@ export default function TeamCard({
         <span className="text-xs text-ink-dim">{team.coach}</span>
       </div>
 
-      <div className="text-right font-mono text-[13px] font-bold tabular-nums">
-        {team.remainingCredits}
-        <span className="text-ink-dim"> / {team.totalCredits}</span>
-      </div>
-
       <div className="flex flex-col gap-3">
         {ROLE_ORDER.map((role) => {
           const rolePlayers = team.players.filter((p) => p.role === role);
@@ -57,6 +52,11 @@ export default function TeamCard({
             </div>
           );
         })}
+      </div>
+
+      <div className="text-right font-mono text-[13px] font-bold tabular-nums">
+        {team.remainingCredits}
+        <span className="text-ink-dim"> / {team.totalCredits}</span>
       </div>
     </div>
   );
