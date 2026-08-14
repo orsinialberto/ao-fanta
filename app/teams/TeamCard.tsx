@@ -14,9 +14,9 @@ export default function TeamCard({
 }) {
   return (
     <div className="flex flex-col gap-3.5 rounded-2xl border border-border bg-surface p-[18px] shadow-sm">
-      <div>
+      <div className="flex items-baseline gap-1.5">
         <h2 className="text-[14.5px] font-extrabold">{team.name}</h2>
-        <p className="text-xs text-ink-dim">{team.coach}</p>
+        <span className="text-xs text-ink-dim">{team.coach}</span>
       </div>
 
       <div className="font-mono text-[13px] font-bold tabular-nums">

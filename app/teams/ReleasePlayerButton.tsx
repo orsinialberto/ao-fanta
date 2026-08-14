@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { Trash2 } from "lucide-react";
 import { errorMessage } from "@/lib/http";
 
 export default function ReleasePlayerButton({
@@ -33,9 +34,11 @@ export default function ReleasePlayerButton({
     <button
       type="button"
       onClick={handleRelease}
-      className="text-red-600 text-xs hover:underline"
+      title="Svincola"
+      aria-label={`Svincola ${playerName}`}
+      className="flex-shrink-0 text-ink-faint hover:text-coral"
     >
-      Svincola
+      <Trash2 size={14} strokeWidth={1.8} />
     </button>
   );
 }
