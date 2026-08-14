@@ -50,11 +50,11 @@ export async function POST(req: NextRequest) {
     if (existing) {
       await prisma.player.update({
         where: { id: existing.id },
-        data: { role: roleRaw as never, serieATeam },
+        data: { role: roleRaw, serieATeam },
       });
     } else {
       await prisma.player.create({
-        data: { name, role: roleRaw as never, serieATeam },
+        data: { name, role: roleRaw, serieATeam },
       });
     }
     imported++;
