@@ -19,15 +19,25 @@ model Team {
 model Player {
   id            String   @id @default(uuid())
   name          String
-  role          String   // P, D, C, A
+  role          String
   serieATeam    String
   fantasyTeamId String?
   fantasyTeam   Team?    @relation(fields: [fantasyTeamId], references: [id])
   cost          Int?
   starter       Boolean  @default(false)
   watchlist     Boolean  @default(false)
-  createdAt     DateTime @default(now())
+  assignedAt    DateTime?
+  createdAt    DateTime @default(now())
 
   @@index([fantasyTeamId])
   @@index([role])
+}
+
+model LeagueSettings {
+  id             String @id @default("singleton")
+  limitP         Int    @default(3)
+  limitD         Int    @default(8)
+  limitC         Int    @default(8)
+  limitA         Int    @default(6)
+  defaultCredits Int    @default(500)
 }
