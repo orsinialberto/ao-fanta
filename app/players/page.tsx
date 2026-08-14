@@ -37,7 +37,6 @@ export default async function PlayersPage({
     <div className="space-y-4">
       <div>
         <h1 className="text-[22px] font-extrabold">Listone</h1>
-        <p className="text-sm text-ink-dim">{players.length} giocatori</p>
       </div>
       <PlayerSearchBar />
       <FilterPanel serieATeams={serieATeams} resultCount={players.length} />
