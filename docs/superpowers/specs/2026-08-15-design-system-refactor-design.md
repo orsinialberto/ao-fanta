@@ -37,7 +37,7 @@ stessi dati per pagina. Libertà di riorganizzare i layout **interni** alle pagi
 | 3 | Sei raggi diversi, `--radius` definito ma ignorato | `rounded-2xl`, `[20px]`, `[14px]`, `[13px]`, `[11px]`, `rounded-lg` |
 | 4 | Spacing arbitrario | `layout.tsx:26`, tutte le card |
 | 5 | Zero motion — nessuna `transition` nel progetto | tutto |
-| 6 | `alert()` per gli errori | `PlayersTable.tsx:110,124` |
+| 6 | Dialog native di sistema: due `alert()`, più la catena `confirm()` → `prompt("Digita ELIMINA")` → `alert()` per lo svuotamento del listone | `PlayersTable.tsx:110,124` · `WipePlayersButton.tsx:9,14,22` |
 | 7 | Griglie a colonne fisse | `teams/page.tsx:24`, `page.tsx:105` |
 | 8 | Coral significa sia "ruolo Attaccante" sia "azione distruttiva" | `roleStyles.ts` vs `PlayersTable.tsx:213` |
 | 9 | Ruolo: `RoleBadge` colorato altrove, lettera nuda in tabella | `PlayersTable.tsx:180` |
@@ -45,6 +45,8 @@ stessi dati per pagina. Libertà di riorganizzare i layout **interni** alle pagi
 | 11 | Crediti squadra in fondo a destra: il dato più importante è il meno visibile | `TeamCard.tsx:66` |
 | 12 | Nessuno skeleton, nessun empty state progettato | nessun `loading.tsx` |
 | 13 | Gradient peach solo nella card sidebar: unico gradient dell'app | `Sidebar.tsx:53` |
+| 14 | Palette Tailwind cruda fuori dai token: `border-red-300 text-red-600 rounded` — un rosso che non esiste altrove nell'app | `WipePlayersButton.tsx:29` |
+| 15 | `RoleFilter` duplica i chip di ruolo di `FilterPanel`: stesse quattro classi copiate in due file | `watchlist/RoleFilter.tsx:6` |
 
 ## Token
 
@@ -164,20 +166,39 @@ Il bottone di rilascio compare in hover sulla riga del giocatore.
 
 ### `/watchlist` Wishlist
 
-Riusa `ListoneToolbar` e la tabella del Listone. Nessun layout proprio.
+Nessun layout proprio: monta `ListoneToolbar` e la tabella del Listone, configurate senza colonna
+Costo e senza i toggle di stato — la rotta *è* già il filtro. `RoleFilter` viene eliminato (fix
+problema 15): i chip di ruolo esistono in un solo posto.
+
+Ora che il pannello è uscito da `/`, questa è l'unica pagina che mostra la wishlist.
 
 ### `/settings` Impostazioni
 
-Da griglia 2×2 di card con icona a **sezioni impilate** larghe max 640px: titolo, hairline, contenuto.
-Le impostazioni sono un documento, non una dashboard. `WipePlayersButton` isolato in una zona
-distruttiva in fondo.
+È la pagina che cambia di più. Da griglia 2×2 di cinque card con icona — l'ultima spaiata su una riga
+da sola — a **sezioni impilate** larghe max 640px: titolo, hairline, contenuto, come il resto della
+pagina. Qui non si consulta niente, si configura una cosa alla volta e di rado.
+
+Ordine delle sezioni, dal più usato al meno: Regole lega, Squadre, Listone, Giocatori (ricerca +
+modifica ruolo/titolare + aggiunta fuori listone, oggi divisi fra `PlayersCard` e `EditPlayerCard`),
+Zona pericolosa.
+
+Le icone in riquadro colorato spariscono. Erano l'unico consumatore dei tre gradient `lavender`,
+`mint` e `peach` di `tailwind.config.ts`, che escono dal progetto insieme a loro.
+
+**Zona pericolosa.** `WipePlayersButton` va isolato in fondo, su fondo `--danger-bg` con bordo
+`--danger-line`. Le classi Tailwind crude passano ai token (fix problema 14) e la catena di tre dialog
+native diventa una sola dialog Radix con la conferma digitata dentro (parte del fix del problema 6).
 
 ## Componenti condivisi nuovi
 
 - **PageHeader** — titolo + sottotitolo + hairline, usato dalle cinque pagine.
 - **ListoneToolbar** — fusione di `PlayerSearchBar` e `FilterPanel`, usata da `/players` e `/watchlist`.
 - **EmptyState** — icona leggera + frase + azione. Oggi gli stati vuoti sono solo testo grigio.
-- **InlineError** — banner di errore dentro form e dialog. Elimina i due `alert()` (fix problema 6).
+- **InlineError** — banner di errore dentro form e dialog, con il messaggio che dice cosa è successo
+  *e* come uscirne. `AssignDialog.tsx:130` ci va già vicino con i warning inline su budget e limite di
+  ruolo: quel pattern diventa il componente condiviso (fix problema 6).
+- **ConfirmDialog** — dialog Radix con conferma digitata, per le azioni irreversibili. Sostituisce la
+  catena `confirm()` / `prompt()` / `alert()` di `WipePlayersButton`.
 - **loading.tsx** per rotta, con skeleton costruiti su hairline.
 
 ## Componenti rimossi
@@ -185,6 +206,9 @@ distruttiva in fondo.
 - **WishlistPanel** (`app/components/WishlistPanel.tsx`) — la Wishlist esce da `/`, vedi sopra. Va
   rimossa anche la chiamata `getFilteredPlayers({ watchlistOnly: true, freeAgentOnly: true })` da
   `app/page.tsx:16`, ora senza consumatori in quella pagina.
+- **RoleFilter** (`app/watchlist/RoleFilter.tsx`) — assorbito da `ListoneToolbar` (fix problema 15).
+- **I tre gradient** `lavender` / `mint` / `peach` in `tailwind.config.ts` — restano senza consumatori
+  una volta tolte le icone in riquadro da Impostazioni e la card "Stato asta" dalla sidebar.
 
 ## Stack
 
@@ -205,6 +229,7 @@ Modifiche alle rotte o a quale contenuto sta su quale pagina.
 
 - Nessun arbitrary value di dimensione testo, raggio o spacing resta nel codice applicativo: tutti i
   valori vengono dai token `@theme`.
-- I tredici problemi elencati in Diagnosi sono chiusi.
+- I quindici problemi elencati in Diagnosi sono chiusi.
+- Nessuna dialog nativa (`alert`, `confirm`, `prompt`) resta nel codice.
 - `npm run build` passa e `npm run test` passa.
 - Le cinque rotte rese a schermo corrispondono ai mockup approvati.
