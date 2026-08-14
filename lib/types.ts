@@ -1,7 +1,10 @@
+import type { Role } from "@/lib/roles";
+
 export type TeamSummary = {
   id: string;
   name: string;
   remainingCredits: number;
+  roleCounts: Record<Role, number>;
 };
 
 export type PlayerWithTeam = {

@@ -41,7 +41,12 @@ export default async function PlayersPage({
       <PlayerFilters />
       <PlayersTable
         players={players}
-        teams={teams.map((t) => ({ id: t.id, name: t.name, remainingCredits: t.remainingCredits }))}
+        teams={teams.map((t) => ({
+          id: t.id,
+          name: t.name,
+          remainingCredits: t.remainingCredits,
+          roleCounts: t.roleCounts,
+        }))}
       />
     </div>
   );

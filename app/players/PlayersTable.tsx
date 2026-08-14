@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { PlayerWithTeam, TeamSummary } from "@/lib/types";
 import { errorMessage } from "@/lib/http";
+import { ROLE_LABELS, ROLE_LIMITS, isValidRole } from "@/lib/roles";
 
 export default function PlayersTable({
   players,
@@ -142,6 +143,9 @@ function AssignModal({
 
   const selectedTeam = teams.find((t) => t.id === teamId);
   const overBudget = selectedTeam ? cost > selectedTeam.remainingCredits : false;
+  const role = isValidRole(player.role) ? player.role : null;
+  const roleFull =
+    selectedTeam && role ? selectedTeam.roleCounts[role] >= ROLE_LIMITS[role] : false;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -193,12 +197,22 @@ function AssignModal({
             Attenzione: costo superiore ai crediti residui della squadra.
           </p>
         )}
+        {roleFull && role && (
+          <p className="text-red-600 text-sm">
+            Limite raggiunto per ruolo {ROLE_LABELS[role]} ({selectedTeam!.roleCounts[role]}/
+            {ROLE_LIMITS[role]}).
+          </p>
+        )}
         {error && <p className="text-red-600 text-sm">{error}</p>}
         <div className="flex gap-2 justify-end">
           <button type="button" onClick={onClose} className="text-sm text-gray-500">
             Annulla
           </button>
-          <button type="submit" className="px-3 py-1 bg-green-600 text-white rounded text-sm">
+          <button
+            type="submit"
+            disabled={roleFull}
+            className="px-3 py-1 bg-green-600 text-white rounded text-sm disabled:opacity-40"
+          >
             Conferma
           </button>
         </div>

@@ -3,14 +3,13 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { errorMessage } from "@/lib/http";
-
-const ROLES = ["P", "D", "C", "A"];
+import { ROLE_ORDER } from "@/lib/roles";
 
 export default function AddPlayerForm() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
-  const [role, setRole] = useState("P");
+  const [role, setRole] = useState<string>(ROLE_ORDER[0]);
   const [serieATeam, setSerieATeam] = useState("");
   const [starter, setStarter] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -67,7 +66,7 @@ export default function AddPlayerForm() {
           onChange={(e) => setRole(e.target.value)}
           className="border rounded px-2 py-1 w-full text-sm"
         >
-          {ROLES.map((r) => (
+          {ROLE_ORDER.map((r) => (
             <option key={r} value={r}>
               {r}
             </option>

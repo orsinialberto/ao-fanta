@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-
-const VALID_ROLES = ["P", "D", "C", "A"];
+import { isValidRole, ROLE_LABELS, ROLE_LIMITS } from "@/lib/roles";
 
 export async function PATCH(
   req: NextRequest,
@@ -13,7 +12,7 @@ export async function PATCH(
 
   if (body.name !== undefined) data.name = body.name;
   if (body.role !== undefined) {
-    if (!VALID_ROLES.includes(body.role)) {
+    if (!isValidRole(body.role)) {
       return NextResponse.json({ error: "Invalid role" }, { status: 400 });
     }
     data.role = body.role;
@@ -33,6 +32,27 @@ export async function PATCH(
           { status: 400 }
         );
       }
+
+      const player = await prisma.player.findUnique({ where: { id }, select: { role: true } });
+      if (!player) {
+        return NextResponse.json({ error: "Player not found" }, { status: 404 });
+      }
+      const role = isValidRole(body.role) ? body.role : player.role;
+      if (isValidRole(role)) {
+        const roleCount = await prisma.player.count({
+          where: { fantasyTeamId: body.fantasyTeamId, role, id: { not: id } },
+        });
+        const limit = ROLE_LIMITS[role];
+        if (roleCount >= limit) {
+          return NextResponse.json(
+            {
+              error: `Limite raggiunto per ruolo ${ROLE_LABELS[role]} (${limit}/${limit})`,
+            },
+            { status: 400 }
+          );
+        }
+      }
+
       data.fantasyTeamId = body.fantasyTeamId;
       data.cost = body.cost;
     }

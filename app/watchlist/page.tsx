@@ -15,7 +15,12 @@ export default async function WatchlistPage() {
       <h1 className="text-2xl font-bold">Watchlist</h1>
       <PlayersTable
         players={players}
-        teams={teams.map((t) => ({ id: t.id, name: t.name, remainingCredits: t.remainingCredits }))}
+        teams={teams.map((t) => ({
+          id: t.id,
+          name: t.name,
+          remainingCredits: t.remainingCredits,
+          roleCounts: t.roleCounts,
+        }))}
       />
     </div>
   );

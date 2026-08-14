@@ -2,8 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-
-const ROLES = ["P", "D", "C", "A"];
+import { ROLE_ORDER } from "@/lib/roles";
 const DEBOUNCE_MS = 250;
 
 export default function PlayerFilters() {
@@ -74,7 +73,7 @@ export default function PlayerFilters() {
         className="border rounded px-2 py-1 text-sm"
       >
         <option value="">Tutti i ruoli</option>
-        {ROLES.map((r) => (
+        {ROLE_ORDER.map((r) => (
           <option key={r} value={r}>
             {r}
           </option>

@@ -1,16 +1,9 @@
 import { getTeamsWithRoster } from "@/lib/teams";
+import { ROLE_ORDER, ROLE_LABELS, ROLE_LIMITS } from "@/lib/roles";
 import TeamForm from "./TeamForm";
 import DeleteTeamButton from "./DeleteTeamButton";
 
 export const dynamic = "force-dynamic";
-
-const ROLE_ORDER = ["P", "D", "C", "A"] as const;
-const ROLE_LABELS: Record<string, string> = {
-  P: "Portieri",
-  D: "Difensori",
-  C: "Centrocampisti",
-  A: "Attaccanti",
-};
 
 export default async function TeamsPage() {
   const teams = await getTeamsWithRoster();
@@ -35,6 +28,13 @@ export default async function TeamsPage() {
                   Spesi: {team.spentCredits} / {team.totalCredits}
                 </p>
                 <p className="font-semibold">Residui: {team.remainingCredits}</p>
+                <p className="text-sm text-gray-500 space-x-2">
+                  {ROLE_ORDER.map((role) => (
+                    <span key={role} title={ROLE_LABELS[role]}>
+                      {role} {team.roleCounts[role]}/{ROLE_LIMITS[role]}
+                    </span>
+                  ))}
+                </p>
               </div>
               <TeamForm mode="edit" team={team} />
               <DeleteTeamButton teamId={team.id} disabled={team.players.length > 0} />
