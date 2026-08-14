@@ -1,10 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import type { PlayerWithTeam, TeamSummary } from "@/lib/types";
 import { errorMessage } from "@/lib/http";
-import { ROLE_LABELS, ROLE_LIMITS, isValidRole } from "@/lib/roles";
+import { ROLE_LABELS, ROLE_LIMITS, isValidRole, ROLE_ORDER } from "@/lib/roles";
+
+type SortKey = "name" | "role" | "serieATeam" | "starter" | "fantasyTeam" | "cost" | "watchlist";
+type SortState = { key: SortKey; dir: "asc" | "desc" };
 
 export default function PlayersTable({
   players,
@@ -15,6 +18,68 @@ export default function PlayersTable({
 }) {
   const router = useRouter();
   const [assigning, setAssigning] = useState<PlayerWithTeam | null>(null);
+  const [sort, setSort] = useState<SortState | null>(null);
+
+  const sortedPlayers = useMemo(() => {
+    if (!sort) return players;
+
+    const sorted = [...players];
+    sorted.sort((a, b) => {
+      let aVal: string | number | boolean = "";
+      let bVal: string | number | boolean = "";
+
+      switch (sort.key) {
+        case "name":
+          aVal = a.name.toLowerCase();
+          bVal = b.name.toLowerCase();
+          break;
+        case "role":
+          aVal = a.role;
+          bVal = b.role;
+          break;
+        case "serieATeam":
+          aVal = a.serieATeam.toLowerCase();
+          bVal = b.serieATeam.toLowerCase();
+          break;
+        case "starter":
+          aVal = a.starter ? 1 : 0;
+          bVal = b.starter ? 1 : 0;
+          break;
+        case "fantasyTeam":
+          aVal = (a.fantasyTeam?.name ?? "").toLowerCase();
+          bVal = (b.fantasyTeam?.name ?? "").toLowerCase();
+          break;
+        case "cost":
+          aVal = a.cost ?? 0;
+          bVal = b.cost ?? 0;
+          break;
+        case "watchlist":
+          aVal = a.watchlist ? 1 : 0;
+          bVal = b.watchlist ? 1 : 0;
+          break;
+      }
+
+      if (aVal < bVal) return sort.dir === "asc" ? -1 : 1;
+      if (aVal > bVal) return sort.dir === "asc" ? 1 : -1;
+      return 0;
+    });
+
+    return sorted;
+  }, [players, sort]);
+
+  function toggleSort(key: SortKey) {
+    setSort((current) => {
+      if (current?.key === key) {
+        return { key, dir: current.dir === "asc" ? "desc" : "asc" };
+      }
+      return { key, dir: "asc" };
+    });
+  }
+
+  function getSortIndicator(key: SortKey) {
+    if (sort?.key !== key) return "";
+    return sort.dir === "asc" ? " ▲" : " ▼";
+  }
 
   async function toggleWatchlist(player: PlayerWithTeam) {
     const res = await fetch(`/api/players/${player.id}`, {
@@ -55,26 +120,86 @@ export default function PlayersTable({
     router.refresh();
   }
 
+  async function changeRole(player: PlayerWithTeam, newRole: string) {
+    const res = await fetch(`/api/players/${player.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ role: newRole }),
+    });
+    if (!res.ok) {
+      alert(await errorMessage(res));
+      return;
+    }
+    router.refresh();
+  }
+
   return (
     <>
       <table className="w-full text-sm border-collapse">
         <thead>
           <tr className="text-left border-b">
-            <th className="py-2">Nome</th>
-            <th>Ruolo</th>
-            <th>Squadra Serie A</th>
-            <th>Titolare</th>
-            <th>Stato</th>
-            <th>Costo</th>
-            <th>Watchlist</th>
+            <th
+              className="py-2 cursor-pointer hover:bg-gray-100"
+              onClick={() => toggleSort("name")}
+            >
+              Nome{getSortIndicator("name")}
+            </th>
+            <th
+              className="cursor-pointer hover:bg-gray-100"
+              onClick={() => toggleSort("role")}
+            >
+              Ruolo{getSortIndicator("role")}
+            </th>
+            <th
+              className="cursor-pointer hover:bg-gray-100"
+              onClick={() => toggleSort("serieATeam")}
+            >
+              Squadra Serie A{getSortIndicator("serieATeam")}
+            </th>
+            <th
+              className="cursor-pointer hover:bg-gray-100"
+              onClick={() => toggleSort("starter")}
+            >
+              Titolare{getSortIndicator("starter")}
+            </th>
+            <th
+              className="cursor-pointer hover:bg-gray-100"
+              onClick={() => toggleSort("fantasyTeam")}
+            >
+              Stato{getSortIndicator("fantasyTeam")}
+            </th>
+            <th
+              className="cursor-pointer hover:bg-gray-100"
+              onClick={() => toggleSort("cost")}
+            >
+              Costo{getSortIndicator("cost")}
+            </th>
+            <th
+              className="cursor-pointer hover:bg-gray-100"
+              onClick={() => toggleSort("watchlist")}
+            >
+              Watchlist{getSortIndicator("watchlist")}
+            </th>
             <th></th>
           </tr>
         </thead>
         <tbody>
-          {players.map((p) => (
+          {sortedPlayers.map((p) => (
             <tr key={p.id} className="border-b">
               <td className="py-1.5">{p.name}</td>
-              <td>{p.role}</td>
+              <td>
+                <select
+                  value={p.role}
+                  onChange={(e) => changeRole(p, e.target.value)}
+                  className="border rounded px-1 py-0.5 text-sm"
+                >
+                  {ROLE_ORDER.map((r) => (
+                    <option key={r} value={r}>
+                      {r}
+                    </option>
+                  ))}
+                </select>
+              </td>
               <td>{p.serieATeam}</td>
               <td>
                 <button
