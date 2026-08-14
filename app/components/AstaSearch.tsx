@@ -11,14 +11,6 @@ import type { Role } from "@/lib/roles";
 
 const DEBOUNCE_MS = 200;
 
-function Kbd({ children }: { children: React.ReactNode }) {
-  return (
-    <kbd className="mr-1 rounded border border-border bg-surface-2 px-[5px] py-px font-mono text-[10px]">
-      {children}
-    </kbd>
-  );
-}
-
 export default function AstaSearch({
   teams,
   roleLimits,
@@ -82,10 +74,6 @@ export default function AstaSearch({
 
   return (
     <div className="rounded-[20px] border border-border bg-surface p-5 shadow-sm">
-      <div className="mb-3 flex items-center gap-2 text-[13px] font-bold text-ink-dim">
-        <Search size={15} strokeWidth={1.8} />
-        Chi è in asta?
-      </div>
       <div className="relative">
         <Search className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-faint" size={18} />
         <input
@@ -136,18 +124,6 @@ export default function AstaSearch({
           )}
         </div>
       )}
-
-      <div className="flex gap-3.5 px-1.5 pb-0.5 pt-2 text-[11.5px] text-ink-faint">
-        <span>
-          <Kbd>↑↓</Kbd>naviga
-        </span>
-        <span>
-          <Kbd>↵</Kbd>assegna
-        </span>
-        <span>
-          <Kbd>esc</Kbd>chiudi
-        </span>
-      </div>
 
       <AssignDialog
         player={assigning}
