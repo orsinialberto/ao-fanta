@@ -29,7 +29,15 @@ function NavLink({ href, label, icon: Icon }: { href: string; label: string; ico
   );
 }
 
-export default function Sidebar() {
+export default function Sidebar({
+  assignedCount,
+  totalCount,
+}: {
+  assignedCount: number;
+  totalCount: number;
+}) {
+  const pct = totalCount > 0 ? Math.round((assignedCount / totalCount) * 100) : 0;
+
   return (
     <aside className="sticky top-0 flex h-screen w-[238px] flex-col gap-6 border-r border-border bg-surface p-5">
       <div className="flex items-center gap-2.5 px-1">
@@ -54,6 +62,16 @@ export default function Sidebar() {
           <NavLink key={l.href} {...l} />
         ))}
       </nav>
+
+      <div className="mt-auto rounded-2xl bg-gradient-to-br from-coral-soft to-surface-2 p-4">
+        <div className="mb-2 text-[11px] font-bold">Stato asta</div>
+        <div className="mb-2 h-1.5 overflow-hidden rounded-full bg-black/10">
+          <div className="h-full rounded-full bg-coral" style={{ width: `${pct}%` }} />
+        </div>
+        <div className="text-[11px] text-ink-dim">
+          <span className="font-mono font-bold text-ink">{assignedCount}</span> / {totalCount} giocatori assegnati
+        </div>
+      </div>
     </aside>
   );
 }
