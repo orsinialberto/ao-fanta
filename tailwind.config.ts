@@ -1,7 +1,9 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
-  content: ["./app/**/*.{ts,tsx}"],
+  // lib/ holds shared class-name maps (roleStyles.ts); without it Tailwind
+  // silently drops any utility that appears only there.
+  content: ["./app/**/*.{ts,tsx}", "./lib/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}"],
   theme: {
     extend: {
       colors: {
@@ -44,6 +46,7 @@ const config: Config = {
         "surface-2": "var(--surface-2)",
         ink: "var(--ink)",
         "ink-dim": "var(--ink-dim)",
+        "ink-faint": "var(--ink-faint)",
         indigo: { DEFAULT: "var(--indigo)", soft: "var(--indigo-soft)" },
         coral: { DEFAULT: "var(--coral)", soft: "var(--coral-soft)" },
         teal: { DEFAULT: "var(--teal)", soft: "var(--teal-soft)" },
@@ -53,6 +56,17 @@ const config: Config = {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+      },
+      backgroundImage: {
+        lavender: "linear-gradient(160deg, var(--lavender-a), var(--lavender-b))",
+        peach: "linear-gradient(160deg, var(--peach-a), var(--peach-b))",
+        mint: "linear-gradient(160deg, var(--mint-a), var(--mint-b))",
+      },
+      boxShadow: {
+        sm: "var(--shadow-sm)",
+        DEFAULT: "var(--shadow-sm)",
+        md: "var(--shadow-md)",
+        lg: "var(--shadow-lg)",
       },
       fontFamily: {
         sans: ["var(--font-manrope)", "ui-sans-serif", "system-ui", "sans-serif"],

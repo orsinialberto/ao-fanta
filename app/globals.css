@@ -31,6 +31,7 @@
     --surface-2: #F5F6FA;
     --ink: #1B1D28;
     --ink-dim: #8A8D9B;
+    --ink-faint: #C3C5D1;
     --indigo: #5B4FE9;
     --indigo-soft: #EDEBFC;
     --coral: #F0654B;
@@ -39,5 +40,29 @@
     --teal-soft: #E1F6EC;
     --amber: #C98A1B;
     --amber-soft: #FBEEDA;
+
+    /* Card gradient pairs */
+    --lavender-a: #E4E1FA;
+    --lavender-b: #F7F5FE;
+    --peach-a: #FCE0D6;
+    --peach-b: #FCEDEA;
+    --mint-a: #D7F3E1;
+    --mint-b: #EAFBF0;
+
+    --shadow-sm: 0 1px 2px rgba(27, 29, 40, 0.04), 0 1px 1px rgba(27, 29, 40, 0.03);
+    --shadow-md: 0 8px 24px rgba(27, 29, 40, 0.07), 0 2px 6px rgba(27, 29, 40, 0.04);
+    --shadow-lg: 0 24px 64px rgba(27, 29, 40, 0.18);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    text-wrap: balance;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--indigo);
+    outline-offset: 2px;
   }
 }

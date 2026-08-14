@@ -2,7 +2,11 @@ import { getFilteredPlayers, getRecentAcquisitions } from "@/lib/players";
 import { getTeamsWithRoster } from "@/lib/teams";
 import { getLeagueSettings, getRoleLimit } from "@/lib/leagueSettings";
 import { ROLE_ORDER } from "@/lib/roles";
+import { ROLE_PILL_BG } from "@/lib/roleStyles";
+import { groupByDay } from "@/lib/dates";
 import AstaSearch from "@/app/components/AstaSearch";
+import WishlistPanel from "@/app/components/WishlistPanel";
+import RoleBadge from "@/app/components/RoleBadge";
 
 export const dynamic = "force-dynamic";
 
@@ -17,6 +21,8 @@ export default async function AstaPage() {
   const roleLimits = Object.fromEntries(
     ROLE_ORDER.map((r) => [r, getRoleLimit(leagueSettings, r)])
   ) as Record<(typeof ROLE_ORDER)[number], number>;
+
+  const recentByDay = groupByDay(recent, (p) => p.assignedAt);
 
   const teamSummaries = teams.map((t) => ({
     id: t.id,
@@ -35,7 +41,7 @@ export default async function AstaPage() {
       <AstaSearch teams={teamSummaries} roleLimits={roleLimits} />
 
       <div>
-        <div className="mb-3 text-[11px] font-bold uppercase tracking-wide text-ink-dim/70">
+        <div className="mb-3 text-[11px] font-bold uppercase tracking-wide text-ink-faint">
           Crediti squadre
         </div>
         <div className="grid grid-cols-3 gap-3.5">
@@ -45,13 +51,13 @@ export default async function AstaPage() {
                 ? Math.round(((t.totalCredits - t.remainingCredits) / t.totalCredits) * 100)
                 : 0;
             return (
-              <div key={t.id} className="rounded-2xl border border-border bg-surface p-4.5 shadow-sm">
+              <div key={t.id} className="rounded-2xl border border-border bg-surface p-[18px] shadow-sm">
                 <div className="mb-3.5 flex items-start justify-between">
                   <div>
                     <div className="text-sm font-extrabold">{t.name}</div>
                     <div className="text-[11.5px] text-ink-dim">{t.players.length} giocatori</div>
                   </div>
-                  <div className="text-right font-mono text-[22px] font-bold">
+                  <div className="text-right font-mono text-[22px] font-bold tabular-nums">
                     {t.remainingCredits}
                     <span className="block font-sans text-[11px] font-semibold text-ink-dim">
                       / {t.totalCredits} cr
@@ -67,8 +73,8 @@ export default async function AstaPage() {
                     return (
                       <div
                         key={role}
-                        className={`rounded-lg py-1.5 text-center font-mono text-[11px] font-bold ${
-                          { P: "bg-teal-soft text-teal", D: "bg-indigo-soft text-indigo", C: "bg-amber-soft text-amber", A: "bg-coral-soft text-coral" }[role]
+                        className={`rounded-lg py-1.5 text-center font-mono text-[11px] font-bold tabular-nums ${
+                          ROLE_PILL_BG[role]
                         } ${full ? "outline outline-[1.5px] -outline-offset-1" : ""}`}
                       >
                         {role} {t.roleCounts[role]}/{roleLimits[role]}
@@ -88,26 +94,36 @@ export default async function AstaPage() {
       </div>
 
       <div className="grid grid-cols-2 gap-3.5">
-        <div className="rounded-2xl border border-border bg-surface p-4.5 shadow-sm">
-          <h3 className="mb-3 text-[13.5px] font-extrabold">Wishlist</h3>
-          {wishlist.length === 0 && <p className="text-xs text-ink-dim">Nessun giocatore in wishlist.</p>}
-          {wishlist.map((p) => (
-            <div key={p.id} className="flex items-center gap-2.5 py-2">
-              <span className="flex-1 text-[13px] font-bold">
-                {p.name} <span className="font-normal text-ink-dim">({p.serieATeam})</span>
-              </span>
-            </div>
-          ))}
-        </div>
-        <div className="rounded-2xl border border-border bg-surface p-4.5 shadow-sm">
-          <h3 className="mb-3 text-[13.5px] font-extrabold">Ultimi acquisti</h3>
+        <WishlistPanel players={wishlist} teams={teamSummaries} roleLimits={roleLimits} />
+
+        <div className="rounded-2xl border border-border bg-surface p-[18px] shadow-sm">
+          <div className="mb-3 flex items-center justify-between">
+            <h3 className="text-[13.5px] font-extrabold">Ultimi acquisti</h3>
+            <span className="text-[11px] font-semibold text-ink-faint">{recent.length} recenti</span>
+          </div>
+
           {recent.length === 0 && <p className="text-xs text-ink-dim">Nessun acquisto ancora.</p>}
-          {recent.map((p) => (
-            <div key={p.id} className="flex items-center gap-2.5 py-2">
-              <span className="flex-1 text-[13px] font-bold">
-                {p.name} <span className="font-normal text-ink-dim">— {p.fantasyTeam?.name}</span>
-              </span>
-              <span className="font-mono text-[12.5px] font-bold text-coral">{p.cost} cr</span>
+
+          {recentByDay.map((group, groupIndex) => (
+            <div key={group.label}>
+              <div
+                className={`mb-1.5 text-[10.5px] font-bold uppercase tracking-[0.04em] text-ink-faint ${
+                  groupIndex === 0 ? "" : "mt-3.5"
+                }`}
+              >
+                {group.label}
+              </div>
+              {group.items.map((p) => (
+                <div key={p.id} className="flex items-center gap-2.5 rounded-lg px-1 py-2">
+                  <RoleBadge role={p.role} size="sm" />
+                  <div className="min-w-0 flex-1 truncate text-[13px] font-bold">
+                    {p.name} <span className="font-semibold text-ink-dim">— {p.fantasyTeam?.name}</span>
+                  </div>
+                  <div className="flex-shrink-0 font-mono text-[12.5px] font-bold tabular-nums text-coral">
+                    {p.cost} cr
+                  </div>
+                </div>
+              ))}
             </div>
           ))}
         </div>

@@ -46,7 +46,7 @@ export default function Sidebar({
       </div>
 
       <nav className="flex flex-col gap-0.5">
-        <div className="mb-2 px-2 text-[10.5px] font-bold uppercase tracking-wide text-ink-dim/70">
+        <div className="mb-2 px-2 text-[10.5px] font-bold uppercase tracking-wide text-ink-faint">
           Principale
         </div>
         {PRIMARY_LINKS.map((l) => (
@@ -55,7 +55,7 @@ export default function Sidebar({
       </nav>
 
       <nav className="flex flex-col gap-0.5">
-        <div className="mb-2 px-2 text-[10.5px] font-bold uppercase tracking-wide text-ink-dim/70">
+        <div className="mb-2 px-2 text-[10.5px] font-bold uppercase tracking-wide text-ink-faint">
           Configurazione
         </div>
         {CONFIG_LINKS.map((l) => (
@@ -63,13 +63,14 @@ export default function Sidebar({
         ))}
       </nav>
 
-      <div className="mt-auto rounded-2xl bg-gradient-to-br from-coral-soft to-surface-2 p-4">
+      <div className="mt-auto rounded-2xl bg-peach p-4">
         <div className="mb-2 text-[11px] font-bold">Stato asta</div>
         <div className="mb-2 h-1.5 overflow-hidden rounded-full bg-black/10">
           <div className="h-full rounded-full bg-coral" style={{ width: `${pct}%` }} />
         </div>
         <div className="text-[11px] text-ink-dim">
-          <span className="font-mono font-bold text-ink">{assignedCount}</span> / {totalCount} giocatori assegnati
+          <span className="font-mono font-bold tabular-nums text-ink">{assignedCount}</span> /{" "}
+          {totalCount} giocatori assegnati
         </div>
       </div>
     </aside>

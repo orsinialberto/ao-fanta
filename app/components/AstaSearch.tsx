@@ -2,13 +2,22 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Search } from "lucide-react";
+import { ChevronRight, Search } from "lucide-react";
 import AssignDialog from "@/app/components/AssignDialog";
 import AddPlayerDialog from "@/app/components/AddPlayerDialog";
+import RoleBadge from "@/app/components/RoleBadge";
 import type { PlayerWithTeam, TeamSummary } from "@/lib/types";
 import type { Role } from "@/lib/roles";
 
 const DEBOUNCE_MS = 200;
+
+function Kbd({ children }: { children: React.ReactNode }) {
+  return (
+    <kbd className="mr-1 rounded border border-border bg-surface-2 px-[5px] py-px font-mono text-[10px]">
+      {children}
+    </kbd>
+  );
+}
 
 export default function AstaSearch({
   teams,
@@ -23,6 +32,7 @@ export default function AstaSearch({
   const [assigning, setAssigning] = useState<PlayerWithTeam | null>(null);
   const [assignOpen, setAssignOpen] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => {
@@ -33,10 +43,42 @@ export default function AstaSearch({
     clearTimeout(timer.current);
     timer.current = setTimeout(async () => {
       const res = await fetch(`/api/players?search=${encodeURIComponent(query)}&freeAgentOnly=true`);
-      if (res.ok) setResults(await res.json());
+      if (res.ok) {
+        setResults(await res.json());
+        setActiveIndex(0);
+      }
     }, DEBOUNCE_MS);
     return () => clearTimeout(timer.current);
   }, [query]);
+
+  function openAssign(player: PlayerWithTeam) {
+    setAssigning(player);
+    setAssignOpen(true);
+  }
+
+  const dropdownOpen = query.trim().length > 0;
+
+  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (!dropdownOpen) return;
+
+    if (e.key === "Escape") {
+      e.preventDefault();
+      setQuery("");
+      return;
+    }
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault();
+      if (results.length === 0) return;
+      const step = e.key === "ArrowDown" ? 1 : -1;
+      setActiveIndex((i) => (i + step + results.length) % results.length);
+      return;
+    }
+    if (e.key === "Enter") {
+      e.preventDefault();
+      if (results.length === 0) setAddOpen(true);
+      else if (results[activeIndex]) openAssign(results[activeIndex]);
+    }
+  }
 
   return (
     <div className="rounded-[20px] border border-border bg-surface p-5 shadow-sm">
@@ -45,34 +87,43 @@ export default function AstaSearch({
         Chi è in asta?
       </div>
       <div className="relative">
-        <Search className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-dim/50" size={18} />
+        <Search className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-faint" size={18} />
         <input
           autoFocus
           value={query}
           onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={handleKeyDown}
           placeholder="Cerca per nome giocatore…"
+          role="combobox"
+          aria-expanded={dropdownOpen}
+          aria-controls="asta-search-results"
+          aria-activedescendant={
+            dropdownOpen && results[activeIndex] ? `asta-result-${results[activeIndex].id}` : undefined
+          }
           className="w-full rounded-[13px] border-[1.5px] border-border bg-surface-2 py-3.5 pl-11 pr-4 text-base focus:border-indigo focus:bg-surface focus:outline-none"
         />
       </div>
 
-      {query.trim() && (
-        <div className="mt-2.5 border-t border-border pt-1">
-          {results.map((p) => (
+      {dropdownOpen && (
+        <div id="asta-search-results" role="listbox" className="mt-2.5 border-t border-border pt-1">
+          {results.map((p, i) => (
             <button
               key={p.id}
-              onClick={() => {
-                setAssigning(p);
-                setAssignOpen(true);
-              }}
-              className="flex w-full items-center gap-3 rounded-lg px-1.5 py-2.5 text-left hover:bg-surface-2"
+              id={`asta-result-${p.id}`}
+              role="option"
+              aria-selected={i === activeIndex}
+              onMouseEnter={() => setActiveIndex(i)}
+              onClick={() => openAssign(p)}
+              className={`flex w-full items-center gap-3 rounded-lg px-1.5 py-2.5 text-left ${
+                i === activeIndex ? "bg-surface-2" : ""
+              }`}
             >
-              <span className="flex h-6.5 w-6.5 flex-shrink-0 items-center justify-center rounded-lg bg-ink text-[11px] font-extrabold text-white">
-                {p.role}
-              </span>
+              <RoleBadge role={p.role} />
               <span className="flex-1">
                 <span className="block text-sm font-bold">{p.name}</span>
                 <span className="block text-[11.5px] text-ink-dim">{p.serieATeam}</span>
               </span>
+              <ChevronRight size={16} className="flex-shrink-0 text-ink-faint" />
             </button>
           ))}
           {results.length === 0 && (
@@ -85,6 +136,18 @@ export default function AstaSearch({
           )}
         </div>
       )}
+
+      <div className="flex gap-3.5 px-1.5 pb-0.5 pt-2 text-[11.5px] text-ink-faint">
+        <span>
+          <Kbd>↑↓</Kbd>naviga
+        </span>
+        <span>
+          <Kbd>↵</Kbd>assegna
+        </span>
+        <span>
+          <Kbd>esc</Kbd>chiudi
+        </span>
+      </div>
 
       <AssignDialog
         player={assigning}

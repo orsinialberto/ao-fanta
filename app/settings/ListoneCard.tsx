@@ -9,7 +9,7 @@ export default async function ListoneCard() {
   return (
     <div className="flex flex-col gap-3.5 rounded-2xl border border-border bg-surface p-5 shadow-sm">
       <div className="flex items-center gap-2.5">
-        <div className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-gradient-to-br from-indigo-soft to-surface-2 text-indigo">
+        <div className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-lavender text-indigo">
           <Upload size={18} strokeWidth={1.8} />
         </div>
         <div>

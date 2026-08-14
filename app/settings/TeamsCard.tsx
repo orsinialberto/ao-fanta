@@ -9,7 +9,7 @@ export default async function TeamsCard() {
   return (
     <div className="flex flex-col gap-3.5 rounded-2xl border border-border bg-surface p-5 shadow-sm">
       <div className="flex items-center gap-2.5">
-        <div className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-teal-soft text-teal">
+        <div className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-mint text-teal">
           <Users size={18} strokeWidth={1.8} />
         </div>
         <div>
@@ -22,7 +22,7 @@ export default async function TeamsCard() {
         {teams.map((t) => (
           <div key={t.id} className="flex items-center gap-2.5 rounded-lg bg-surface-2 px-2.5 py-2">
             <span className="flex-1 text-[12.5px] font-bold">{t.name}</span>
-            <span className="font-mono text-[11px] text-ink-dim">{t.totalCredits} cr</span>
+            <span className="font-mono text-[11px] tabular-nums text-ink-dim">{t.totalCredits} cr</span>
             <DeleteTeamButton teamId={t.id} disabled={t.players.length > 0} />
           </div>
         ))}

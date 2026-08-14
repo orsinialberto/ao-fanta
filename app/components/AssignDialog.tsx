@@ -7,16 +7,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/app/components/ui/dialog";
+import RoleBadge from "@/app/components/RoleBadge";
 import { errorMessage } from "@/lib/http";
 import { ROLE_LABELS, isValidRole, type Role } from "@/lib/roles";
 import type { PlayerWithTeam, TeamSummary } from "@/lib/types";
-
-const ROLE_BADGE_BG: Record<Role, string> = {
-  P: "bg-teal",
-  D: "bg-indigo",
-  C: "bg-amber",
-  A: "bg-coral",
-};
 
 export default function AssignDialog({
   player,
@@ -75,13 +69,7 @@ export default function AssignDialog({
       <DialogContent className="max-w-sm">
         <DialogHeader>
           <div className="flex items-center gap-3">
-            <span
-              className={`flex h-9 w-9 items-center justify-center rounded-[10px] text-[13px] font-extrabold text-white ${
-                role ? ROLE_BADGE_BG[role] : "bg-ink-dim"
-              }`}
-            >
-              {player.role}
-            </span>
+            <RoleBadge role={player.role} size="lg" />
             <div>
               <DialogTitle>Assegna {player.name}</DialogTitle>
               <p className="text-[11.5px] text-ink-dim">{player.serieATeam}</p>
@@ -138,7 +126,7 @@ export default function AssignDialog({
             <button
               type="submit"
               disabled={roleFull}
-              className="rounded-lg bg-teal px-3.5 py-2 text-[12.5px] font-bold text-white disabled:opacity-40"
+              className="rounded-lg bg-indigo px-3.5 py-2 text-[12.5px] font-bold text-white disabled:opacity-40"
             >
               Conferma
             </button>

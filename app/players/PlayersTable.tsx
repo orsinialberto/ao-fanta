@@ -2,13 +2,24 @@
 
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import { ChevronDown, ChevronUp, Star } from "lucide-react";
 import type { PlayerWithTeam, TeamSummary } from "@/lib/types";
 import { errorMessage } from "@/lib/http";
-import { ROLE_LABELS, isValidRole, ROLE_ORDER, type Role } from "@/lib/roles";
+import { ROLE_ORDER, type Role } from "@/lib/roles";
 import AssignDialog from "@/app/components/AssignDialog";
 
 type SortKey = "name" | "role" | "serieATeam" | "starter" | "fantasyTeam" | "cost" | "watchlist";
 type SortState = { key: SortKey; dir: "asc" | "desc" };
+
+const COLUMNS: { key: SortKey; label: string }[] = [
+  { key: "name", label: "Nome" },
+  { key: "role", label: "Ruolo" },
+  { key: "serieATeam", label: "Squadra Serie A" },
+  { key: "starter", label: "Titolare" },
+  { key: "fantasyTeam", label: "Stato" },
+  { key: "cost", label: "Costo" },
+  { key: "watchlist", label: "Wish" },
+];
 
 export default function PlayersTable({
   players,
@@ -80,9 +91,10 @@ export default function PlayersTable({
     });
   }
 
-  function getSortIndicator(key: SortKey) {
-    if (sort?.key !== key) return "";
-    return sort.dir === "asc" ? " ▲" : " ▼";
+  function SortIcon({ column }: { column: SortKey }) {
+    if (sort?.key !== column) return null;
+    const Icon = sort.dir === "asc" ? ChevronUp : ChevronDown;
+    return <Icon size={10} className="ml-[3px] inline-block align-[-1px] text-indigo" />;
   }
 
   async function toggleWatchlist(player: PlayerWithTeam) {
@@ -139,106 +151,119 @@ export default function PlayersTable({
 
   return (
     <>
-      <table className="w-full text-sm border-collapse">
-        <thead>
-          <tr className="text-left border-b">
-            <th
-              className="py-2 cursor-pointer hover:bg-gray-100"
-              onClick={() => toggleSort("name")}
-            >
-              Nome{getSortIndicator("name")}
-            </th>
-            <th
-              className="cursor-pointer hover:bg-gray-100"
-              onClick={() => toggleSort("role")}
-            >
-              Ruolo{getSortIndicator("role")}
-            </th>
-            <th
-              className="cursor-pointer hover:bg-gray-100"
-              onClick={() => toggleSort("serieATeam")}
-            >
-              Squadra Serie A{getSortIndicator("serieATeam")}
-            </th>
-            <th
-              className="cursor-pointer hover:bg-gray-100"
-              onClick={() => toggleSort("starter")}
-            >
-              Titolare{getSortIndicator("starter")}
-            </th>
-            <th
-              className="cursor-pointer hover:bg-gray-100"
-              onClick={() => toggleSort("fantasyTeam")}
-            >
-              Stato{getSortIndicator("fantasyTeam")}
-            </th>
-            <th
-              className="cursor-pointer hover:bg-gray-100"
-              onClick={() => toggleSort("cost")}
-            >
-              Costo{getSortIndicator("cost")}
-            </th>
-            <th
-              className="cursor-pointer hover:bg-gray-100"
-              onClick={() => toggleSort("watchlist")}
-            >
-              Watchlist{getSortIndicator("watchlist")}
-            </th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {sortedPlayers.map((p) => (
-            <tr key={p.id} className="border-b">
-              <td className="py-1.5">{p.name}</td>
-              <td>
-                <select
-                  value={p.role}
-                  onChange={(e) => changeRole(p, e.target.value)}
-                  className="border rounded px-1 py-0.5 text-sm"
-                >
-                  {ROLE_ORDER.map((r) => (
-                    <option key={r} value={r}>
-                      {r}
-                    </option>
-                  ))}
-                </select>
-              </td>
-              <td>{p.serieATeam}</td>
-              <td>
-                <button
-                  type="button"
-                  onClick={() => toggleStarter(p)}
-                  title="Titolare (clicca per cambiare)"
-                  className="text-xs"
-                >
-                  {p.starter ? "Sì" : "-"}
-                </button>
-              </td>
-              <td>{p.fantasyTeam ? p.fantasyTeam.name : "Svincolato"}</td>
-              <td>{p.cost ?? "-"}</td>
-              <td>
-                <button type="button" onClick={() => toggleWatchlist(p)} title="Watchlist">
-                  {p.watchlist ? "★" : "☆"}
-                </button>
-              </td>
-              <td>
-                {p.fantasyTeam ? (
-                  <button type="button" onClick={() => unassign(p)} className="text-red-600 text-xs">
-                    Svincola
-                  </button>
-                ) : teams.length > 0 ? (
-                  <button type="button" onClick={() => { setAssigning(p); setAssignOpen(true); }} className="text-blue-600 text-xs">
-                    Assegna
-                  </button>
-                ) : (
-                  <span className="text-gray-400 text-xs">Crea prima una squadra</span>
-                )}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <div className="overflow-hidden rounded-[14px] border border-border bg-surface shadow-sm">
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[640px] border-collapse text-[13px]">
+            <thead>
+              <tr>
+                {COLUMNS.map((col) => (
+                  <th
+                    key={col.key}
+                    onClick={() => toggleSort(col.key)}
+                    className="cursor-pointer select-none whitespace-nowrap border-b border-border px-3.5 py-2.5 text-left text-[11px] font-bold uppercase tracking-[0.03em] text-ink-faint hover:text-ink-dim"
+                  >
+                    {col.label}
+                    <SortIcon column={col.key} />
+                  </th>
+                ))}
+                <th className="border-b border-border px-3.5 py-2.5" />
+              </tr>
+            </thead>
+            <tbody className="[&>tr:last-child>td]:border-b-0">
+              {sortedPlayers.map((p) => (
+                <tr key={p.id} className="hover:bg-surface-2">
+                  <td className="border-b border-border px-3.5 py-2.5 align-middle font-bold">
+                    {p.name}
+                  </td>
+                  <td className="border-b border-border px-3.5 py-2.5 align-middle">
+                    <select
+                      value={p.role}
+                      onChange={(e) => changeRole(p, e.target.value)}
+                      className="rounded-[7px] border border-border bg-surface px-1.5 py-[3px] text-[12px]"
+                    >
+                      {ROLE_ORDER.map((r) => (
+                        <option key={r} value={r}>
+                          {r}
+                        </option>
+                      ))}
+                    </select>
+                  </td>
+                  <td className="border-b border-border px-3.5 py-2.5 align-middle text-ink-dim">
+                    {p.serieATeam}
+                  </td>
+                  <td className="border-b border-border px-3.5 py-2.5 align-middle">
+                    <button
+                      type="button"
+                      onClick={() => toggleStarter(p)}
+                      title="Titolare (clicca per cambiare)"
+                      className={`inline-flex items-center rounded-md p-[3px] hover:bg-surface-2 hover:text-ink ${
+                        p.starter ? "text-amber" : "text-ink-faint"
+                      }`}
+                    >
+                      <Star size={16} fill={p.starter ? "currentColor" : "none"} />
+                    </button>
+                  </td>
+                  <td className="border-b border-border px-3.5 py-2.5 align-middle">
+                    <span
+                      className={`inline-flex items-center rounded-full px-2.5 py-[3px] text-[11px] font-bold ${
+                        p.fantasyTeam ? "bg-indigo-soft text-indigo" : "bg-surface-2 text-ink-dim"
+                      }`}
+                    >
+                      {p.fantasyTeam ? p.fantasyTeam.name : "Svincolato"}
+                    </span>
+                  </td>
+                  <td className="border-b border-border px-3.5 py-2.5 align-middle font-mono font-bold tabular-nums">
+                    {p.cost ?? "—"}
+                  </td>
+                  <td className="border-b border-border px-3.5 py-2.5 align-middle">
+                    <button
+                      type="button"
+                      onClick={() => toggleWatchlist(p)}
+                      title="Wishlist"
+                      className={`inline-flex items-center rounded-md p-[3px] hover:bg-surface-2 hover:text-ink ${
+                        p.watchlist ? "text-amber" : "text-ink-faint"
+                      }`}
+                    >
+                      <Star size={16} fill={p.watchlist ? "currentColor" : "none"} />
+                    </button>
+                  </td>
+                  <td className="border-b border-border px-3.5 py-2.5 align-middle">
+                    {p.fantasyTeam ? (
+                      <button
+                        type="button"
+                        onClick={() => unassign(p)}
+                        className="text-[12px] font-bold text-coral"
+                      >
+                        Svincola
+                      </button>
+                    ) : teams.length > 0 ? (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setAssigning(p);
+                          setAssignOpen(true);
+                        }}
+                        className="text-[12px] font-bold text-indigo"
+                      >
+                        Assegna
+                      </button>
+                    ) : (
+                      <span className="text-[12px] text-ink-faint">Crea prima una squadra</span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+              {sortedPlayers.length === 0 && (
+                <tr>
+                  <td colSpan={COLUMNS.length + 1} className="px-3.5 py-10 text-center text-ink-dim">
+                    Nessun giocatore da mostrare.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
 
       <AssignDialog
         player={assigning}

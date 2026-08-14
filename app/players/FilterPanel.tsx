@@ -86,8 +86,8 @@ export default function FilterPanel({
         </button>
       </div>
 
-      <div className="mb-4.5">
-        <div className="mb-2 text-[11px] font-bold uppercase tracking-wide text-ink-dim/70">Ruolo</div>
+      <div className="mb-[18px]">
+        <div className="mb-2 text-[11px] font-bold uppercase tracking-wide text-ink-faint">Ruolo</div>
         <div className="flex gap-1.5">
           {ROLE_ORDER.map((role) => (
             <button
@@ -103,8 +103,8 @@ export default function FilterPanel({
         </div>
       </div>
 
-      <div className="mb-4.5">
-        <div className="mb-2 text-[11px] font-bold uppercase tracking-wide text-ink-dim/70">Squadra Serie A</div>
+      <div className="mb-[18px]">
+        <div className="mb-2 text-[11px] font-bold uppercase tracking-wide text-ink-faint">Squadra Serie A</div>
         <select
           value={activeSerieATeam}
           onChange={(e) => setParam("serieATeam", e.target.value)}
@@ -119,15 +119,15 @@ export default function FilterPanel({
         </select>
       </div>
 
-      <div className="mb-4.5">
-        <div className="mb-2 text-[11px] font-bold uppercase tracking-wide text-ink-dim/70">Stato</div>
+      <div className="mb-[18px]">
+        <div className="mb-2 text-[11px] font-bold uppercase tracking-wide text-ink-faint">Stato</div>
         {(["freeAgentOnly", "starterOnly", "watchlistOnly"] as const).map((key) => (
           <label key={key} className="flex cursor-pointer items-center gap-2 py-1 text-[12.5px]">
             <input
               type="checkbox"
               checked={searchParams.get(key) === "true"}
               onChange={() => toggleBoolean(key)}
-              className="h-3.75 w-3.75 accent-indigo"
+              className="h-[15px] w-[15px] accent-indigo"
             />
             {BOOLEAN_LABELS[key]}
           </label>
@@ -160,7 +160,7 @@ export default function FilterPanel({
       <button onClick={resetAll} className="text-[11.5px] font-bold text-ink-dim hover:text-coral">
         Azzera tutto
       </button>
-      <div className="mt-2 text-[11px] text-ink-dim/70">{resultCount} risultati</div>
+      <div className="mt-2 text-[11px] text-ink-faint">{resultCount} risultati</div>
     </aside>
   );
 }

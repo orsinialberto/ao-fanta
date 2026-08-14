@@ -6,6 +6,13 @@ import { SlidersHorizontal } from "lucide-react";
 import { errorMessage } from "@/lib/http";
 import type { LeagueSettings } from "@prisma/client";
 
+const LIMIT_FIELDS = [
+  { field: "limitP", label: "Por", dot: "bg-teal" },
+  { field: "limitD", label: "Dif", dot: "bg-indigo" },
+  { field: "limitC", label: "Cen", dot: "bg-amber" },
+  { field: "limitA", label: "Att", dot: "bg-coral" },
+] as const;
+
 export default function LeagueRulesCard({ settings }: { settings: LeagueSettings }) {
   const router = useRouter();
   const [form, setForm] = useState({
@@ -47,15 +54,18 @@ export default function LeagueRulesCard({ settings }: { settings: LeagueSettings
       </div>
 
       <div className="grid grid-cols-4 gap-2.5">
-        {(["limitP", "limitD", "limitC", "limitA"] as const).map((field) => (
+        {LIMIT_FIELDS.map(({ field, label, dot }) => (
           <div key={field} className="flex flex-col gap-1.5">
-            <label className="text-[11px] font-bold">{field.replace("limit", "")}</label>
+            <label className="flex items-center gap-1.5 text-[11px] font-extrabold">
+              <span className={`h-[7px] w-[7px] rounded-full ${dot}`} />
+              {label}
+            </label>
             <input
               type="number"
               min={0}
               value={form[field]}
               onChange={(e) => setForm((f) => ({ ...f, [field]: Number(e.target.value) }))}
-              className="rounded-lg border border-border bg-surface-2 px-2.5 py-2 text-center font-mono text-sm"
+              className="rounded-lg border border-border bg-surface-2 px-2.5 py-2 text-center font-mono text-sm tabular-nums"
             />
           </div>
         ))}

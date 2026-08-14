@@ -10,7 +10,7 @@ export default function PlayersCard() {
   return (
     <div className="flex flex-col gap-3.5 rounded-2xl border border-border bg-surface p-5 shadow-sm">
       <div className="flex items-center gap-2.5">
-        <div className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-[color-mix(in_srgb,var(--coral)_12%,white)] text-coral">
+        <div className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-peach text-coral">
           <UserPlus size={18} strokeWidth={1.8} />
         </div>
         <div>

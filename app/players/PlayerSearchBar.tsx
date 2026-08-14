@@ -29,7 +29,7 @@ export default function PlayerSearchBar() {
 
   return (
     <div className="relative mb-3.5">
-      <Search className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-dim/50" size={16} />
+      <Search className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-faint" size={16} />
       <input
         value={search}
         onChange={(e) => setSearch(e.target.value)}

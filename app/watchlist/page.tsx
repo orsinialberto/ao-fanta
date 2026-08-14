@@ -19,7 +19,12 @@ export default async function WatchlistPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold">Watchlist</h1>
+      <div>
+        <h1 className="text-[22px] font-extrabold">Wishlist</h1>
+        <p className="text-sm text-ink-dim">
+          {players.length} svincolati in wishlist
+        </p>
+      </div>
       <PlayersTable
         players={players}
         teams={teams.map((t) => ({
