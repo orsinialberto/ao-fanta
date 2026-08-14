@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { ChevronDown, ChevronUp, Star } from "lucide-react";
 import type { PlayerWithTeam, TeamSummary } from "@/lib/types";
 import { errorMessage } from "@/lib/http";
-import { ROLE_ORDER, type Role } from "@/lib/roles";
+import type { Role } from "@/lib/roles";
 import AssignDialog from "@/app/components/AssignDialog";
 
 type SortKey = "name" | "role" | "serieATeam" | "starter" | "fantasyTeam" | "cost" | "watchlist";
@@ -110,37 +110,11 @@ export default function PlayersTable({
     router.refresh();
   }
 
-  async function toggleStarter(player: PlayerWithTeam) {
-    const res = await fetch(`/api/players/${player.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ starter: !player.starter }),
-    });
-    if (!res.ok) {
-      alert(await errorMessage(res));
-      return;
-    }
-    router.refresh();
-  }
-
   async function unassign(player: PlayerWithTeam) {
     const res = await fetch(`/api/players/${player.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ fantasyTeamId: null }),
-    });
-    if (!res.ok) {
-      alert(await errorMessage(res));
-      return;
-    }
-    router.refresh();
-  }
-
-  async function changeRole(player: PlayerWithTeam, newRole: string) {
-    const res = await fetch(`/api/players/${player.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ role: newRole }),
     });
     if (!res.ok) {
       alert(await errorMessage(res));
@@ -175,33 +149,19 @@ export default function PlayersTable({
                   <td className="border-b border-border px-3.5 py-2.5 align-middle font-bold">
                     {p.name}
                   </td>
-                  <td className="border-b border-border px-3.5 py-2.5 align-middle">
-                    <select
-                      value={p.role}
-                      onChange={(e) => changeRole(p, e.target.value)}
-                      className="rounded-[7px] border border-border bg-surface px-1.5 py-[3px] text-[12px]"
-                    >
-                      {ROLE_ORDER.map((r) => (
-                        <option key={r} value={r}>
-                          {r}
-                        </option>
-                      ))}
-                    </select>
+                  <td className="border-b border-border px-3.5 py-2.5 align-middle font-bold">
+                    {p.role}
                   </td>
                   <td className="border-b border-border px-3.5 py-2.5 align-middle text-ink-dim">
                     {p.serieATeam}
                   </td>
                   <td className="border-b border-border px-3.5 py-2.5 align-middle">
-                    <button
-                      type="button"
-                      onClick={() => toggleStarter(p)}
-                      title="Titolare (clicca per cambiare)"
-                      className={`inline-flex items-center rounded-md p-[3px] hover:bg-surface-2 hover:text-ink ${
-                        p.starter ? "text-amber" : "text-ink-faint"
-                      }`}
+                    <span
+                      title="Titolare"
+                      className={`inline-flex items-center ${p.starter ? "text-amber" : "text-ink-faint"}`}
                     >
                       <Star size={16} fill={p.starter ? "currentColor" : "none"} />
-                    </button>
+                    </span>
                   </td>
                   <td className="border-b border-border px-3.5 py-2.5 align-middle">
                     <span

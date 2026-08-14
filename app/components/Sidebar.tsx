@@ -46,24 +46,12 @@ export default function Sidebar({
       </div>
 
       <nav className="flex flex-col gap-0.5">
-        <div className="mb-2 px-2 text-[10.5px] font-bold uppercase tracking-wide text-ink-faint">
-          Principale
-        </div>
         {PRIMARY_LINKS.map((l) => (
           <NavLink key={l.href} {...l} />
         ))}
       </nav>
 
-      <nav className="flex flex-col gap-0.5">
-        <div className="mb-2 px-2 text-[10.5px] font-bold uppercase tracking-wide text-ink-faint">
-          Configurazione
-        </div>
-        {CONFIG_LINKS.map((l) => (
-          <NavLink key={l.href} {...l} />
-        ))}
-      </nav>
-
-      <div className="mt-auto rounded-2xl bg-peach p-4">
+      <div className="rounded-2xl bg-peach p-4">
         <div className="mb-2 text-[11px] font-bold">Stato asta</div>
         <div className="mb-2 h-1.5 overflow-hidden rounded-full bg-black/10">
           <div className="h-full rounded-full bg-coral" style={{ width: `${pct}%` }} />
@@ -73,6 +61,12 @@ export default function Sidebar({
           {totalCount} giocatori assegnati
         </div>
       </div>
+
+      <nav className="mt-auto flex flex-col gap-0.5">
+        {CONFIG_LINKS.map((l) => (
+          <NavLink key={l.href} {...l} />
+        ))}
+      </nav>
     </aside>
   );
 }

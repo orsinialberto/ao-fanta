@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { SlidersHorizontal, ChevronRight, X } from "lucide-react";
+import { X } from "lucide-react";
 import { ROLE_ORDER, parseRoleParam, type Role } from "@/lib/roles";
 
 const ROLE_CHIP_ON: Record<Role, string> = {
@@ -22,7 +21,6 @@ export default function FilterPanel({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [collapsed, setCollapsed] = useState(false);
 
   const activeRoles = parseRoleParam(searchParams.get("role"));
   const activeSerieATeam = searchParams.get("serieATeam") ?? "";
@@ -59,41 +57,15 @@ export default function FilterPanel({
     watchlistOnly: "Wishlist",
   };
 
-  if (collapsed) {
-    return (
-      <aside className="flex w-[52px] flex-shrink-0 flex-col items-center gap-3 rounded-2xl border border-border bg-surface p-2.5 pt-4 shadow-sm">
-        {activeCount > 0 && (
-          <span className="flex h-5 w-5 items-center justify-center rounded-md bg-indigo text-[10px] font-extrabold text-white">
-            {activeCount}
-          </span>
-        )}
-        <button onClick={() => setCollapsed(false)} className="rounded-md p-1 text-ink-dim hover:bg-surface-2">
-          <ChevronRight size={15} className="rotate-180" />
-        </button>
-      </aside>
-    );
-  }
-
   return (
-    <aside className="w-[272px] flex-shrink-0 rounded-2xl border border-border bg-surface p-4 shadow-sm">
-      <div className="mb-3.5 flex items-center justify-between">
-        <div className="flex items-center gap-1.5 text-[13px] font-extrabold">
-          <SlidersHorizontal size={15} className="text-ink-dim" />
-          Filtri
-        </div>
-        <button onClick={() => setCollapsed(true)} className="rounded-md p-0.5 text-ink-dim hover:bg-surface-2">
-          <ChevronRight size={15} />
-        </button>
-      </div>
-
-      <div className="mb-[18px]">
-        <div className="mb-2 text-[11px] font-bold uppercase tracking-wide text-ink-faint">Ruolo</div>
-        <div className="flex gap-1.5">
+    <div className="w-full rounded-2xl border border-border bg-surface p-4 shadow-sm">
+      <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+        <div className="flex items-center gap-1.5">
           {ROLE_ORDER.map((role) => (
             <button
               key={role}
               onClick={() => toggleRole(role)}
-              className={`flex-1 rounded-lg border-[1.5px] py-1.5 text-[12px] font-extrabold ${
+              className={`rounded-lg border-[1.5px] px-3 py-1.5 text-[12px] font-extrabold ${
                 activeRoles.includes(role) ? ROLE_CHIP_ON[role] : "border-border text-ink-dim"
               }`}
             >
@@ -101,14 +73,11 @@ export default function FilterPanel({
             </button>
           ))}
         </div>
-      </div>
 
-      <div className="mb-[18px]">
-        <div className="mb-2 text-[11px] font-bold uppercase tracking-wide text-ink-faint">Squadra Serie A</div>
         <select
           value={activeSerieATeam}
           onChange={(e) => setParam("serieATeam", e.target.value)}
-          className="w-full rounded-lg border border-border bg-surface px-2.5 py-2 text-[12.5px]"
+          className="rounded-lg border border-border bg-surface px-2.5 py-2 text-[12.5px]"
         >
           <option value="">Tutte le squadre</option>
           {serieATeams.map((team) => (
@@ -117,25 +86,30 @@ export default function FilterPanel({
             </option>
           ))}
         </select>
-      </div>
 
-      <div className="mb-[18px]">
-        <div className="mb-2 text-[11px] font-bold uppercase tracking-wide text-ink-faint">Stato</div>
-        {(["freeAgentOnly", "starterOnly", "watchlistOnly"] as const).map((key) => (
-          <label key={key} className="flex cursor-pointer items-center gap-2 py-1 text-[12.5px]">
-            <input
-              type="checkbox"
-              checked={searchParams.get(key) === "true"}
-              onChange={() => toggleBoolean(key)}
-              className="h-[15px] w-[15px] accent-indigo"
-            />
-            {BOOLEAN_LABELS[key]}
-          </label>
-        ))}
+        <div className="flex items-center gap-4">
+          {(["freeAgentOnly", "starterOnly", "watchlistOnly"] as const).map((key) => (
+            <label key={key} className="flex cursor-pointer items-center gap-2 text-[12.5px]">
+              <input
+                type="checkbox"
+                checked={searchParams.get(key) === "true"}
+                onChange={() => toggleBoolean(key)}
+                className="h-[15px] w-[15px] accent-indigo"
+              />
+              {BOOLEAN_LABELS[key]}
+            </label>
+          ))}
+        </div>
+
+        <button onClick={resetAll} className="text-[11.5px] font-bold text-ink-dim hover:text-coral">
+          Azzera tutto
+        </button>
+
+        <div className="ml-auto text-[11px] text-ink-faint">{resultCount} risultati</div>
       </div>
 
       {activeCount > 0 && (
-        <div className="mb-2.5 flex flex-wrap gap-1.5">
+        <div className="mt-3 flex flex-wrap gap-1.5">
           {activeRoles.map((r) => (
             <span key={r} className="inline-flex items-center gap-1 rounded-full bg-indigo-soft px-2 py-1 text-[11px] font-bold text-indigo">
               {r}
@@ -156,11 +130,6 @@ export default function FilterPanel({
           ))}
         </div>
       )}
-
-      <button onClick={resetAll} className="text-[11.5px] font-bold text-ink-dim hover:text-coral">
-        Azzera tutto
-      </button>
-      <div className="mt-2 text-[11px] text-ink-faint">{resultCount} risultati</div>
-    </aside>
+    </div>
   );
 }

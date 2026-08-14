@@ -39,17 +39,13 @@ export default async function PlayersPage({
         <h1 className="text-[22px] font-extrabold">Listone</h1>
         <p className="text-sm text-ink-dim">{players.length} giocatori</p>
       </div>
-      <div className="flex items-start gap-4">
-        <div className="min-w-0 flex-1">
-          <PlayerSearchBar />
-          <PlayersTable
-            players={players}
-            teams={teams.map((t) => ({ id: t.id, name: t.name, remainingCredits: t.remainingCredits, roleCounts: t.roleCounts }))}
-            roleLimits={roleLimits}
-          />
-        </div>
-        <FilterPanel serieATeams={serieATeams} resultCount={players.length} />
-      </div>
+      <PlayerSearchBar />
+      <FilterPanel serieATeams={serieATeams} resultCount={players.length} />
+      <PlayersTable
+        players={players}
+        teams={teams.map((t) => ({ id: t.id, name: t.name, remainingCredits: t.remainingCredits, roleCounts: t.roleCounts }))}
+        roleLimits={roleLimits}
+      />
     </div>
   );
 }

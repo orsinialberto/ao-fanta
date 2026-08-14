@@ -3,6 +3,7 @@ import LeagueRulesCard from "./LeagueRulesCard";
 import ListoneCard from "./ListoneCard";
 import TeamsCard from "./TeamsCard";
 import PlayersCard from "./PlayersCard";
+import EditPlayerCard from "./EditPlayerCard";
 
 export const dynamic = "force-dynamic";
 
@@ -19,6 +20,7 @@ export default async function SettingsPage() {
         <ListoneCard />
         <TeamsCard />
         <PlayersCard />
+        <EditPlayerCard />
         <LeagueRulesCard settings={settings} />
       </div>
     </div>
