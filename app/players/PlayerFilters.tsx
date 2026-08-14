@@ -1,13 +1,31 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 
 const ROLES = ["GK", "DEF", "MID", "FWD"];
+const DEBOUNCE_MS = 250;
 
 export default function PlayerFilters() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+
+  // Text inputs are controlled so that Back/Forward navigation (which
+  // changes searchParams without the input ever firing onChange) updates
+  // what's displayed, not just what's applied.
+  const [search, setSearch] = useState(searchParams.get("search") ?? "");
+  const [serieATeam, setSerieATeam] = useState(searchParams.get("serieATeam") ?? "");
+
+  useEffect(() => {
+    setSearch(searchParams.get("search") ?? "");
+  }, [searchParams]);
+
+  useEffect(() => {
+    setSerieATeam(searchParams.get("serieATeam") ?? "");
+  }, [searchParams]);
+
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   function update(key: string, value: string) {
     const params = new URLSearchParams(searchParams.toString());
@@ -16,7 +34,14 @@ export default function PlayerFilters() {
     } else {
       params.delete(key);
     }
-    router.push(`${pathname}?${params.toString()}`);
+    // replace (not push) so text-input edits don't create one history
+    // entry per keystroke.
+    router.replace(`${pathname}?${params.toString()}`);
+  }
+
+  function updateDebounced(key: string, value: string) {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => update(key, value), DEBOUNCE_MS);
   }
 
   function toggle(key: string) {
@@ -28,8 +53,11 @@ export default function PlayerFilters() {
     <div className="flex flex-wrap gap-3 items-center border rounded p-3">
       <input
         placeholder="Cerca per nome"
-        defaultValue={searchParams.get("search") ?? ""}
-        onChange={(e) => update("search", e.target.value)}
+        value={search}
+        onChange={(e) => {
+          setSearch(e.target.value);
+          updateDebounced("search", e.target.value);
+        }}
         className="border rounded px-2 py-1 text-sm"
       />
       <select
@@ -46,8 +74,11 @@ export default function PlayerFilters() {
       </select>
       <input
         placeholder="Squadra Serie A"
-        defaultValue={searchParams.get("serieATeam") ?? ""}
-        onChange={(e) => update("serieATeam", e.target.value)}
+        value={serieATeam}
+        onChange={(e) => {
+          setSerieATeam(e.target.value);
+          updateDebounced("serieATeam", e.target.value);
+        }}
         className="border rounded px-2 py-1 text-sm"
       />
       <label className="text-sm flex items-center gap-1">
