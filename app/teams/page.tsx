@@ -2,6 +2,8 @@ import { getTeamsWithRoster } from "@/lib/teams";
 import { ROLE_ORDER, ROLE_LABELS, ROLE_LIMITS } from "@/lib/roles";
 import TeamForm from "./TeamForm";
 import DeleteTeamButton from "./DeleteTeamButton";
+import ReleasePlayerButton from "./ReleasePlayerButton";
+import ReleaseAllButton from "./ReleaseAllButton";
 
 export const dynamic = "force-dynamic";
 
@@ -37,6 +39,11 @@ export default async function TeamsPage() {
                 </p>
               </div>
               <TeamForm mode="edit" team={team} />
+              <ReleaseAllButton
+                teamId={team.id}
+                teamName={team.name}
+                isDisabled={team.players.length === 0}
+              />
               <DeleteTeamButton teamId={team.id} disabled={team.players.length > 0} />
             </div>
           </div>
@@ -50,10 +57,15 @@ export default async function TeamsPage() {
                 <ul className="divide-y">
                   {rolePlayers.map((p) => (
                     <li key={p.id} className="flex justify-between py-1">
-                      <span>
-                        {p.name} <span className="text-gray-400 text-sm">({p.serieATeam})</span>
-                      </span>
-                      <span className="font-medium">{p.cost}</span>
+                      <div>
+                        <span>
+                          {p.name} <span className="text-gray-400 text-sm">({p.serieATeam})</span>
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">{p.cost}</span>
+                        <ReleasePlayerButton playerId={p.id} playerName={p.name} />
+                      </div>
                     </li>
                   ))}
                 </ul>
