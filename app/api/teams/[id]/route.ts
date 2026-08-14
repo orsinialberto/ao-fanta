@@ -3,8 +3,9 @@ import { prisma } from "@/lib/prisma";
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const body = await req.json();
   const data: { name?: string; coach?: string; totalCredits?: number } = {};
 
@@ -17,23 +18,39 @@ export async function PATCH(
     data.totalCredits = body.totalCredits;
   }
 
-  const team = await prisma.team.update({ where: { id: params.id }, data });
-  return NextResponse.json(team);
+  try {
+    const team = await prisma.team.update({ where: { id }, data });
+    return NextResponse.json(team);
+  } catch (error: unknown) {
+    if (error instanceof Error && "code" in error && error.code === "P2025") {
+      return NextResponse.json({ error: "Team not found" }, { status: 404 });
+    }
+    throw error;
+  }
 }
 
 export async function DELETE(
   _req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const playerCount = await prisma.player.count({ where: { fantasyTeamId: params.id } });
+  const { id } = await params;
 
-  if (playerCount > 0) {
-    return NextResponse.json(
-      { error: "Cannot delete team with assigned players. Unassign players first." },
-      { status: 409 }
-    );
+  try {
+    const playerCount = await prisma.player.count({ where: { fantasyTeamId: id } });
+
+    if (playerCount > 0) {
+      return NextResponse.json(
+        { error: "Cannot delete team with assigned players. Unassign players first." },
+        { status: 409 }
+      );
+    }
+
+    await prisma.team.delete({ where: { id } });
+    return NextResponse.json({ ok: true });
+  } catch (error: unknown) {
+    if (error instanceof Error && "code" in error && error.code === "P2025") {
+      return NextResponse.json({ error: "Team not found" }, { status: 404 });
+    }
+    throw error;
   }
-
-  await prisma.team.delete({ where: { id: params.id } });
-  return NextResponse.json({ ok: true });
 }
