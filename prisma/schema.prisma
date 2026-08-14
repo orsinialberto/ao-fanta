@@ -1,0 +1,33 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Team {
+  id           String   @id @default(uuid())
+  name         String
+  coach        String
+  totalCredits Int
+  players      Player[]
+  createdAt    DateTime @default(now())
+}
+
+model Player {
+  id            String   @id @default(uuid())
+  name          String
+  role          String   // GK, DEF, MID, FWD
+  serieATeam    String
+  fantasyTeamId String?
+  fantasyTeam   Team?    @relation(fields: [fantasyTeamId], references: [id])
+  cost          Int?
+  starter       Boolean  @default(false)
+  watchlist     Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  @@index([fantasyTeamId])
+  @@index([role])
+}
