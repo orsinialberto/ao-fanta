@@ -41,7 +41,7 @@ stessi dati per pagina. Libertà di riorganizzare i layout **interni** alle pagi
 | 7 | Griglie a colonne fisse | `teams/page.tsx:24`, `page.tsx:105` |
 | 8 | Coral significa sia "ruolo Attaccante" sia "azione distruttiva" | `roleStyles.ts` vs `PlayersTable.tsx:213` |
 | 9 | Ruolo: `RoleBadge` colorato altrove, lettera nuda in tabella | `PlayersTable.tsx:180` |
-| 10 | Wishlist: griglia 2×2 dentro griglia 2×2 → colonne ~110px, nomi troncati | `WishlistPanel.tsx:31` |
+| 10 | Wishlist duplicata: stessi dati in `/` e in `/watchlist`, e in `/` è una griglia 2×2 dentro una griglia 2×2 con colonne da ~110px e nomi troncati | `WishlistPanel.tsx:31` |
 | 11 | Crediti squadra in fondo a destra: il dato più importante è il meno visibile | `TeamCard.tsx:66` |
 | 12 | Nessuno skeleton, nessun empty state progettato | nessun `loading.tsx` |
 | 13 | Gradient peach solo nella card sidebar: unico gradient dell'app | `Sidebar.tsx:53` |
@@ -132,14 +132,18 @@ numeri mono, senza box.
 
 Griglia `1fr / 296px`, colonna destra **sticky**.
 
-- Sinistra: ricerca hero, risultati **inline** (la card si espande) invece che in overlay, poi Wishlist
-  e Ultimi acquisti.
+- Sinistra: ricerca hero, risultati **inline** (la card si espande) invece che in overlay, poi Ultimi
+  acquisti.
 - Destra sticky: crediti squadre, sempre visibili mentre si cerca. È il fix centrale — oggi si cerca in
   cima e i crediti stanno sotto la piega.
 - Riga squadra: nome, crediti mono, barra di spesa 2px, quattro pill di ruolo.
 - **Pill di ruolo al limite**: quando `roleCounts[r] >= roleLimits[r]` la pill passa da tinta soft a
   colore pieno. Segnale passivo, nessun testo aggiuntivo.
-- Wishlist a **colonna singola** (fix problema 10).
+
+**La Wishlist esce dalla pagina Asta.** Il pannello duplicava dati che hanno già una rotta dedicata e
+rubava spazio verticale alla ricerca, che è la ragione per cui la pagina esiste. `WishlistPanel.tsx`
+viene eliminato e `app/page.tsx` smette di caricare la query relativa; `/watchlist` resta l'unico posto
+dove la wishlist si consulta. Questo chiude il problema 10 per rimozione anziché per redesign.
 
 ### `/players` Listone
 
@@ -175,6 +179,12 @@ distruttiva in fondo.
 - **EmptyState** — icona leggera + frase + azione. Oggi gli stati vuoti sono solo testo grigio.
 - **InlineError** — banner di errore dentro form e dialog. Elimina i due `alert()` (fix problema 6).
 - **loading.tsx** per rotta, con skeleton costruiti su hairline.
+
+## Componenti rimossi
+
+- **WishlistPanel** (`app/components/WishlistPanel.tsx`) — la Wishlist esce da `/`, vedi sopra. Va
+  rimossa anche la chiamata `getFilteredPlayers({ watchlistOnly: true, freeAgentOnly: true })` da
+  `app/page.tsx:16`, ora senza consumatori in quella pagina.
 
 ## Stack
 
