@@ -1,0 +1,103 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import * as XLSX from "xlsx";
+
+type ImportResult = { imported: number; skipped: number; errors: string[] };
+
+export default function ImportPage() {
+  const router = useRouter();
+  const [file, setFile] = useState<File | null>(null);
+  const [headers, setHeaders] = useState<string[]>([]);
+  const [mapping, setMapping] = useState({ name: "", role: "", serieATeam: "" });
+  const [result, setResult] = useState<ImportResult | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const selected = e.target.files?.[0];
+    if (!selected) return;
+
+    setFile(selected);
+    setResult(null);
+
+    const buffer = await selected.arrayBuffer();
+    const workbook = XLSX.read(buffer, { type: "array" });
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const rows: Record<string, unknown>[] = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+    const cols = rows.length > 0 ? Object.keys(rows[0]) : [];
+    setHeaders(cols);
+    setMapping({ name: cols[0] ?? "", role: cols[1] ?? "", serieATeam: cols[2] ?? "" });
+  }
+
+  async function handleImport() {
+    if (!file) return;
+    setLoading(true);
+    setResult(null);
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("mapping", JSON.stringify(mapping));
+
+    const res = await fetch("/api/import", { method: "POST", body: formData });
+    const body: ImportResult = await res.json();
+    setResult(body);
+    setLoading(false);
+    router.refresh();
+  }
+
+  return (
+    <div className="space-y-4 max-w-xl">
+      <h1 className="text-2xl font-bold">Import giocatori</h1>
+
+      <input type="file" accept=".csv,.xlsx,.xls" onChange={handleFileSelect} />
+
+      {headers.length > 0 && (
+        <div className="space-y-2 border rounded p-4">
+          <p className="text-sm text-gray-500">Associa le colonne del file ai campi:</p>
+          {(["name", "role", "serieATeam"] as const).map((field) => (
+            <div key={field} className="flex items-center gap-2">
+              <label className="w-32 text-sm">{field}</label>
+              <select
+                value={mapping[field]}
+                onChange={(e) => setMapping((m) => ({ ...m, [field]: e.target.value }))}
+                className="border rounded px-2 py-1 text-sm"
+              >
+                <option value="">-- seleziona colonna --</option>
+                {headers.map((h) => (
+                  <option key={h} value={h}>
+                    {h}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ))}
+          <p className="text-xs text-gray-400">
+            Ruolo atteso nel file: GK, DEF, MID o FWD (case-insensitive).
+          </p>
+          <button
+            onClick={handleImport}
+            disabled={loading || !mapping.name || !mapping.role || !mapping.serieATeam}
+            className="px-3 py-1.5 bg-blue-600 text-white rounded text-sm disabled:opacity-40"
+          >
+            {loading ? "Importazione..." : "Importa"}
+          </button>
+        </div>
+      )}
+
+      {result && (
+        <div className="border rounded p-4 text-sm space-y-1">
+          <p>Importati: {result.imported}</p>
+          <p>Scartati: {result.skipped}</p>
+          {result.errors.length > 0 && (
+            <ul className="text-red-600 list-disc list-inside">
+              {result.errors.map((err, i) => (
+                <li key={i}>{err}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
