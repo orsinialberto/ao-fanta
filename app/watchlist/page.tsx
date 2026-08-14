@@ -29,9 +29,6 @@ export default async function WatchlistPage({
     <div className="space-y-4">
       <div>
         <h1 className="text-[22px] font-extrabold">Wishlist</h1>
-        <p className="text-sm text-ink-dim">
-          {players.length} svincolati in wishlist
-        </p>
       </div>
       <RoleFilter />
       <PlayersTable
