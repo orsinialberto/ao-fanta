@@ -20,3 +20,12 @@ export async function getTeamsWithRoster() {
     };
   });
 }
+
+export async function getDistinctSerieATeams(): Promise<string[]> {
+  const teams = await prisma.player.findMany({
+    distinct: ["serieATeam"],
+    select: { serieATeam: true },
+    orderBy: { serieATeam: "asc" },
+  });
+  return teams.map((t) => t.serieATeam);
+}
