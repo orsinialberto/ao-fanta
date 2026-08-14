@@ -32,3 +32,8 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json(player, { status: 201 });
 }
+
+export async function DELETE(req: NextRequest) {
+  await prisma.player.deleteMany({});
+  return NextResponse.json({ ok: true });
+}
