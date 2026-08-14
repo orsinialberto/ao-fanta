@@ -13,6 +13,7 @@ export default function ImportPage() {
   const [mapping, setMapping] = useState({ name: "", role: "", serieATeam: "" });
   const [result, setResult] = useState<ImportResult | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const selected = e.target.files?.[0];
@@ -20,30 +21,48 @@ export default function ImportPage() {
 
     setFile(selected);
     setResult(null);
+    setError(null);
 
-    const buffer = await selected.arrayBuffer();
-    const workbook = XLSX.read(buffer, { type: "array" });
-    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    const rows: Record<string, unknown>[] = XLSX.utils.sheet_to_json(sheet, { defval: "" });
-    const cols = rows.length > 0 ? Object.keys(rows[0]) : [];
-    setHeaders(cols);
-    setMapping({ name: cols[0] ?? "", role: cols[1] ?? "", serieATeam: cols[2] ?? "" });
+    try {
+      const buffer = await selected.arrayBuffer();
+      const workbook = XLSX.read(buffer, { type: "array" });
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      const rows: Record<string, unknown>[] = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+      const cols = rows.length > 0 ? Object.keys(rows[0]) : [];
+      setHeaders(cols);
+      setMapping({ name: cols[0] ?? "", role: cols[1] ?? "", serieATeam: cols[2] ?? "" });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Errore durante la lettura del file";
+      setError(message);
+      setHeaders([]);
+      setFile(null);
+    }
   }
 
   async function handleImport() {
     if (!file) return;
     setLoading(true);
     setResult(null);
+    setError(null);
 
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("mapping", JSON.stringify(mapping));
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("mapping", JSON.stringify(mapping));
 
-    const res = await fetch("/api/import", { method: "POST", body: formData });
-    const body: ImportResult = await res.json();
-    setResult(body);
-    setLoading(false);
-    router.refresh();
+      const res = await fetch("/api/import", { method: "POST", body: formData });
+      if (!res.ok) {
+        throw new Error(`Server error: ${res.status}`);
+      }
+      const body: ImportResult = await res.json();
+      setResult(body);
+      router.refresh();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Errore durante l'importazione";
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -82,6 +101,13 @@ export default function ImportPage() {
           >
             {loading ? "Importazione..." : "Importa"}
           </button>
+        </div>
+      )}
+
+      {error && (
+        <div className="border border-red-400 rounded p-4 text-sm bg-red-50 text-red-700">
+          <p className="font-semibold">Errore:</p>
+          <p>{error}</p>
         </div>
       )}
 
