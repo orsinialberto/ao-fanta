@@ -7,7 +7,21 @@ import { sheetToRows, normalizeRole } from "@/lib/xlsxImport";
 import PageHeader from "@/app/components/PageHeader";
 import InlineError from "@/app/components/InlineError";
 
-type ImportResult = { imported: number; skipped: number; errors: string[] };
+type PreviewResult = {
+  toCreate: string[];
+  toUpdate: string[];
+  toDelete: string[];
+  skipped: number;
+  errors: string[];
+};
+
+type CommitResult = {
+  created: number;
+  updated: number;
+  deleted: number;
+  skipped: number;
+  errors: string[];
+};
 
 export default function ImportPage() {
   const router = useRouter();
@@ -15,7 +29,8 @@ export default function ImportPage() {
   const [headers, setHeaders] = useState<string[]>([]);
   const [previewRows, setPreviewRows] = useState<Record<string, unknown>[]>([]);
   const [mapping, setMapping] = useState({ name: "", role: "", serieATeam: "" });
-  const [result, setResult] = useState<ImportResult | null>(null);
+  const [preview, setPreview] = useState<PreviewResult | null>(null);
+  const [result, setResult] = useState<CommitResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -24,6 +39,7 @@ export default function ImportPage() {
     if (!selected) return;
 
     setFile(selected);
+    setPreview(null);
     setResult(null);
     setError(null);
 
@@ -45,23 +61,46 @@ export default function ImportPage() {
     }
   }
 
-  async function handleImport() {
+  async function runImport(mode: "preview" | "commit") {
+    if (!file) return null;
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("mapping", JSON.stringify(mapping));
+    formData.append("mode", mode);
+
+    const res = await fetch("/api/import", { method: "POST", body: formData });
+    const body = await res.json();
+    if (!res.ok) {
+      throw new Error(body.error ?? `Server error: ${res.status}`);
+    }
+    return body;
+  }
+
+  async function handlePreview() {
     if (!file) return;
     setLoading(true);
-    setResult(null);
+    setError(null);
+    setPreview(null);
+
+    try {
+      const body = (await runImport("preview")) as PreviewResult;
+      setPreview(body);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Errore durante l'anteprima";
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleConfirm() {
+    setLoading(true);
     setError(null);
 
     try {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("mapping", JSON.stringify(mapping));
-
-      const res = await fetch("/api/import", { method: "POST", body: formData });
-      if (!res.ok) {
-        throw new Error(`Server error: ${res.status}`);
-      }
-      const body: ImportResult = await res.json();
+      const body = (await runImport("commit")) as CommitResult;
       setResult(body);
+      setPreview(null);
       router.refresh();
     } catch (err) {
       const message = err instanceof Error ? err.message : "Errore durante l'importazione";
@@ -80,7 +119,7 @@ export default function ImportPage() {
       <div className="max-w-xl space-y-4">
         <input type="file" accept=".csv,.xlsx,.xls" onChange={handleFileSelect} />
 
-        {headers.length > 0 && (
+        {headers.length > 0 && !preview && (
           <div className="space-y-2 rounded-lg border border-line p-4">
             <p className="text-small text-ink-2">Associa le colonne del file ai campi:</p>
             {(["name", "role", "serieATeam"] as const).map((field) => (
@@ -142,12 +181,57 @@ export default function ImportPage() {
             )}
 
             <button
-              onClick={handleImport}
+              onClick={handlePreview}
               disabled={loading || !mapping.name || !mapping.role || !mapping.serieATeam}
               className="rounded-md bg-accent px-3 py-1.5 text-small font-semibold text-white transition-colors duration-fast ease-standard hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-40"
             >
-              {loading ? "Importazione..." : "Importa"}
+              {loading ? "Analisi..." : "Anteprima modifiche"}
             </button>
+          </div>
+        )}
+
+        {preview && (
+          <div className="space-y-2 rounded-lg border border-line p-4">
+            <p className="text-small text-ink-2">
+              Nuovi: {preview.toCreate.length} · Aggiornati: {preview.toUpdate.length} · Da
+              eliminare: {preview.toDelete.length}
+            </p>
+            {preview.toDelete.length > 0 && (
+              <div className="space-y-1">
+                <p className="text-small font-semibold text-danger">
+                  Questi giocatori non sono nel file e verranno eliminati (perdendo assegnazione,
+                  costo e tier wishlist se presenti):
+                </p>
+                <ul className="list-inside list-disc text-small-dense text-danger">
+                  {preview.toDelete.map((name) => (
+                    <li key={name}>{name}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {preview.errors.length > 0 && (
+              <ul className="list-inside list-disc text-small-dense text-danger">
+                {preview.errors.map((err, i) => (
+                  <li key={i}>{err}</li>
+                ))}
+              </ul>
+            )}
+            <div className="flex gap-2">
+              <button
+                onClick={handleConfirm}
+                disabled={loading}
+                className="rounded-md bg-accent px-3 py-1.5 text-small font-semibold text-white transition-colors duration-fast ease-standard hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                {loading ? "Importazione..." : "Conferma import"}
+              </button>
+              <button
+                onClick={() => setPreview(null)}
+                disabled={loading}
+                className="rounded-md border border-line px-3 py-1.5 text-small disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Torna alla mappatura
+              </button>
+            </div>
           </div>
         )}
 
@@ -155,7 +239,9 @@ export default function ImportPage() {
 
         {result && (
           <div className="space-y-1 rounded-lg border border-line p-4 text-small">
-            <p>Importati: {result.imported}</p>
+            <p>Nuovi: {result.created}</p>
+            <p>Aggiornati: {result.updated}</p>
+            <p>Eliminati: {result.deleted}</p>
             <p>Scartati: {result.skipped}</p>
             {result.errors.length > 0 && (
               <ul className="list-inside list-disc text-danger">
