@@ -1,10 +1,11 @@
 import { getFilteredPlayers } from "@/lib/players";
 import { getTeamsWithRoster, getDistinctSerieATeams } from "@/lib/teams";
 import { getLeagueSettings, getRoleLimit } from "@/lib/leagueSettings";
-import { ROLE_ORDER, parseRoleParam } from "@/lib/roles";
-import PlayerSearchBar from "./PlayerSearchBar";
-import FilterPanel from "./FilterPanel";
+import { ROLE_ORDER } from "@/lib/roles";
+import PageHeader from "@/app/components/PageHeader";
+import ListoneToolbar from "./ListoneToolbar";
 import PlayersTable from "./PlayersTable";
+import { readSearchParams } from "@/lib/filterParams";
 
 export const dynamic = "force-dynamic";
 
@@ -14,14 +15,7 @@ export default async function PlayersPage({
   searchParams: Promise<{ [key: string]: string | undefined }>;
 }) {
   const params = await searchParams;
-  const filters = {
-    role: parseRoleParam(params.role),
-    serieATeam: params.serieATeam,
-    freeAgentOnly: params.freeAgentOnly === "true",
-    starterOnly: params.starterOnly === "true",
-    watchlistOnly: params.watchlistOnly === "true",
-    search: params.search,
-  };
+  const filters = readSearchParams(params);
 
   const [players, teams, serieATeams, leagueSettings] = await Promise.all([
     getFilteredPlayers(filters),
@@ -34,17 +28,17 @@ export default async function PlayersPage({
   ) as Record<(typeof ROLE_ORDER)[number], number>;
 
   return (
-    <div className="space-y-4">
-      <div>
-        <h1 className="text-[22px] font-extrabold">Listone</h1>
-      </div>
-      <PlayerSearchBar />
-      <FilterPanel serieATeams={serieATeams} resultCount={players.length} />
+    <>
+      <PageHeader
+        title="Listone"
+        subtitle="Tutti i giocatori disponibili, con filtri e assegnazione diretta."
+      />
+      <ListoneToolbar serieATeams={serieATeams} resultCount={players.length} />
       <PlayersTable
         players={players}
         teams={teams.map((t) => ({ id: t.id, name: t.name, remainingCredits: t.remainingCredits, roleCounts: t.roleCounts }))}
         roleLimits={roleLimits}
       />
-    </div>
+    </>
   );
 }

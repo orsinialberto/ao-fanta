@@ -7,6 +7,10 @@ import type { PlayerWithTeam, TeamSummary } from "@/lib/types";
 import { errorMessage } from "@/lib/http";
 import type { Role } from "@/lib/roles";
 import AssignDialog from "@/app/components/AssignDialog";
+import RoleBadge from "@/app/components/RoleBadge";
+import EmptyState from "@/app/components/EmptyState";
+import InlineError from "@/app/components/InlineError";
+import { Users } from "lucide-react";
 
 type SortKey = "name" | "role" | "serieATeam" | "starter" | "fantasyTeam" | "cost" | "watchlist";
 type SortState = { key: SortKey; dir: "asc" | "desc" };
@@ -37,6 +41,7 @@ export default function PlayersTable({
   const [assigning, setAssigning] = useState<PlayerWithTeam | null>(null);
   const [assignOpen, setAssignOpen] = useState(false);
   const [sort, setSort] = useState<SortState | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const sortedPlayers = useMemo(() => {
     if (!sort) return players;
@@ -107,9 +112,10 @@ export default function PlayersTable({
       body: JSON.stringify({ watchlist: !player.watchlist }),
     });
     if (!res.ok) {
-      alert(await errorMessage(res));
+      setError(await errorMessage(res));
       return;
     }
+    setError(null);
     router.refresh();
   }
 
@@ -120,114 +126,124 @@ export default function PlayersTable({
       body: JSON.stringify({ fantasyTeamId: null }),
     });
     if (!res.ok) {
-      alert(await errorMessage(res));
+      setError(await errorMessage(res));
       return;
     }
+    setError(null);
     router.refresh();
   }
 
   return (
     <>
-      <div className="overflow-hidden rounded-[14px] border border-border bg-surface shadow-sm">
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[640px] border-collapse text-[13px]">
-            <thead>
-              <tr>
-                {COLUMNS.map((col) => (
-                  <th
-                    key={col.key}
-                    onClick={() => toggleSort(col.key)}
-                    className="cursor-pointer select-none whitespace-nowrap border-b border-border px-3.5 py-2.5 text-left text-[11px] font-bold uppercase tracking-[0.03em] text-ink-faint hover:text-ink-dim"
+      {error && (
+        <div className="mb-3">
+          <InlineError message={error} />
+        </div>
+      )}
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[640px] border-collapse text-small">
+          <thead>
+            <tr>
+              {COLUMNS.map((col) => (
+                <th
+                  key={col.key}
+                  onClick={() => toggleSort(col.key)}
+                  className="sticky top-0 z-10 cursor-pointer select-none whitespace-nowrap border-b border-line bg-paper px-3 py-3 text-left text-label uppercase text-ink-3 transition-colors duration-fast ease-standard hover:text-ink-2"
+                >
+                  {col.label}
+                  <SortIcon column={col.key} />
+                </th>
+              ))}
+              <th className="sticky top-0 z-10 border-b border-line bg-paper px-3 py-3" />
+            </tr>
+          </thead>
+          <tbody className="[&>tr:last-child>td]:border-b-0">
+            {sortedPlayers.map((p) => (
+              <tr key={p.id} className="group transition-colors duration-fast ease-standard hover:bg-surface-sunk">
+                <td className="h-11 border-b border-line px-3 align-middle font-semibold">
+                  {p.name}
+                </td>
+                <td className="h-11 w-px border-b border-line px-3 align-middle">
+                  <RoleBadge role={p.role} size="sm" />
+                </td>
+                <td className="h-11 border-b border-line px-3 align-middle text-ink-dim">
+                  {p.serieATeam}
+                </td>
+                <td className="h-11 border-b border-line px-3 align-middle">
+                  <span
+                    title="Titolare"
+                    className={`inline-flex items-center ${p.starter ? "text-amber" : "text-ink-faint"}`}
                   >
-                    {col.label}
-                    <SortIcon column={col.key} />
-                  </th>
-                ))}
-                <th className="border-b border-border px-3.5 py-2.5" />
-              </tr>
-            </thead>
-            <tbody className="[&>tr:last-child>td]:border-b-0">
-              {sortedPlayers.map((p) => (
-                <tr key={p.id} className="hover:bg-surface-2">
-                  <td className="border-b border-border px-3.5 py-2.5 align-middle font-bold">
-                    {p.name}
+                    <Star size={16} fill={p.starter ? "currentColor" : "none"} />
+                  </span>
+                </td>
+                <td className="h-11 border-b border-line px-3 align-middle">
+                  <span
+                    className={`inline-flex items-center rounded-full px-2 py-px text-small-dense font-medium ${
+                      p.fantasyTeam
+                        ? "bg-accent-bg text-accent"
+                        : "border border-line bg-surface-sunk text-ink-3"
+                    }`}
+                  >
+                    {p.fantasyTeam ? p.fantasyTeam.name : "Svincolato"}
+                  </span>
+                </td>
+                {showCost && (
+                  <td className="h-11 border-b border-line px-3 align-middle font-mono font-bold tabular-nums">
+                    {p.cost ?? "—"}
                   </td>
-                  <td className="border-b border-border px-3.5 py-2.5 align-middle font-bold">
-                    {p.role}
-                  </td>
-                  <td className="border-b border-border px-3.5 py-2.5 align-middle text-ink-dim">
-                    {p.serieATeam}
-                  </td>
-                  <td className="border-b border-border px-3.5 py-2.5 align-middle">
-                    <span
-                      title="Titolare"
-                      className={`inline-flex items-center ${p.starter ? "text-amber" : "text-ink-faint"}`}
-                    >
-                      <Star size={16} fill={p.starter ? "currentColor" : "none"} />
-                    </span>
-                  </td>
-                  <td className="border-b border-border px-3.5 py-2.5 align-middle">
-                    <span
-                      className={`inline-flex items-center rounded-full px-2.5 py-[3px] text-[11px] font-bold ${
-                        p.fantasyTeam ? "bg-indigo-soft text-indigo" : "bg-surface-2 text-ink-dim"
-                      }`}
-                    >
-                      {p.fantasyTeam ? p.fantasyTeam.name : "Svincolato"}
-                    </span>
-                  </td>
-                  {showCost && (
-                    <td className="border-b border-border px-3.5 py-2.5 align-middle font-mono font-bold tabular-nums">
-                      {p.cost ?? "—"}
-                    </td>
-                  )}
-                  <td className="border-b border-border px-3.5 py-2.5 align-middle">
+                )}
+                <td className="h-11 border-b border-line px-3 align-middle">
+                  <button
+                    type="button"
+                    onClick={() => toggleWatchlist(p)}
+                    title="Wishlist"
+                    className={`inline-flex items-center rounded-md p-[3px] hover:bg-surface-2 hover:text-ink ${
+                      p.watchlist ? "text-amber" : "text-ink-faint"
+                    }`}
+                  >
+                    <Star size={16} fill={p.watchlist ? "currentColor" : "none"} />
+                  </button>
+                </td>
+                <td className="h-11 w-px whitespace-nowrap border-b border-line px-3 text-right align-middle">
+                  {p.fantasyTeam ? (
                     <button
                       type="button"
-                      onClick={() => toggleWatchlist(p)}
-                      title="Wishlist"
-                      className={`inline-flex items-center rounded-md p-[3px] hover:bg-surface-2 hover:text-ink ${
-                        p.watchlist ? "text-amber" : "text-ink-faint"
-                      }`}
+                      onClick={() => unassign(p)}
+                      className="text-small-dense font-semibold text-ink-3 opacity-0 transition-[opacity,color] duration-fast ease-standard hover:text-danger group-hover:opacity-100 focus-visible:opacity-100"
                     >
-                      <Star size={16} fill={p.watchlist ? "currentColor" : "none"} />
+                      Svincola
                     </button>
-                  </td>
-                  <td className="border-b border-border px-3.5 py-2.5 align-middle">
-                    {p.fantasyTeam ? (
-                      <button
-                        type="button"
-                        onClick={() => unassign(p)}
-                        className="text-[12px] font-bold text-coral"
-                      >
-                        Svincola
-                      </button>
-                    ) : teams.length > 0 ? (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setAssigning(p);
-                          setAssignOpen(true);
-                        }}
-                        className="text-[12px] font-bold text-indigo"
-                      >
-                        Assegna
-                      </button>
-                    ) : (
-                      <span className="text-[12px] text-ink-faint">Crea prima una squadra</span>
-                    )}
-                  </td>
-                </tr>
-              ))}
-              {sortedPlayers.length === 0 && (
-                <tr>
-                  <td colSpan={COLUMNS.length + 1} className="px-3.5 py-10 text-center text-ink-dim">
-                    Nessun giocatore da mostrare.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+                  ) : teams.length > 0 ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAssigning(p);
+                        setAssignOpen(true);
+                      }}
+                      className="text-small-dense font-semibold text-accent opacity-0 transition-opacity duration-fast ease-standard group-hover:opacity-100 focus-visible:opacity-100"
+                    >
+                      Assegna
+                    </button>
+                  ) : (
+                    <span className="text-small-dense text-ink-3">Crea prima una squadra</span>
+                  )}
+                </td>
+              </tr>
+            ))}
+            {sortedPlayers.length === 0 && (
+              <tr>
+                <td colSpan={COLUMNS.length + 1} className="px-3 py-6">
+                  <EmptyState
+                    icon={Users}
+                    title="Nessun giocatore da mostrare"
+                    description="Nessun risultato per questi filtri. Prova ad azzerarli o a importare il listone da Impostazioni."
+                  />
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       </div>
 
       <AssignDialog
