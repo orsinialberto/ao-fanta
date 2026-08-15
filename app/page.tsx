@@ -66,7 +66,7 @@ export default async function AstaPage() {
                 <div className="mb-2 flex items-center gap-3">
                   <span className="text-label uppercase text-ink-3">{group.label}</span>
                   <span className="h-px flex-1 bg-line" />
-                  <span className="font-mono text-small-dense tabular-nums text-ink-3">
+                  <span className="font-mono font-medium text-small-dense tabular-nums text-ink-3">
                     {group.items.length}
                   </span>
                 </div>

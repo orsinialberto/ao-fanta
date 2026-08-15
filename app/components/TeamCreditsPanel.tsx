@@ -22,7 +22,7 @@ export default function TeamCreditsPanel({
     <aside className="sticky top-10">
       <div className="mb-3 flex items-baseline justify-between">
         <h2 className="text-label uppercase text-ink-3">Crediti squadre</h2>
-        <span className="font-mono text-small-dense tabular-nums text-ink-3">{teams.length}</span>
+        <span className="font-mono font-medium text-small-dense tabular-nums text-ink-3">{teams.length}</span>
       </div>
 
       <div className="rounded-lg border border-line bg-surface px-4">
@@ -36,7 +36,7 @@ export default function TeamCreditsPanel({
           <div key={team.id} className="border-b border-line py-3 last:border-b-0">
             <div className="flex items-baseline justify-between gap-3">
               <span className="text-body-dense font-semibold">{team.name}</span>
-              <span className="font-mono text-body-dense font-semibold tabular-nums">
+              <span className="font-mono text-body-dense font-medium tabular-nums">
                 {team.remainingCredits}
                 <span className="text-small-dense font-medium text-ink-3">/{team.totalCredits}</span>
               </span>
@@ -44,7 +44,7 @@ export default function TeamCreditsPanel({
 
             <div className="my-2 h-[2px] overflow-hidden rounded-full bg-line">
               <div
-                className="h-full rounded-full bg-accent transition-[width] duration-500 ease-standard"
+                className="h-full rounded-full bg-accent transition-[width] duration-[400ms] ease-standard"
                 style={{ width: `${spendPercent(team.spentCredits, team.totalCredits)}%` }}
               />
             </div>
