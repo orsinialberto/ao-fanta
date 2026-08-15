@@ -48,9 +48,9 @@ Gestionale locale per aste di fantacalcio. Next.js 15 + Prisma + SQLite.
 ## Funzionalità
 
 - **Squadre** (`/teams`) — crea/modifica/elimina squadre fantacalcio, crediti residui calcolati in automatico.
-- **Giocatori** (`/players`) — elenco con filtri (nome, ruolo, squadra Serie A, svincolati, titolari, watchlist), assegnazione a squadra, aggiunta manuale.
+- **Giocatori** (`/players`) — elenco con filtri (nome, ruolo, squadra Serie A, svincolati, titolari, tier wishlist), assegnazione a squadra, aggiunta manuale.
 - **Import** (`/players/import`) — carica un file CSV/Excel, mappa le colonne del listone ai campi (nome, ruolo, squadra), preview prima di confermare.
-- **Watchlist** (`/watchlist`) — giocatori svincolati marcati da tenere d'occhio durante l'asta.
+- **Wishlist** (`/wishlist`) — giocatori svincolati divisi in tre liste di priorità: **A** (big), **B** (medi), **C** (low cost). Il tier si assegna dalle pillole A/B/C nella colonna "Wish" del listone; riclick sulla pillola attiva toglie il giocatore dalla wishlist.
 
 ## Note
 
