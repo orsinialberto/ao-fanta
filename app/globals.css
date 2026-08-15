@@ -79,57 +79,6 @@
   --duration-base: 180ms;
 }
 
-/* ─────────────────────────────────────────────────────────
-   LEGACY ALIASES — deleted in Task 10.
-   These keep every component that still uses the old colour
-   names building while the routes are migrated one at a time.
-   Do not use any of these names in new code.
-   ───────────────────────────────────────────────────────── */
-@theme {
-  --color-page: var(--color-paper);
-  --color-surface-2: var(--color-surface-sunk);
-  --color-ink-dim: var(--color-ink-2);
-  --color-ink-faint: var(--color-ink-3);
-  --color-border: var(--color-line);
-  --color-input: var(--color-line);
-  --color-ring: var(--color-accent);
-  --color-background: var(--color-paper);
-  --color-foreground: var(--color-ink);
-  --color-card: var(--color-surface);
-  --color-card-foreground: var(--color-ink);
-  --color-popover: var(--color-surface);
-  --color-popover-foreground: var(--color-ink);
-  --color-primary: var(--color-accent);
-  --color-primary-foreground: #ffffff;
-  --color-secondary: var(--color-surface-sunk);
-  --color-secondary-foreground: var(--color-ink);
-  --color-muted: var(--color-surface-sunk);
-  --color-muted-foreground: var(--color-ink-2);
-  --color-accent-foreground: var(--color-accent);
-  --color-destructive: var(--color-danger);
-  --color-destructive-foreground: #ffffff;
-  --color-indigo: var(--color-accent);
-  --color-indigo-soft: var(--color-accent-bg);
-  --color-teal: var(--color-role-p);
-  --color-teal-soft: var(--color-role-p-soft);
-  --color-amber: var(--color-role-c);
-  --color-amber-soft: var(--color-role-c-soft);
-  --color-coral: var(--color-role-a);
-  --color-coral-soft: var(--color-role-a-soft);
-}
-
-/* Legacy gradients — the only consumers are the sidebar status card and the
-   settings icon badges, both removed by Task 9. Deleted in Task 10. */
-@utility bg-lavender {
-  background-image: linear-gradient(160deg, #e4e1fa, #f7f5fe);
-}
-@utility bg-peach {
-  background-image: linear-gradient(160deg, #fce0d6, #fcedea);
-}
-@utility bg-mint {
-  background-image: linear-gradient(160deg, #d7f3e1, #eafbf0);
-}
-
 @layer base {
   /* v4 changed the default border colour to currentColor. Without this the
      bare `border` class in the shadcn components would draw in the text
