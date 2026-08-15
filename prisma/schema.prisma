@@ -26,11 +26,13 @@ model Player {
   cost          Int?
   starter       Boolean  @default(false)
   watchlist     Boolean  @default(false)
+  wishlistTier  String?
   assignedAt    DateTime?
   createdAt    DateTime @default(now())
 
   @@index([fantasyTeamId])
   @@index([role])
+  @@index([wishlistTier])
 }
 
 model LeagueSettings {
