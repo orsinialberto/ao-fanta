@@ -5,6 +5,7 @@ import ListoneCard from "./ListoneCard";
 import TeamsCard from "./TeamsCard";
 import PlayersCard from "./PlayersCard";
 import EditPlayerCard from "./EditPlayerCard";
+import MarkStartersCard from "./MarkStartersCard";
 import DangerZone from "./DangerZone";
 
 export const dynamic = "force-dynamic";
@@ -24,6 +25,7 @@ export default async function SettingsPage() {
         <ListoneCard />
         <PlayersCard />
         <EditPlayerCard />
+        <MarkStartersCard />
         <DangerZone />
       </div>
     </>
