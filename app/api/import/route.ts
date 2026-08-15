@@ -1,16 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import * as XLSX from "xlsx";
 import { prisma } from "@/lib/prisma";
-import { normalize } from "@/lib/normalize";
-import { sheetToRows, normalizeRole } from "@/lib/xlsxImport";
+import { sheetToRows } from "@/lib/xlsxImport";
+import { parseAndValidateRows, computeReconcile } from "@/lib/importReconcile";
 
 export async function POST(req: NextRequest) {
   const formData = await req.formData();
   const file = formData.get("file") as File | null;
   const mappingRaw = formData.get("mapping") as string | null;
+  const mode = (formData.get("mode") as string | null) ?? "preview";
 
   if (!file || !mappingRaw) {
     return NextResponse.json({ error: "file and mapping are required" }, { status: 400 });
+  }
+  if (mode !== "preview" && mode !== "commit") {
+    return NextResponse.json({ error: "mode must be 'preview' or 'commit'" }, { status: 400 });
   }
 
   const mapping = JSON.parse(mappingRaw) as {
@@ -32,56 +36,52 @@ export async function POST(req: NextRequest) {
 
   const sheet = workbook.Sheets[sheetName];
   const rows = sheetToRows(sheet);
+  const { valid, errors } = parseAndValidateRows(rows, mapping);
 
-  // Upsert-by-name must be accent-insensitive too (SQLite LIKE/equality
-  // folds ASCII case but not diacritics), otherwise re-importing with a
-  // differently-accented name creates a duplicate instead of updating.
-  // Dataset is small (~600 players), so load all names once and compare
-  // normalized in JS rather than an exact-match findFirst per row.
-  const existingPlayers = await prisma.player.findMany({
-    select: { id: true, name: true },
-  });
-  const existingByNormalizedName = new Map(
-    existingPlayers.map((p) => [normalize(p.name), p.id])
-  );
-
-  let imported = 0;
-  const errors: string[] = [];
-
-  for (const [index, row] of rows.entries()) {
-    const name = String(row[mapping.name] ?? "").trim();
-    const roleRaw = String(row[mapping.role] ?? "").trim();
-    const serieATeam = String(row[mapping.serieATeam] ?? "").trim();
-    const rowNumber = index + 2; // header row is row 1
-
-    if (!name) {
-      errors.push(`Riga ${rowNumber}: nome mancante`);
-      continue;
-    }
-    const role = normalizeRole(roleRaw);
-    if (!role) {
-      errors.push(`Riga ${rowNumber}: ruolo non valido "${roleRaw}"`);
-      continue;
-    }
-    if (!serieATeam) {
-      errors.push(`Riga ${rowNumber}: squadra Serie A mancante`);
-      continue;
-    }
-
-    const existingId = existingByNormalizedName.get(normalize(name));
-    if (existingId) {
-      await prisma.player.update({
-        where: { id: existingId },
-        data: { role, serieATeam },
-      });
-    } else {
-      const created = await prisma.player.create({
-        data: { name, role, serieATeam },
-      });
-      existingByNormalizedName.set(normalize(name), created.id);
-    }
-    imported++;
+  if (valid.length === 0) {
+    return NextResponse.json(
+      { error: "Nessuna riga valida trovata nel file", skipped: errors.length, errors },
+      { status: 400 }
+    );
   }
 
-  return NextResponse.json({ imported, skipped: errors.length, errors });
+  // Upsert/delete-by-name must be accent-insensitive too (SQLite LIKE/equality
+  // folds ASCII case but not diacritics) — matching happens in JS via
+  // computeReconcile rather than a DB query per row.
+  const existingPlayers = await prisma.player.findMany({
+    select: { id: true, name: true, role: true, serieATeam: true },
+  });
+
+  const { toCreate, toUpdate, toDeleteIds, toDeleteNames } = computeReconcile(
+    valid,
+    existingPlayers
+  );
+
+  if (mode === "preview") {
+    return NextResponse.json({
+      toCreate: toCreate.map((p) => p.name),
+      toUpdate: toUpdate.map((p) => p.name),
+      toDelete: toDeleteNames,
+      skipped: errors.length,
+      errors,
+    });
+  }
+
+  await prisma.$transaction([
+    ...(toCreate.length > 0 ? [prisma.player.createMany({ data: toCreate })] : []),
+    ...toUpdate.map((p) =>
+      prisma.player.update({ where: { id: p.id }, data: { role: p.role, serieATeam: p.serieATeam } })
+    ),
+    ...(toDeleteIds.length > 0
+      ? [prisma.player.deleteMany({ where: { id: { in: toDeleteIds } } })]
+      : []),
+  ]);
+
+  return NextResponse.json({
+    created: toCreate.length,
+    updated: toUpdate.length,
+    deleted: toDeleteIds.length,
+    skipped: errors.length,
+    errors,
+  });
 }
