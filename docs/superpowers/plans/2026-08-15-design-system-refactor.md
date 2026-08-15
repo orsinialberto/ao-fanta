@@ -21,7 +21,7 @@
 - **Type scale**, six steps only: `text-display` (32/700/−.02em), `text-h2` (20/650/−.01em), `text-h3` (15/600), `text-body` (14/400), `text-small` (13/400), `text-label` (11/600/uppercase/.08em). Auction density adds `text-body-dense` (13) and `text-small-dense` (12).
 - **Radius scale**, four steps only: `rounded-sm` 6px (badges, chips), `rounded-md` 10px (inputs, buttons), `rounded-lg` 14px (cards), `rounded-xl` 20px (dialogs).
 - **No shadows on cards.** Cards get `border border-line`. `shadow-overlay` is allowed only on dialogs and dropdowns.
-- **Motion:** `ease-standard` = `cubic-bezier(0.2, 0, 0, 1)`, `duration-fast` = 120ms (hover), `duration-base` = 180ms (overlays), 400ms for credit bar width. Always paired with a `transition-*` utility naming the specific property — never `transition-all`.
+- **Motion:** `ease-standard` = `cubic-bezier(0.2, 0, 0, 1)`, `duration-fast` = 120ms (hover), `duration-base` = 180ms (overlays), `duration-[400ms]` for credit bar width (an arbitrary value, since Tailwind's default duration scale has no 400 step and Task 1 defines no matching token — same sanctioned-exception rationale as the `h-[2px]`/`h-[3px]` accent bars above). Always paired with a `transition-*` utility naming the specific property — never `transition-all`.
 - **Numbers** use `font-mono font-medium tabular-nums`. Never `font-bold` on mono.
 - **Role colour mapping** (desaturated from the current palette): P=`#0F7B62`, D=`#3D4EAC`, C=`#A66A11`, A=`#C2452D`, with softs `#E7F2EE`, `#EAECF7`, `#F7EFE2`, `#F9EAE6`.
 - **`--danger` `#B3261E` is never a role colour and `--color-role-a` is never a destructive colour.** This separation is defect 8; do not reintroduce the overlap.
