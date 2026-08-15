@@ -94,6 +94,7 @@ export default function ImportPage() {
   }
 
   async function handleConfirm() {
+    if (!file) return;
     setLoading(true);
     setError(null);
 
@@ -203,8 +204,8 @@ export default function ImportPage() {
                   costo e tier wishlist se presenti):
                 </p>
                 <ul className="list-inside list-disc text-small-dense text-danger">
-                  {preview.toDelete.map((name) => (
-                    <li key={name}>{name}</li>
+                  {preview.toDelete.map((name, i) => (
+                    <li key={`${name}-${i}`}>{name}</li>
                   ))}
                 </ul>
               </div>

@@ -60,6 +60,24 @@ describe("computeReconcile", () => {
     expect(result.toDeleteIds).toEqual([]);
   });
 
+  it("updates a player whose role changed", () => {
+    const existing = [{ id: "1", name: "Osimhen", role: "A", serieATeam: "Napoli" }];
+    const validRows = [{ name: "Osimhen", role: "D", serieATeam: "Napoli" }];
+    const result = computeReconcile(validRows, existing);
+    expect(result.toUpdate).toEqual([{ id: "1", name: "Osimhen", role: "D", serieATeam: "Napoli" }]);
+    expect(result.toCreate).toEqual([]);
+    expect(result.toDeleteIds).toEqual([]);
+  });
+
+  it("uses only the last row when the file has duplicate names", () => {
+    const validRows = [
+      { name: "Osimhen", role: "A", serieATeam: "Napoli" },
+      { name: "Osimhen", role: "A", serieATeam: "Galatasaray" },
+    ];
+    const result = computeReconcile(validRows, []);
+    expect(result.toCreate).toEqual([{ name: "Osimhen", role: "A", serieATeam: "Galatasaray" }]);
+  });
+
   it("matches names case/accent-insensitively so it updates rather than duplicates", () => {
     const existing = [{ id: "1", name: "Vlahović", role: "A", serieATeam: "Juventus" }];
     const validRows = [{ name: "vlahovic", role: "A", serieATeam: "Milan" }];
@@ -83,12 +101,37 @@ describe("computeReconcile", () => {
     expect(result.toDeleteNames).toEqual(["Ritirato"]);
   });
 
+  it("deletes every duplicate but one when two existing players normalize to the same name", () => {
+    const existing = [
+      { id: "1", name: "Osimhen", role: "A", serieATeam: "Napoli" },
+      { id: "2", name: "osimhen", role: "A", serieATeam: "Napoli" },
+    ];
+    const validRows = [{ name: "Osimhen", role: "A", serieATeam: "Napoli" }];
+    const result = computeReconcile(validRows, existing);
+    // The first encountered ("1") is the one eligible to match the file row;
+    // it's unchanged so it's neither created nor updated. The duplicate
+    // ("2") can never be "the" match and is unconditionally deleted.
+    expect(result.toCreate).toEqual([]);
+    expect(result.toUpdate).toEqual([]);
+    expect(result.toDeleteIds).toEqual(["2"]);
+    expect(result.toDeleteNames).toEqual(["osimhen"]);
+  });
+
   it("does not protect an existing player from deletion when the file has a row for them that failed validation", () => {
-    // parseAndValidateRows would have dropped this row (bad role), so it
-    // never reaches computeReconcile as a valid row — the player must
-    // still be diffed as missing.
+    // Compose the two functions for real: a raw row with a bad role is
+    // dropped by parseAndValidateRows into errors, not valid, so it never
+    // reaches computeReconcile as a valid row — the player must still be
+    // diffed as missing.
+    const mapping = { name: "Nome", role: "Ruolo", serieATeam: "Squadra" };
+    const { valid, errors } = parseAndValidateRows(
+      [{ Nome: "Osimhen", Ruolo: "XX", Squadra: "Napoli" }],
+      mapping
+    );
+    expect(valid).toEqual([]);
+    expect(errors).toEqual(['Riga 2: ruolo non valido "XX"']);
+
     const existing = [{ id: "1", name: "Osimhen", role: "A", serieATeam: "Napoli" }];
-    const result = computeReconcile([], existing);
+    const result = computeReconcile(valid, existing);
     expect(result.toDeleteIds).toEqual(["1"]);
   });
 });

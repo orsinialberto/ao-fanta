@@ -58,7 +58,24 @@ export function computeReconcile(
   toDeleteIds: string[];
   toDeleteNames: string[];
 } {
-  const existingByNormalizedName = new Map(existing.map((p) => [normalize(p.name), p]));
+  // If multiple existing DB players normalize to the same name (an
+  // accidental duplicate — POST /api/players has no uniqueness check), only
+  // the first one encountered is eligible to be matched against the file;
+  // every other duplicate can never be "the" match, so it's routed straight
+  // to deletion regardless of whether the file has a row for that name. This
+  // guarantees at most one DB row per normalized name survives an import.
+  const existingByNormalizedName = new Map<string, ExistingPlayer>();
+  const toDeleteIds: string[] = [];
+  const toDeleteNames: string[] = [];
+  for (const p of existing) {
+    const key = normalize(p.name);
+    if (existingByNormalizedName.has(key)) {
+      toDeleteIds.push(p.id);
+      toDeleteNames.push(p.name);
+    } else {
+      existingByNormalizedName.set(key, p);
+    }
+  }
 
   // Last row wins if the file has duplicate names, matching the
   // pre-existing upsert loop's overwrite behavior.
@@ -79,10 +96,8 @@ export function computeReconcile(
     }
   }
 
-  const toDeleteIds: string[] = [];
-  const toDeleteNames: string[] = [];
-  for (const p of existing) {
-    if (!rowsByNormalizedName.has(normalize(p.name))) {
+  for (const [normalizedName, p] of existingByNormalizedName) {
+    if (!rowsByNormalizedName.has(normalizedName)) {
       toDeleteIds.push(p.id);
       toDeleteNames.push(p.name);
     }
