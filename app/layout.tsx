@@ -19,9 +19,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html lang="it" className={`${manrope.variable} ${jetbrainsMono.variable}`}>
-      <body className="flex bg-page text-ink font-sans">
+      <body className="flex bg-paper text-ink font-sans">
         <Sidebar assignedCount={assigned} totalCount={total} />
-        <main className="w-full max-w-[1180px] flex-1 px-[34px] pb-[60px] pt-[26px]">
+        <main className="w-full max-w-[1240px] flex-1 px-12 pb-16 pt-10">
           {children}
         </main>
       </body>

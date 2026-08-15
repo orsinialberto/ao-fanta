@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Gavel, List, Users, Star, Settings } from "lucide-react";
+import { spendPercent } from "@/lib/credits";
 
 const PRIMARY_LINKS = [
   { href: "/", label: "Asta", icon: Gavel },
@@ -19,11 +20,13 @@ function NavLink({ href, label, icon: Icon }: { href: string; label: string; ico
   return (
     <Link
       href={href}
-      className={`flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-semibold ${
-        active ? "bg-indigo-soft text-indigo" : "text-ink-dim hover:bg-surface-2 hover:text-ink"
+      className={`flex items-center gap-3 rounded-md px-2 py-2 text-small transition-colors duration-fast ease-standard ${
+        active
+          ? "bg-surface font-semibold text-ink shadow-[inset_0_0_0_1px_var(--color-line)]"
+          : "font-medium text-ink-2 hover:bg-surface-sunk hover:text-ink"
       }`}
     >
-      <Icon size={17} strokeWidth={1.8} />
+      <Icon size={15} strokeWidth={1.7} />
       {label}
     </Link>
   );
@@ -36,33 +39,36 @@ export default function Sidebar({
   assignedCount: number;
   totalCount: number;
 }) {
-  const pct = totalCount > 0 ? Math.round((assignedCount / totalCount) * 100) : 0;
+  const pct = spendPercent(assignedCount, totalCount);
 
   return (
-    <aside className="sticky top-0 flex h-screen w-[238px] flex-col gap-6 border-r border-border bg-surface p-5">
-      <div className="flex items-center gap-2.5 px-1">
-        <div className="h-7 w-7 flex-shrink-0 rounded-[9px] bg-gradient-to-br from-indigo to-[#8B7FF0]" />
-        <span className="text-[14.5px] font-extrabold">ao-fanta</span>
+    <aside className="sticky top-0 flex h-screen w-[220px] flex-col gap-6 border-r border-line bg-paper p-4">
+      <div className="flex items-center gap-2 px-2">
+        <div className="h-5 w-5 shrink-0 rounded-sm bg-accent" />
+        <span className="text-h3">ao-fanta</span>
       </div>
 
-      <nav className="flex flex-col gap-0.5">
+      <nav className="flex flex-col gap-px">
         {PRIMARY_LINKS.map((l) => (
           <NavLink key={l.href} {...l} />
         ))}
       </nav>
 
-      <div className="rounded-2xl bg-peach p-4">
-        <div className="mb-2 text-[11px] font-bold">Stato asta</div>
-        <div className="mb-2 h-1.5 overflow-hidden rounded-full bg-black/10">
-          <div className="h-full rounded-full bg-coral" style={{ width: `${pct}%` }} />
+      <div className="flex flex-col gap-2 px-2">
+        <span className="text-label uppercase text-ink-3">Stato asta</span>
+        <div className="h-[3px] overflow-hidden rounded-full bg-line">
+          <div
+            className="h-full rounded-full bg-accent transition-[width] duration-500 ease-standard"
+            style={{ width: `${pct}%` }}
+          />
         </div>
-        <div className="text-[11px] text-ink-dim">
-          <span className="font-mono font-bold tabular-nums text-ink">{assignedCount}</span> /{" "}
-          {totalCount} giocatori assegnati
-        </div>
+        <span className="text-small-dense text-ink-3">
+          <span className="font-mono font-semibold tabular-nums text-ink">{assignedCount}</span> di{" "}
+          {totalCount} assegnati
+        </span>
       </div>
 
-      <nav className="mt-auto flex flex-col gap-0.5">
+      <nav className="mt-auto flex flex-col gap-px">
         {CONFIG_LINKS.map((l) => (
           <NavLink key={l.href} {...l} />
         ))}
