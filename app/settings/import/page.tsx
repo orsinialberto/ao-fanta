@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import * as XLSX from "xlsx";
 import { sheetToRows, normalizeRole } from "@/lib/xlsxImport";
+import PageHeader from "@/app/components/PageHeader";
+import InlineError from "@/app/components/InlineError";
 
 type ImportResult = { imported: number; skipped: number; errors: string[] };
 
@@ -70,102 +72,101 @@ export default function ImportPage() {
   }
 
   return (
-    <div className="space-y-4 max-w-xl">
-      <h1 className="text-2xl font-bold">Import giocatori</h1>
+    <>
+      <PageHeader
+        title="Import giocatori"
+        subtitle="Carica un file CSV o Excel, associa le colonne e conferma l'importazione."
+      />
+      <div className="max-w-xl space-y-4">
+        <input type="file" accept=".csv,.xlsx,.xls" onChange={handleFileSelect} />
 
-      <input type="file" accept=".csv,.xlsx,.xls" onChange={handleFileSelect} />
-
-      {headers.length > 0 && (
-        <div className="space-y-2 border rounded p-4">
-          <p className="text-sm text-gray-500">Associa le colonne del file ai campi:</p>
-          {(["name", "role", "serieATeam"] as const).map((field) => (
-            <div key={field} className="flex items-center gap-2">
-              <label className="w-32 text-sm">{field}</label>
-              <select
-                value={mapping[field]}
-                onChange={(e) => setMapping((m) => ({ ...m, [field]: e.target.value }))}
-                className="border rounded px-2 py-1 text-sm"
-              >
-                <option value="">-- seleziona colonna --</option>
-                {headers.map((h) => (
-                  <option key={h} value={h}>
-                    {h}
-                  </option>
-                ))}
-              </select>
-            </div>
-          ))}
-          <p className="text-xs text-gray-400">
-            Ruolo atteso nel file: P/D/C/A (case-insensitive).
-          </p>
-
-          {previewRows.length > 0 && (
-            <div className="space-y-1">
-              <p className="text-sm text-gray-500">
-                Anteprima (prime {previewRows.length} righe con la mappatura attuale):
-              </p>
-              <div className="overflow-x-auto">
-                <table className="w-full text-xs border-collapse">
-                  <thead>
-                    <tr className="text-left border-b">
-                      <th className="py-1 pr-3">name</th>
-                      <th className="py-1 pr-3">role</th>
-                      <th className="py-1 pr-3">serieATeam</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {previewRows.map((row, i) => (
-                      <tr key={i} className="border-b">
-                        <td className="py-1 pr-3">
-                          {mapping.name ? String(row[mapping.name] ?? "") : "—"}
-                        </td>
-                        <td className="py-1 pr-3">
-                          {mapping.role
-                            ? normalizeRole(String(row[mapping.role] ?? "")) ??
-                              `${String(row[mapping.role] ?? "")} (non valido)`
-                            : "—"}
-                        </td>
-                        <td className="py-1 pr-3">
-                          {mapping.serieATeam ? String(row[mapping.serieATeam] ?? "") : "—"}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+        {headers.length > 0 && (
+          <div className="space-y-2 rounded-lg border border-line p-4">
+            <p className="text-small text-ink-2">Associa le colonne del file ai campi:</p>
+            {(["name", "role", "serieATeam"] as const).map((field) => (
+              <div key={field} className="flex items-center gap-2">
+                <label className="w-32 text-small">{field}</label>
+                <select
+                  value={mapping[field]}
+                  onChange={(e) => setMapping((m) => ({ ...m, [field]: e.target.value }))}
+                  className="rounded-md border border-line bg-surface px-2 py-1 text-small"
+                >
+                  <option value="">-- seleziona colonna --</option>
+                  {headers.map((h) => (
+                    <option key={h} value={h}>
+                      {h}
+                    </option>
+                  ))}
+                </select>
               </div>
-            </div>
-          )}
+            ))}
+            <p className="text-small-dense text-ink-3">
+              Ruolo atteso nel file: P/D/C/A (case-insensitive).
+            </p>
 
-          <button
-            onClick={handleImport}
-            disabled={loading || !mapping.name || !mapping.role || !mapping.serieATeam}
-            className="px-3 py-1.5 bg-blue-600 text-white rounded text-sm disabled:opacity-40"
-          >
-            {loading ? "Importazione..." : "Importa"}
-          </button>
-        </div>
-      )}
+            {previewRows.length > 0 && (
+              <div className="space-y-1">
+                <p className="text-small text-ink-2">
+                  Anteprima (prime {previewRows.length} righe con la mappatura attuale):
+                </p>
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse text-small-dense">
+                    <thead>
+                      <tr className="border-b border-line text-left">
+                        <th className="py-1 pr-3">name</th>
+                        <th className="py-1 pr-3">role</th>
+                        <th className="py-1 pr-3">serieATeam</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {previewRows.map((row, i) => (
+                        <tr key={i} className="border-b border-line">
+                          <td className="py-1 pr-3">
+                            {mapping.name ? String(row[mapping.name] ?? "") : "—"}
+                          </td>
+                          <td className="py-1 pr-3">
+                            {mapping.role
+                              ? normalizeRole(String(row[mapping.role] ?? "")) ??
+                                `${String(row[mapping.role] ?? "")} (non valido)`
+                              : "—"}
+                          </td>
+                          <td className="py-1 pr-3">
+                            {mapping.serieATeam ? String(row[mapping.serieATeam] ?? "") : "—"}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
 
-      {error && (
-        <div className="border border-red-400 rounded p-4 text-sm bg-red-50 text-red-700">
-          <p className="font-semibold">Errore:</p>
-          <p>{error}</p>
-        </div>
-      )}
+            <button
+              onClick={handleImport}
+              disabled={loading || !mapping.name || !mapping.role || !mapping.serieATeam}
+              className="rounded-md bg-accent px-3 py-1.5 text-small font-semibold text-white transition-colors duration-fast ease-standard hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              {loading ? "Importazione..." : "Importa"}
+            </button>
+          </div>
+        )}
 
-      {result && (
-        <div className="border rounded p-4 text-sm space-y-1">
-          <p>Importati: {result.imported}</p>
-          <p>Scartati: {result.skipped}</p>
-          {result.errors.length > 0 && (
-            <ul className="text-red-600 list-disc list-inside">
-              {result.errors.map((err, i) => (
-                <li key={i}>{err}</li>
-              ))}
-            </ul>
-          )}
-        </div>
-      )}
-    </div>
+        {error && <InlineError title="Errore:" message={error} />}
+
+        {result && (
+          <div className="space-y-1 rounded-lg border border-line p-4 text-small">
+            <p>Importati: {result.imported}</p>
+            <p>Scartati: {result.skipped}</p>
+            {result.errors.length > 0 && (
+              <ul className="list-inside list-disc text-danger">
+                {result.errors.map((err, i) => (
+                  <li key={i}>{err}</li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
+      </div>
+    </>
   );
 }

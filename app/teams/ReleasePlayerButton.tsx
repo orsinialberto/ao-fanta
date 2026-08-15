@@ -22,7 +22,7 @@ export default function ReleasePlayerButton({
         onClick={() => setOpen(true)}
         title="Svincola"
         aria-label={`Svincola ${playerName}`}
-        className="flex-shrink-0 text-ink-3 hover:text-role-a"
+        className="flex-shrink-0 text-ink-3 hover:text-danger"
       >
         <Trash2 size={14} strokeWidth={1.8} />
       </button>

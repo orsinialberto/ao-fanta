@@ -22,7 +22,7 @@ export default function ReleaseAllButton({
         type="button"
         onClick={() => setOpen(true)}
         disabled={isDisabled}
-        className="rounded-lg border border-role-a px-3 py-1.5 text-small-dense font-bold text-role-a disabled:opacity-40 disabled:cursor-not-allowed"
+        className="rounded-lg border border-line px-3 py-1.5 text-small-dense font-bold text-ink-3 hover:text-danger disabled:opacity-40 disabled:cursor-not-allowed"
       >
         Svincola tutto
       </button>

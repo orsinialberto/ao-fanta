@@ -83,7 +83,7 @@ export default function TeamForm({
       <button type="button" onClick={() => setOpen(false)} className="text-small-dense font-semibold text-ink-2">
         Annulla
       </button>
-      {error && <span className="text-small-dense font-semibold text-role-a">{error}</span>}
+      {error && <span className="text-small-dense font-semibold text-danger">{error}</span>}
     </form>
   );
 }

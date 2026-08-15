@@ -113,7 +113,7 @@ export default function EditPlayerCard() {
             </span>
             <button
               onClick={() => setSelected(null)}
-              className="flex-shrink-0 text-small-dense font-semibold text-ink-2 hover:text-role-a"
+              className="flex-shrink-0 text-small-dense font-semibold text-ink-2 hover:text-danger"
             >
               Cambia
             </button>
@@ -150,7 +150,7 @@ export default function EditPlayerCard() {
         </div>
       )}
 
-      {error && <p className="text-xs text-role-a">{error}</p>}
+      {error && <p className="text-xs text-danger">{error}</p>}
     </SettingsSection>
   );
 }
