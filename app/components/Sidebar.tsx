@@ -22,7 +22,7 @@ function NavLink({ href, label, icon: Icon }: { href: string; label: string; ico
       href={href}
       className={`flex items-center gap-3 rounded-md px-2 py-2 text-small transition-colors duration-fast ease-standard ${
         active
-          ? "bg-surface font-semibold text-ink shadow-[inset_0_0_0_1px_var(--color-line)]"
+          ? "bg-surface font-semibold text-ink ring-1 ring-inset ring-line"
           : "font-medium text-ink-2 hover:bg-surface-sunk hover:text-ink"
       }`}
     >
@@ -63,7 +63,7 @@ export default function Sidebar({
           />
         </div>
         <span className="text-small-dense text-ink-3">
-          <span className="font-mono font-semibold tabular-nums text-ink">{assignedCount}</span> di{" "}
+          <span className="font-mono font-medium tabular-nums text-ink">{assignedCount}</span> di{" "}
           {totalCount} assegnati
         </span>
       </div>
