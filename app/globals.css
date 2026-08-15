@@ -1,57 +1,152 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  /* ── colour ───────────────────────────────────────────── */
+  --color-paper: #fbfbfa;
+  --color-surface: #ffffff;
+  --color-surface-sunk: #f4f4f2;
+  --color-ink: #16161a;
+  --color-ink-2: #5c5c66;
+  --color-ink-3: #9a9aa3;
+  --color-line: #e6e6e2;
+  --color-line-strong: #d4d4ce;
+  --color-accent: #3b3a8f;
+  --color-accent-hover: #2f2e77;
+  --color-accent-bg: #eae9f5;
+  --color-danger: #b3261e;
+  --color-danger-bg: #fbefed;
+  --color-danger-line: #e9cdc9;
+
+  --color-role-p: #0f7b62;
+  --color-role-p-soft: #e7f2ee;
+  --color-role-d: #3d4eac;
+  --color-role-d-soft: #eaecf7;
+  --color-role-c: #a66a11;
+  --color-role-c-soft: #f7efe2;
+  --color-role-a: #c2452d;
+  --color-role-a-soft: #f9eae6;
+
+  /* ── typography ───────────────────────────────────────── */
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jbmono), ui-monospace, monospace;
+
+  --text-display: 2rem;
+  --text-display--line-height: 1.15;
+  --text-display--letter-spacing: -0.02em;
+  --text-display--font-weight: 700;
+
+  --text-h2: 1.25rem;
+  --text-h2--line-height: 1.3;
+  --text-h2--letter-spacing: -0.01em;
+  --text-h2--font-weight: 650;
+
+  --text-h3: 0.9375rem;
+  --text-h3--line-height: 1.4;
+  --text-h3--font-weight: 600;
+
+  --text-body: 0.875rem;
+  --text-body--line-height: 1.55;
+
+  --text-small: 0.8125rem;
+  --text-small--line-height: 1.5;
+
+  --text-label: 0.6875rem;
+  --text-label--line-height: 1.4;
+  --text-label--letter-spacing: 0.08em;
+  --text-label--font-weight: 600;
+
+  /* Auction density only. Same scale, two steps tighter. */
+  --text-body-dense: 0.8125rem;
+  --text-body-dense--line-height: 1.5;
+  --text-small-dense: 0.75rem;
+  --text-small-dense--line-height: 1.45;
+
+  /* ── shape ────────────────────────────────────────────── */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+
+  /* Cards use a hairline, never a shadow. This is for things that
+     genuinely float: dialogs and dropdowns. */
+  --shadow-overlay:
+    0 1px 2px rgb(22 22 26 / 0.06),
+    0 16px 40px -12px rgb(22 22 26 / 0.22);
+
+  /* ── motion ───────────────────────────────────────────── */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --duration-fast: 120ms;
+  --duration-base: 180ms;
+}
+
+/* ─────────────────────────────────────────────────────────
+   LEGACY ALIASES — deleted in Task 10.
+   These keep every component that still uses the old colour
+   names building while the routes are migrated one at a time.
+   Do not use any of these names in new code.
+   ───────────────────────────────────────────────────────── */
+@theme {
+  --color-page: var(--color-paper);
+  --color-surface-2: var(--color-surface-sunk);
+  --color-ink-dim: var(--color-ink-2);
+  --color-ink-faint: var(--color-ink-3);
+  --color-border: var(--color-line);
+  --color-input: var(--color-line);
+  --color-ring: var(--color-accent);
+  --color-background: var(--color-paper);
+  --color-foreground: var(--color-ink);
+  --color-card: var(--color-surface);
+  --color-card-foreground: var(--color-ink);
+  --color-popover: var(--color-surface);
+  --color-popover-foreground: var(--color-ink);
+  --color-primary: var(--color-accent);
+  --color-primary-foreground: #ffffff;
+  --color-secondary: var(--color-surface-sunk);
+  --color-secondary-foreground: var(--color-ink);
+  --color-muted: var(--color-surface-sunk);
+  --color-muted-foreground: var(--color-ink-2);
+  --color-accent-foreground: var(--color-accent);
+  --color-destructive: var(--color-danger);
+  --color-destructive-foreground: #ffffff;
+  --color-indigo: var(--color-accent);
+  --color-indigo-soft: var(--color-accent-bg);
+  --color-teal: var(--color-role-p);
+  --color-teal-soft: var(--color-role-p-soft);
+  --color-amber: var(--color-role-c);
+  --color-amber-soft: var(--color-role-c-soft);
+  --color-coral: var(--color-role-a);
+  --color-coral-soft: var(--color-role-a-soft);
+}
+
+/* Legacy gradients — the only consumers are the sidebar status card and the
+   settings icon badges, both removed by Task 9. Deleted in Task 10. */
+@utility bg-lavender {
+  background-image: linear-gradient(160deg, #e4e1fa, #f7f5fe);
+}
+@utility bg-peach {
+  background-image: linear-gradient(160deg, #fce0d6, #fcedea);
+}
+@utility bg-mint {
+  background-image: linear-gradient(160deg, #d7f3e1, #eafbf0);
+}
 
 @layer base {
-  :root {
-    --background: 232 23% 94%;
-    --foreground: 231 19% 13%;
-    --card: 0 0% 100%;
-    --card-foreground: 231 19% 13%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 231 19% 13%;
-    --primary: 245 78% 61%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 228 33% 97%;
-    --secondary-foreground: 231 19% 13%;
-    --muted: 228 33% 97%;
-    --muted-foreground: 230 8% 57%;
-    --accent: 247 74% 96%;
-    --accent-foreground: 245 78% 61%;
-    --destructive: 9 85% 62%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 232 17% 92%;
-    --input: 232 17% 92%;
-    --ring: 245 78% 61%;
-    --radius: 1rem;
+  /* v4 changed the default border colour to currentColor. Without this the
+     bare `border` class in the shadcn components would draw in the text
+     colour. Remove this block only when no bare `border` utility is left. */
+  *,
+  ::after,
+  ::before {
+    border-color: var(--color-line);
+  }
 
-    /* App-specific named tokens */
-    --page: #ECEDF3;
-    --surface: #FFFFFF;
-    --surface-2: #F5F6FA;
-    --ink: #1B1D28;
-    --ink-dim: #8A8D9B;
-    --ink-faint: #C3C5D1;
-    --indigo: #5B4FE9;
-    --indigo-soft: #EDEBFC;
-    --coral: #F0654B;
-    --coral-soft: #FDE7E1;
-    --teal: #1FA97E;
-    --teal-soft: #E1F6EC;
-    --amber: #C98A1B;
-    --amber-soft: #FBEEDA;
-
-    /* Card gradient pairs */
-    --lavender-a: #E4E1FA;
-    --lavender-b: #F7F5FE;
-    --peach-a: #FCE0D6;
-    --peach-b: #FCEDEA;
-    --mint-a: #D7F3E1;
-    --mint-b: #EAFBF0;
-
-    --shadow-sm: 0 1px 2px rgba(27, 29, 40, 0.04), 0 1px 1px rgba(27, 29, 40, 0.03);
-    --shadow-md: 0 8px 24px rgba(27, 29, 40, 0.07), 0 2px 6px rgba(27, 29, 40, 0.04);
-    --shadow-lg: 0 24px 64px rgba(27, 29, 40, 0.18);
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
   }
 
   h1,
@@ -62,7 +157,16 @@
   }
 
   :focus-visible {
-    outline: 2px solid var(--indigo);
+    outline: 2px solid var(--color-accent);
     outline-offset: 2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
   }
 }
