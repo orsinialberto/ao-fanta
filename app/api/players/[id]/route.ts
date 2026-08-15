@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { isValidRole, ROLE_LABELS, type Role } from "@/lib/roles";
 import { getLeagueSettings, getRoleLimit } from "@/lib/leagueSettings";
 import { evaluateRoleLimit } from "@/lib/roleLimit";
+import { isValidTier } from "@/lib/wishlist";
 
 async function checkRoleLimit(
   playerTeamId: string | null,
@@ -58,6 +59,14 @@ export async function PATCH(
   if (body.serieATeam !== undefined) data.serieATeam = body.serieATeam;
   if (body.starter !== undefined) data.starter = !!body.starter;
   if (body.watchlist !== undefined) data.watchlist = !!body.watchlist;
+  if (body.wishlistTier !== undefined) {
+    // null clears the tier; anything outside A/B/C is a client bug, not a value
+    // to silently coerce.
+    if (body.wishlistTier !== null && !isValidTier(body.wishlistTier)) {
+      return NextResponse.json({ error: "Invalid wishlist tier" }, { status: 400 });
+    }
+    data.wishlistTier = body.wishlistTier;
+  }
 
   if (body.fantasyTeamId !== undefined) {
     if (body.fantasyTeamId === null) {

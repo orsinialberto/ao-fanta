@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getFilteredPlayers } from "@/lib/players";
 import { isValidRole, parseRoleParam } from "@/lib/roles";
+import { parseTierParam } from "@/lib/wishlist";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -13,6 +14,7 @@ export async function GET(req: NextRequest) {
     starterOnly: searchParams.get("starterOnly") === "true",
     watchlistOnly: searchParams.get("watchlistOnly") === "true",
     search: searchParams.get("search") ?? undefined,
+    wishlistTier: parseTierParam(searchParams.get("wishlistTier")),
   });
 
   return NextResponse.json(players);
