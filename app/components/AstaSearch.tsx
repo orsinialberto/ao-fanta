@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronRight, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import AssignDialog from "@/app/components/AssignDialog";
 import AddPlayerDialog from "@/app/components/AddPlayerDialog";
 import RoleBadge from "@/app/components/RoleBadge";
@@ -73,9 +73,9 @@ export default function AstaSearch({
   }
 
   return (
-    <div className="rounded-[20px] border border-border bg-surface p-5 shadow-sm">
-      <div className="relative">
-        <Search className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-faint" size={18} />
+    <div className="overflow-hidden rounded-lg border border-line-strong bg-surface">
+      <div className="flex items-center gap-3 px-4 py-3">
+        <Search className="pointer-events-none shrink-0 text-ink-3" size={17} />
         <input
           autoFocus
           value={query}
@@ -88,12 +88,15 @@ export default function AstaSearch({
           aria-activedescendant={
             dropdownOpen && results[activeIndex] ? `asta-result-${results[activeIndex].id}` : undefined
           }
-          className="w-full rounded-[13px] border-[1.5px] border-border bg-surface-2 py-3.5 pl-11 pr-4 text-base focus:border-indigo focus:bg-surface focus:outline-none"
+          className="w-full bg-transparent text-h3 font-normal placeholder:text-ink-3 focus:outline-none"
         />
+        <span className="shrink-0 rounded-sm border border-line px-2 py-px font-mono text-small-dense text-ink-3">
+          ↑↓ · ⏎ assegna · esc
+        </span>
       </div>
 
       {dropdownOpen && (
-        <div id="asta-search-results" role="listbox" className="mt-2.5 border-t border-border pt-1">
+        <div id="asta-search-results" role="listbox" className="border-t border-line p-1">
           {results.map((p, i) => (
             <button
               key={p.id}
@@ -102,22 +105,19 @@ export default function AstaSearch({
               aria-selected={i === activeIndex}
               onMouseEnter={() => setActiveIndex(i)}
               onClick={() => openAssign(p)}
-              className={`flex w-full items-center gap-3 rounded-lg px-1.5 py-2.5 text-left ${
-                i === activeIndex ? "bg-surface-2" : ""
+              className={`flex w-full items-center gap-3 rounded-md px-3 py-2 text-left transition-colors duration-fast ease-standard ${
+                i === activeIndex ? "bg-surface-sunk" : ""
               }`}
             >
-              <RoleBadge role={p.role} />
-              <span className="flex-1">
-                <span className="block text-sm font-bold">{p.name}</span>
-                <span className="block text-[11.5px] text-ink-dim">{p.serieATeam}</span>
-              </span>
-              <ChevronRight size={16} className="flex-shrink-0 text-ink-faint" />
+              <RoleBadge role={p.role} size="sm" />
+              <span className="text-body-dense font-semibold">{p.name}</span>
+              <span className="ml-auto font-mono text-small-dense text-ink-3">{p.serieATeam}</span>
             </button>
           ))}
           {results.length === 0 && (
             <button
               onClick={() => setAddOpen(true)}
-              className="flex w-full items-center gap-2 rounded-lg px-1.5 py-2.5 text-left text-sm text-indigo hover:bg-surface-2"
+              className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-body-dense text-accent transition-colors duration-fast ease-standard hover:bg-surface-sunk"
             >
               Aggiungi &quot;{query}&quot; al listone
             </button>

@@ -1,122 +1,105 @@
-import { getFilteredPlayers, getRecentAcquisitions } from "@/lib/players";
+import { getRecentAcquisitions } from "@/lib/players";
 import { getTeamsWithRoster } from "@/lib/teams";
 import { getLeagueSettings, getRoleLimit } from "@/lib/leagueSettings";
-import { ROLE_ORDER } from "@/lib/roles";
-import { ROLE_PILL_BG } from "@/lib/roleStyles";
+import { ROLE_ORDER, type Role } from "@/lib/roles";
 import { groupByDay } from "@/lib/dates";
+import PageHeader from "@/app/components/PageHeader";
+import EmptyState from "@/app/components/EmptyState";
 import AstaSearch from "@/app/components/AstaSearch";
-import WishlistPanel from "@/app/components/WishlistPanel";
+import TeamCreditsPanel from "@/app/components/TeamCreditsPanel";
 import RoleBadge from "@/app/components/RoleBadge";
+import { Gavel } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
 export default async function AstaPage() {
-  const [teams, leagueSettings, wishlist, recent] = await Promise.all([
+  const [teams, leagueSettings, recent] = await Promise.all([
     getTeamsWithRoster(),
     getLeagueSettings(),
-    getFilteredPlayers({ watchlistOnly: true, freeAgentOnly: true }),
-    getRecentAcquisitions(5),
+    getRecentAcquisitions(8),
   ]);
 
   const roleLimits = Object.fromEntries(
     ROLE_ORDER.map((r) => [r, getRoleLimit(leagueSettings, r)])
-  ) as Record<(typeof ROLE_ORDER)[number], number>;
+  ) as Record<Role, number>;
+
+  const rosterSize = ROLE_ORDER.reduce((sum, r) => sum + roleLimits[r], 0);
+  const assigned = teams.reduce(
+    (sum, t) => sum + ROLE_ORDER.reduce((n, r) => n + t.roleCounts[r], 0),
+    0
+  );
 
   const recentByDay = groupByDay(recent, (p) => p.assignedAt);
 
-  const teamSummaries = teams.map((t) => ({
-    id: t.id,
-    name: t.name,
-    remainingCredits: t.remainingCredits,
-    roleCounts: t.roleCounts,
-  }));
-
   return (
-    <div className="space-y-7">
-      <div>
-        <h1 className="text-[22px] font-extrabold">Asta</h1>
-      </div>
+    <>
+      <PageHeader
+        title="Asta"
+        subtitle={`${assigned} di ${teams.length * rosterSize} giocatori assegnati · ${
+          teams.length
+        } squadre in gioco`}
+      />
 
-      <AstaSearch teams={teamSummaries} roleLimits={roleLimits} />
+      <div className="grid grid-cols-[1fr_296px] items-start gap-8 text-body-dense">
+        <div>
+          <AstaSearch
+            teams={teams.map((t) => ({
+              id: t.id,
+              name: t.name,
+              remainingCredits: t.remainingCredits,
+              roleCounts: t.roleCounts,
+            }))}
+            roleLimits={roleLimits}
+          />
 
-      <div className="rounded-2xl border border-border bg-surface p-[18px] shadow-sm">
-        <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-[13.5px] font-extrabold">Crediti squadre</h3>
-          <span className="text-[11px] font-semibold text-ink-faint">{teams.length} squadre</span>
-        </div>
+          <section className="mt-6">
+            {recent.length === 0 && (
+              <EmptyState
+                icon={Gavel}
+                title="Nessun acquisto ancora"
+                description="Cerca un giocatore qui sopra e assegnalo per far partire l'asta."
+              />
+            )}
 
-        {teams.length === 0 && (
-          <p className="text-xs text-ink-dim">Nessuna squadra ancora — creane una in Impostazioni.</p>
-        )}
-
-        {teams.length > 0 && (
-          <>
-            <div className="flex items-center justify-between gap-3.5 px-1 text-[10.5px] font-bold uppercase tracking-[0.04em] text-ink-faint">
-              <div className="flex-1">Squadra</div>
-              <div className="flex-1 text-center">Rosa</div>
-              <div className="flex-1 text-right">Crediti</div>
-            </div>
-            {teams.map((t) => (
-              <div
-                key={t.id}
-                className="flex items-center justify-between gap-3.5 rounded-lg px-1 py-2 hover:bg-surface-2"
-              >
-                <div className="flex-1 text-sm font-extrabold">{t.name}</div>
-                <div className="flex flex-1 justify-center gap-1.5">
-                  {ROLE_ORDER.map((role) => (
-                    <div
-                      key={role}
-                      className={`rounded-lg px-2 py-1 text-center font-mono text-[11px] font-bold tabular-nums ${ROLE_PILL_BG[role]}`}
-                    >
-                      {role} {t.roleCounts[role]}/{roleLimits[role]}
-                    </div>
-                  ))}
+            {recentByDay.map((group) => (
+              <div key={group.label} className="mb-6 last:mb-0">
+                <div className="mb-2 flex items-center gap-3">
+                  <span className="text-label uppercase text-ink-3">{group.label}</span>
+                  <span className="h-px flex-1 bg-line" />
+                  <span className="font-mono text-small-dense tabular-nums text-ink-3">
+                    {group.items.length}
+                  </span>
                 </div>
-                <div className="flex-1 text-right font-mono text-[13px] font-bold tabular-nums">
-                  {t.remainingCredits}
-                  <span className="text-ink-dim"> / {t.totalCredits}</span>
-                </div>
+                {group.items.map((p) => (
+                  <div
+                    key={p.id}
+                    className="flex items-center gap-3 border-b border-line py-2 transition-colors duration-fast ease-standard last:border-b-0 hover:bg-surface-sunk"
+                  >
+                    <RoleBadge role={p.role} size="sm" />
+                    <span className="min-w-0 truncate font-medium">{p.name}</span>
+                    <span className="ml-auto shrink-0 text-small-dense text-ink-2">
+                      {p.fantasyTeam?.name}
+                    </span>
+                    <span className="shrink-0 font-mono font-medium tabular-nums">{p.cost}</span>
+                  </div>
+                ))}
               </div>
             ))}
-          </>
-        )}
-      </div>
-
-      <div className="grid grid-cols-2 gap-3.5">
-        <WishlistPanel players={wishlist} />
-
-        <div className="rounded-2xl border border-border bg-surface p-[18px] shadow-sm">
-          <div className="mb-3 flex items-center justify-between">
-            <h3 className="text-[13.5px] font-extrabold">Ultimi acquisti</h3>
-            <span className="text-[11px] font-semibold text-ink-faint">{recent.length} recenti</span>
-          </div>
-
-          {recent.length === 0 && <p className="text-xs text-ink-dim">Nessun acquisto ancora.</p>}
-
-          {recentByDay.map((group, groupIndex) => (
-            <div key={group.label}>
-              <div
-                className={`mb-1.5 text-[10.5px] font-bold uppercase tracking-[0.04em] text-ink-faint ${
-                  groupIndex === 0 ? "" : "mt-3.5"
-                }`}
-              >
-                {group.label}
-              </div>
-              {group.items.map((p) => (
-                <div key={p.id} className="flex items-center gap-2.5 rounded-lg px-1 py-2">
-                  <RoleBadge role={p.role} size="sm" />
-                  <div className="min-w-0 flex-1 truncate text-[13px] font-bold">
-                    {p.name} <span className="font-semibold text-ink-dim">— {p.fantasyTeam?.name}</span>
-                  </div>
-                  <div className="flex-shrink-0 font-mono text-[12.5px] font-bold tabular-nums text-coral">
-                    {p.cost} cr
-                  </div>
-                </div>
-              ))}
-            </div>
-          ))}
+          </section>
         </div>
+
+        <TeamCreditsPanel
+          teams={teams.map((t) => ({
+            id: t.id,
+            name: t.name,
+            remainingCredits: t.remainingCredits,
+            totalCredits: t.totalCredits,
+            spentCredits: t.spentCredits,
+            roleCounts: t.roleCounts,
+          }))}
+          roleLimits={roleLimits}
+        />
       </div>
-    </div>
+    </>
   );
 }
