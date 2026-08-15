@@ -1,5 +1,6 @@
 import { ROLE_ORDER, ROLE_LABELS, type Role } from "@/lib/roles";
-import { ROLE_PILL_BG } from "@/lib/roleStyles";
+import { rolePillClass } from "@/lib/roleStyles";
+import { spendPercent } from "@/lib/credits";
 import ReleasePlayerButton from "./ReleasePlayerButton";
 import type { getTeamsWithRoster } from "@/lib/teams";
 
@@ -13,50 +14,67 @@ export default function TeamCard({
   roleLimits: Record<Role, number>;
 }) {
   return (
-    <div className="flex flex-col gap-3.5 rounded-2xl border border-border bg-surface p-[18px] shadow-sm">
-      <div className="flex items-baseline justify-between gap-1.5">
-        <h2 className="text-[14.5px] font-extrabold">{team.name}</h2>
-        <span className="text-xs text-ink-dim">{team.coach}</span>
+    <div className="flex flex-col gap-4 rounded-lg border border-line bg-surface p-4 transition-colors duration-base ease-standard hover:border-line-strong">
+      <div>
+        <h2 className="text-h2">{team.name}</h2>
+        <p className="text-small text-ink-3">{team.coach}</p>
       </div>
 
-      <div className="flex flex-col gap-3">
+      <div>
+        <div className="flex items-baseline justify-between font-mono tabular-nums">
+          <span className="text-h2 font-medium">{team.remainingCredits}</span>
+          <span className="text-small-dense text-ink-3">di {team.totalCredits} crediti</span>
+        </div>
+        <div className="mt-2 h-[2px] overflow-hidden rounded-full bg-line">
+          <div
+            className="h-full rounded-full bg-accent transition-[width] duration-[400ms] ease-standard"
+            style={{ width: `${spendPercent(team.spentCredits, team.totalCredits)}%` }}
+          />
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-4">
         {ROLE_ORDER.map((role) => {
           const rolePlayers = team.players.filter((p) => p.role === role);
           return (
             <div key={role}>
-              <div className="mb-1 flex items-center justify-between gap-1.5">
-                <h3 className="text-[10.5px] font-bold uppercase tracking-[0.04em] text-ink-faint">
-                  {ROLE_LABELS[role]}
-                </h3>
+              <div className="mb-1 flex items-center justify-between gap-2 border-b border-line pb-1">
+                <h3 className="text-label uppercase text-ink-3">{ROLE_LABELS[role]}</h3>
                 <span
-                  className={`rounded-lg px-2 py-0.5 text-center font-mono text-[10.5px] font-bold tabular-nums ${ROLE_PILL_BG[role]}`}
+                  className={`rounded-sm px-2 py-px font-mono text-small-dense font-medium tabular-nums ${rolePillClass(
+                    role,
+                    team.roleCounts[role],
+                    roleLimits[role]
+                  )}`}
                 >
                   {role} {team.roleCounts[role]}/{roleLimits[role]}
                 </span>
               </div>
               {rolePlayers.length > 0 ? (
-                <ul className="flex flex-col gap-0.5">
+                <ul className="flex flex-col gap-px">
                   {rolePlayers.map((p) => (
-                    <li key={p.id} className="flex items-center justify-between gap-2 py-0.5">
-                      <span className="min-w-0 truncate text-[12.5px] font-bold">{p.name}</span>
-                      <span className="flex flex-shrink-0 items-center gap-2">
-                        <span className="font-mono text-[12px] font-bold tabular-nums">{p.cost}</span>
-                        <ReleasePlayerButton playerId={p.id} playerName={p.name} />
+                    <li
+                      key={p.id}
+                      className="group flex items-center justify-between gap-2 py-px text-small"
+                    >
+                      <span className="min-w-0 truncate font-medium">{p.name}</span>
+                      <span className="flex shrink-0 items-center gap-2">
+                        <span className="font-mono text-small-dense font-medium tabular-nums text-ink-2">
+                          {p.cost}
+                        </span>
+                        <span className="opacity-0 transition-opacity duration-fast ease-standard group-hover:opacity-100 focus-within:opacity-100">
+                          <ReleasePlayerButton playerId={p.id} playerName={p.name} />
+                        </span>
                       </span>
                     </li>
                   ))}
                 </ul>
               ) : (
-                <p className="text-[11px] text-ink-dim">Nessuno.</p>
+                <p className="text-small-dense text-ink-3">Nessuno.</p>
               )}
             </div>
           );
         })}
-      </div>
-
-      <div className="text-right font-mono text-[13px] font-bold tabular-nums">
-        {team.remainingCredits}
-        <span className="text-ink-dim"> / {team.totalCredits}</span>
       </div>
     </div>
   );
