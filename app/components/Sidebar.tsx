@@ -9,7 +9,7 @@ const PRIMARY_LINKS = [
   { href: "/", label: "Asta", icon: Gavel },
   { href: "/players", label: "Listone", icon: List },
   { href: "/teams", label: "Squadre", icon: Users },
-  { href: "/watchlist", label: "Wishlist", icon: Star },
+  { href: "/wishlist", label: "Wishlist", icon: Star },
 ];
 
 const CONFIG_LINKS = [{ href: "/settings", label: "Impostazioni", icon: Settings }];
