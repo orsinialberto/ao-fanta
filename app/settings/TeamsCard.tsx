@@ -1,42 +1,44 @@
-import { Users, Trash2 } from "lucide-react";
 import { getTeamsWithRoster } from "@/lib/teams";
 import TeamForm from "@/app/teams/TeamForm";
 import ReleaseAllButton from "@/app/teams/ReleaseAllButton";
 import DeleteTeamButton from "@/app/teams/DeleteTeamButton";
+import SettingsSection from "./SettingsSection";
 
 export default async function TeamsCard() {
   const teams = await getTeamsWithRoster();
 
   return (
-    <div className="flex flex-col gap-3.5 rounded-2xl border border-border bg-surface p-5 shadow-sm">
-      <div className="flex items-center gap-2.5">
-        <div className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-mint text-teal">
-          <Users size={18} strokeWidth={1.8} />
-        </div>
-        <div>
-          <h3 className="text-[14.5px] font-extrabold">Squadre</h3>
-          <p className="text-xs text-ink-dim">Crea, modifica ed elimina squadre di lega</p>
-        </div>
-      </div>
-
-      <div className="flex flex-col gap-1.5">
+    <SettingsSection
+      title="Squadre"
+      hint={`${teams.length} squadre`}
+      description="Le rose si consultano in Squadre. Qui si creano, si rinominano e si eliminano."
+    >
+      <div className="mb-4">
         {teams.map((t) => (
-          <div key={t.id} className="flex flex-wrap items-center gap-2.5 rounded-lg bg-surface-2 px-2.5 py-2">
-            <span className="flex-1 text-[12.5px] font-bold">{t.name}</span>
-            <span className="font-mono text-[11px] tabular-nums text-ink-dim">{t.totalCredits} cr</span>
-            <TeamForm mode="edit" team={t} />
-            <ReleaseAllButton
-              teamId={t.id}
-              teamName={t.name}
-              isDisabled={t.players.length === 0}
-            />
-            <DeleteTeamButton teamId={t.id} disabled={t.players.length > 0} />
+          <div
+            key={t.id}
+            className="group flex items-center gap-3 border-b border-line py-2 last:border-b-0"
+          >
+            <span className="flex-1 text-small font-semibold">{t.name}</span>
+            <span className="font-mono text-small-dense tabular-nums text-ink-3">
+              {t.totalCredits} cr
+            </span>
+            <span className="flex items-center gap-3 opacity-0 transition-opacity duration-fast ease-standard group-hover:opacity-100 focus-within:opacity-100">
+              <TeamForm mode="edit" team={t} />
+              <ReleaseAllButton
+                teamId={t.id}
+                teamName={t.name}
+                isDisabled={t.players.length === 0}
+              />
+              <DeleteTeamButton teamId={t.id} disabled={t.players.length > 0} />
+            </span>
           </div>
         ))}
-        {teams.length === 0 && <p className="text-xs text-ink-dim">Nessuna squadra creata.</p>}
+        {teams.length === 0 && (
+          <p className="text-small text-ink-3">Nessuna squadra creata.</p>
+        )}
       </div>
-
       <TeamForm mode="create" />
-    </div>
+    </SettingsSection>
   );
 }

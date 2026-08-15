@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { SlidersHorizontal } from "lucide-react";
+import InlineError from "@/app/components/InlineError";
 import { errorMessage } from "@/lib/http";
 import type { LeagueSettings } from "@prisma/client";
+import SettingsSection from "./SettingsSection";
 
 const LIMIT_FIELDS = [
   { field: "limitP", label: "Por", dot: "bg-teal" },
@@ -42,21 +43,15 @@ export default function LeagueRulesCard({ settings }: { settings: LeagueSettings
   }
 
   return (
-    <div className="flex flex-col gap-3.5 rounded-2xl border border-border bg-surface p-5 shadow-sm">
-      <div className="flex items-center gap-2.5">
-        <div className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-amber-soft text-amber">
-          <SlidersHorizontal size={18} strokeWidth={1.8} />
-        </div>
-        <div>
-          <h3 className="text-[14.5px] font-extrabold">Regole lega</h3>
-          <p className="text-xs text-ink-dim">Limiti per ruolo e crediti di default</p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-4 gap-2.5">
+    <SettingsSection
+      title="Regole lega"
+      hint={`rosa da ${form.limitP + form.limitD + form.limitC + form.limitA}`}
+      description="Limiti per ruolo e crediti assegnati a ogni squadra nuova."
+    >
+      <div className="mb-4 grid grid-cols-4 gap-2.5">
         {LIMIT_FIELDS.map(({ field, label, dot }) => (
           <div key={field} className="flex flex-col gap-1.5">
-            <label className="flex items-center gap-1.5 text-[11px] font-extrabold">
+            <label className="flex items-center gap-1.5 text-label">
               <span className={`h-[7px] w-[7px] rounded-full ${dot}`} />
               {label}
             </label>
@@ -65,32 +60,32 @@ export default function LeagueRulesCard({ settings }: { settings: LeagueSettings
               min={0}
               value={form[field]}
               onChange={(e) => setForm((f) => ({ ...f, [field]: Number(e.target.value) }))}
-              className="rounded-lg border border-border bg-surface-2 px-2.5 py-2 text-center font-mono text-sm tabular-nums"
+              className="w-full rounded-md border border-line-strong bg-surface px-3 py-2 text-center font-mono text-body font-medium tabular-nums transition-colors duration-fast ease-standard focus:border-accent focus:outline-none"
             />
           </div>
         ))}
       </div>
 
-      <div className="flex flex-col gap-1.5">
-        <label className="text-[11px] font-bold text-ink-dim">Crediti squadra (default)</label>
+      <div className="mb-4 flex flex-col gap-1.5">
+        <label className="text-label text-ink-dim">Crediti squadra (default)</label>
         <input
           type="number"
           min={0}
           value={form.defaultCredits}
           onChange={(e) => setForm((f) => ({ ...f, defaultCredits: Number(e.target.value) }))}
-          className="rounded-lg border border-border bg-surface-2 px-2.5 py-2 text-sm"
+          className="w-full rounded-md border border-line-strong bg-surface px-3 py-2 text-center font-mono text-body font-medium tabular-nums transition-colors duration-fast ease-standard focus:border-accent focus:outline-none"
         />
       </div>
 
-      {error && <p className="text-sm text-coral">{error}</p>}
+      {error && <InlineError message={error} />}
 
       <button
         onClick={handleSave}
         disabled={saving}
-        className="self-start rounded-lg bg-indigo px-3.5 py-2 text-[12.5px] font-bold text-white disabled:opacity-50"
+        className="h-8 self-start rounded-md bg-accent px-3 text-small font-semibold text-white transition-colors duration-fast ease-standard hover:bg-accent-hover disabled:opacity-40"
       >
         {saving ? "Salvataggio…" : "Salva modifiche"}
       </button>
-    </div>
+    </SettingsSection>
   );
 }

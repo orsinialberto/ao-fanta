@@ -1,36 +1,36 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { errorMessage } from "@/lib/http";
+import ConfirmDialog from "@/app/components/ConfirmDialog";
 
-export default function WipePlayersButton() {
+export default function WipePlayersButton({ playerCount }: { playerCount: number }) {
   const router = useRouter();
-
-  async function handleWipe() {
-    if (!confirm("Questa azione cancellerà TUTTI i giocatori dal database. Continuare?")) {
-      return;
-    }
-
-    const confirmation = prompt("Digita ELIMINA per confermare lo svuotamento del database:");
-    if (confirmation !== "ELIMINA") {
-      return;
-    }
-
-    const res = await fetch("/api/players", { method: "DELETE" });
-    if (!res.ok) {
-      alert(await errorMessage(res));
-      return;
-    }
-
-    router.refresh();
-  }
+  const [open, setOpen] = useState(false);
 
   return (
-    <button
-      onClick={handleWipe}
-      className="px-3 py-1.5 border border-red-300 text-red-600 rounded text-sm"
-    >
-      Svuota DB
-    </button>
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="h-8 shrink-0 rounded-md border border-danger-line bg-surface px-3 text-small font-semibold text-danger transition-colors duration-fast ease-standard hover:bg-danger hover:text-white"
+      >
+        Svuota
+      </button>
+
+      <ConfirmDialog
+        open={open}
+        onOpenChange={setOpen}
+        title="Svuota il listone"
+        description={`Cancella tutti i ${playerCount} giocatori e le assegnazioni delle squadre. Non è reversibile.`}
+        confirmWord="ELIMINA"
+        confirmLabel="Svuota il listone"
+        onConfirm={() => fetch("/api/players", { method: "DELETE" })}
+        onConfirmed={() => {
+          setOpen(false);
+          router.refresh();
+        }}
+      />
+    </>
   );
 }
