@@ -102,7 +102,7 @@ export default function PlayersTable({
   function SortIcon({ column }: { column: SortKey }) {
     if (sort?.key !== column) return null;
     const Icon = sort.dir === "asc" ? ChevronUp : ChevronDown;
-    return <Icon size={10} className="ml-[3px] inline-block align-[-1px] text-indigo" />;
+    return <Icon size={10} className="ml-[3px] inline-block align-[-1px] text-accent" />;
   }
 
   async function toggleWatchlist(player: PlayerWithTeam) {
@@ -166,13 +166,13 @@ export default function PlayersTable({
                 <td className="h-11 w-px border-b border-line px-3 align-middle">
                   <RoleBadge role={p.role} size="sm" />
                 </td>
-                <td className="h-11 border-b border-line px-3 align-middle text-ink-dim">
+                <td className="h-11 border-b border-line px-3 align-middle text-ink-2">
                   {p.serieATeam}
                 </td>
                 <td className="h-11 border-b border-line px-3 align-middle">
                   <span
                     title="Titolare"
-                    className={`inline-flex items-center ${p.starter ? "text-amber" : "text-ink-faint"}`}
+                    className={`inline-flex items-center ${p.starter ? "text-role-c" : "text-ink-3"}`}
                   >
                     <Star size={16} fill={p.starter ? "currentColor" : "none"} />
                   </span>
@@ -189,7 +189,7 @@ export default function PlayersTable({
                   </span>
                 </td>
                 {showCost && (
-                  <td className="h-11 border-b border-line px-3 align-middle font-mono font-bold tabular-nums">
+                  <td className="h-11 border-b border-line px-3 align-middle font-mono font-medium tabular-nums">
                     {p.cost ?? "—"}
                   </td>
                 )}
@@ -198,8 +198,8 @@ export default function PlayersTable({
                     type="button"
                     onClick={() => toggleWatchlist(p)}
                     title="Wishlist"
-                    className={`inline-flex items-center rounded-md p-[3px] hover:bg-surface-2 hover:text-ink ${
-                      p.watchlist ? "text-amber" : "text-ink-faint"
+                    className={`inline-flex items-center rounded-md p-[3px] hover:bg-surface-sunk hover:text-ink ${
+                      p.watchlist ? "text-role-c" : "text-ink-3"
                     }`}
                   >
                     <Star size={16} fill={p.watchlist ? "currentColor" : "none"} />

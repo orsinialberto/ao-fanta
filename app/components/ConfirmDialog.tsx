@@ -24,8 +24,8 @@ export default function ConfirmDialog({
   onOpenChange: (open: boolean) => void;
   title: string;
   description: string;
-  /** The user must type this exactly before the action unlocks. */
-  confirmWord: string;
+  /** The user must type this exactly before the action unlocks. Omit for reversible actions. */
+  confirmWord?: string;
   confirmLabel: string;
   onConfirm: () => Promise<Response>;
   onConfirmed: () => void;
@@ -42,7 +42,7 @@ export default function ConfirmDialog({
     }
   }, [open]);
 
-  const unlocked = typed === confirmWord;
+  const unlocked = confirmWord ? typed === confirmWord : true;
 
   async function handleConfirm() {
     setPending(true);
@@ -66,21 +66,23 @@ export default function ConfirmDialog({
         <div className="flex flex-col gap-3">
           <p className="text-small text-ink-2">{description}</p>
 
-          <div>
-            <label
-              htmlFor="confirm-word"
-              className="mb-1 block text-label uppercase text-ink-3"
-            >
-              Digita {confirmWord} per confermare
-            </label>
-            <input
-              id="confirm-word"
-              value={typed}
-              onChange={(e) => setTyped(e.target.value)}
-              autoComplete="off"
-              className="w-full rounded-md border border-line-strong bg-surface px-3 py-2 text-body transition-colors duration-fast ease-standard focus:border-accent focus:outline-none"
-            />
-          </div>
+          {confirmWord && (
+            <div>
+              <label
+                htmlFor="confirm-word"
+                className="mb-1 block text-label uppercase text-ink-3"
+              >
+                Digita {confirmWord} per confermare
+              </label>
+              <input
+                id="confirm-word"
+                value={typed}
+                onChange={(e) => setTyped(e.target.value)}
+                autoComplete="off"
+                className="w-full rounded-md border border-line-strong bg-surface px-3 py-2 text-body transition-colors duration-fast ease-standard focus:border-accent focus:outline-none"
+              />
+            </div>
+          )}
 
           {error && <InlineError message={error} />}
 

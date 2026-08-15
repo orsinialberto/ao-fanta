@@ -78,7 +78,7 @@ export default function AssignDialog({
           </div>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-3.5">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           <div>
             <label className="mb-1 block text-label uppercase text-ink-3">Squadra</label>
             <select

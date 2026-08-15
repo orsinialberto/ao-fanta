@@ -90,7 +90,7 @@ export default function AddPlayerDialog({
             required
             className="w-full rounded-md border border-line-strong bg-surface px-3 py-2 text-body transition-colors duration-fast ease-standard focus:border-accent focus:outline-none"
           />
-          <label className="flex items-center gap-2 text-sm">
+          <label className="flex items-center gap-2 text-small">
             <input type="checkbox" checked={starter} onChange={(e) => setStarter(e.target.checked)} />
             Titolare
           </label>
@@ -105,7 +105,7 @@ export default function AddPlayerDialog({
             </button>
             <button
               type="submit"
-              className="rounded-md bg-accent px-3 py-2 text-small font-semibold text-white transition-colors duration-fast ease-standard hover:bg-accent-hover disabled:opacity-40"
+              className="rounded-md bg-accent px-3 py-2 text-small font-semibold text-white transition-colors duration-fast ease-standard hover:bg-accent-hover"
             >
               Salva
             </button>

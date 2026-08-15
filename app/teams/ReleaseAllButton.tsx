@@ -1,7 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { errorMessage } from "@/lib/http";
+import ConfirmDialog from "@/app/components/ConfirmDialog";
 
 export default function ReleaseAllButton({
   teamId,
@@ -13,31 +14,35 @@ export default function ReleaseAllButton({
   isDisabled: boolean;
 }) {
   const router = useRouter();
-
-  async function handleReleaseAll() {
-    if (!confirm(`Svincolare tutti i giocatori di ${teamName}?`)) return;
-
-    const res = await fetch(`/api/teams/${teamId}/release-all`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-    });
-
-    if (!res.ok) {
-      alert(await errorMessage(res));
-      return;
-    }
-
-    router.refresh();
-  }
+  const [open, setOpen] = useState(false);
 
   return (
-    <button
-      type="button"
-      onClick={handleReleaseAll}
-      disabled={isDisabled}
-      className="rounded-lg border border-coral px-3 py-1.5 text-[12px] font-bold text-coral disabled:opacity-40 disabled:cursor-not-allowed"
-    >
-      Svincola tutto
-    </button>
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        disabled={isDisabled}
+        className="rounded-lg border border-role-a px-3 py-1.5 text-small-dense font-bold text-role-a disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        Svincola tutto
+      </button>
+      <ConfirmDialog
+        open={open}
+        onOpenChange={setOpen}
+        title="Svincolare tutti i giocatori?"
+        description={`Tutti i giocatori di ${teamName} torneranno svincolati. Potrai riassegnarli in seguito.`}
+        confirmLabel="Svincola tutto"
+        onConfirm={() =>
+          fetch(`/api/teams/${teamId}/release-all`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+          })
+        }
+        onConfirmed={() => {
+          setOpen(false);
+          router.refresh();
+        }}
+      />
+    </>
   );
 }

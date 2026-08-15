@@ -46,7 +46,7 @@ export default function TeamForm({
     return (
       <button
         onClick={() => setOpen(true)}
-        className="rounded-lg bg-indigo px-3 py-1.5 text-[12px] font-bold text-white"
+        className="rounded-lg bg-accent px-3 py-1.5 text-small-dense font-bold text-white"
       >
         {mode === "create" ? "Nuova squadra" : "Modifica"}
       </button>
@@ -60,14 +60,14 @@ export default function TeamForm({
         onChange={(e) => setName(e.target.value)}
         placeholder="Nome squadra"
         required
-        className="rounded-lg border border-border px-2 py-1 text-[12.5px]"
+        className="rounded-lg border border-line px-2 py-1 text-small-dense"
       />
       <input
         value={coach}
         onChange={(e) => setCoach(e.target.value)}
         placeholder="Allenatore"
         required
-        className="rounded-lg border border-border px-2 py-1 text-[12.5px]"
+        className="rounded-lg border border-line px-2 py-1 text-small-dense"
       />
       <input
         type="number"
@@ -75,15 +75,15 @@ export default function TeamForm({
         onChange={(e) => setTotalCredits(Number(e.target.value))}
         min={0}
         required
-        className="w-24 rounded-lg border border-border px-2 py-1 text-[12.5px]"
+        className="w-24 rounded-lg border border-line px-2 py-1 text-small-dense"
       />
-      <button type="submit" className="rounded-lg bg-teal px-3 py-1 text-[12px] font-bold text-white">
+      <button type="submit" className="rounded-lg bg-role-p px-3 py-1 text-small-dense font-bold text-white">
         Salva
       </button>
-      <button type="button" onClick={() => setOpen(false)} className="text-[12px] font-semibold text-ink-dim">
+      <button type="button" onClick={() => setOpen(false)} className="text-small-dense font-semibold text-ink-2">
         Annulla
       </button>
-      {error && <span className="text-[12px] font-semibold text-coral">{error}</span>}
+      {error && <span className="text-small-dense font-semibold text-role-a">{error}</span>}
     </form>
   );
 }

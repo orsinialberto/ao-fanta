@@ -8,10 +8,10 @@ import type { LeagueSettings } from "@prisma/client";
 import SettingsSection from "./SettingsSection";
 
 const LIMIT_FIELDS = [
-  { field: "limitP", label: "Por", dot: "bg-teal" },
-  { field: "limitD", label: "Dif", dot: "bg-indigo" },
-  { field: "limitC", label: "Cen", dot: "bg-amber" },
-  { field: "limitA", label: "Att", dot: "bg-coral" },
+  { field: "limitP", label: "Por", dot: "bg-role-p" },
+  { field: "limitD", label: "Dif", dot: "bg-accent" },
+  { field: "limitC", label: "Cen", dot: "bg-role-c" },
+  { field: "limitA", label: "Att", dot: "bg-role-a" },
 ] as const;
 
 export default function LeagueRulesCard({ settings }: { settings: LeagueSettings }) {
@@ -52,7 +52,7 @@ export default function LeagueRulesCard({ settings }: { settings: LeagueSettings
         {LIMIT_FIELDS.map(({ field, label, dot }) => (
           <div key={field} className="flex flex-col gap-1.5">
             <label className="flex items-center gap-1.5 text-label">
-              <span className={`h-[7px] w-[7px] rounded-full ${dot}`} />
+              <span className={`h-2 w-2 rounded-full ${dot}`} />
               {label}
             </label>
             <input
@@ -67,7 +67,7 @@ export default function LeagueRulesCard({ settings }: { settings: LeagueSettings
       </div>
 
       <div className="mb-4 flex flex-col gap-1.5">
-        <label className="text-label text-ink-dim">Crediti squadra (default)</label>
+        <label className="text-label text-ink-2">Crediti squadra (default)</label>
         <input
           type="number"
           min={0}

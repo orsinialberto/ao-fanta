@@ -63,7 +63,7 @@ export default function ListoneToolbar({
   return (
     <div className="border-b border-line pb-3">
       <div className="flex items-center gap-4">
-        <div className="flex w-[230px] items-center gap-2 rounded-md border border-line bg-surface-sunk px-3 py-1.5 transition-colors duration-fast ease-standard focus-within:border-accent">
+        <div className="flex w-56 items-center gap-2 rounded-md border border-line bg-surface-sunk px-3 py-1.5 transition-colors duration-fast ease-standard focus-within:border-accent">
           <Search size={14} className="shrink-0 text-ink-3" />
           <input
             value={search}
@@ -125,7 +125,7 @@ export default function ListoneToolbar({
           </div>
         )}
 
-        <span className="ml-auto font-mono text-small-dense tabular-nums text-ink-3">
+        <span className="ml-auto font-mono text-small-dense font-medium tabular-nums text-ink-3">
           {resultCount} risultati
         </span>
       </div>

@@ -30,7 +30,7 @@ export default async function TeamsCard() {
                 teamName={t.name}
                 isDisabled={t.players.length === 0}
               />
-              <DeleteTeamButton teamId={t.id} disabled={t.players.length > 0} />
+              <DeleteTeamButton teamId={t.id} teamName={t.name} disabled={t.players.length > 0} />
             </span>
           </div>
         ))}
