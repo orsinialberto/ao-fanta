@@ -8,6 +8,7 @@ import {
   DialogTitle,
 } from "@/app/components/ui/dialog";
 import RoleBadge from "@/app/components/RoleBadge";
+import InlineError from "@/app/components/InlineError";
 import { errorMessage } from "@/lib/http";
 import { ROLE_LABELS, isValidRole, type Role } from "@/lib/roles";
 import type { PlayerWithTeam, TeamSummary } from "@/lib/types";
@@ -72,19 +73,19 @@ export default function AssignDialog({
             <RoleBadge role={player.role} size="lg" />
             <div>
               <DialogTitle>Assegna {player.name}</DialogTitle>
-              <p className="text-[11.5px] text-ink-dim">{player.serieATeam}</p>
+              <p className="text-small text-ink-3">{player.serieATeam}</p>
             </div>
           </div>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-3.5">
           <div>
-            <label className="mb-1.5 block text-[11px] font-bold text-ink-dim">Squadra</label>
+            <label className="mb-1 block text-label uppercase text-ink-3">Squadra</label>
             <select
               value={teamId}
               onChange={(e) => setTeamId(e.target.value)}
               required
-              className="w-full rounded-lg border border-border bg-surface-2 px-3 py-2.5 text-[13.5px]"
+              className="w-full rounded-md border border-line-strong bg-surface px-3 py-2 text-body transition-colors duration-fast ease-standard focus:border-accent focus:outline-none"
             >
               {teams.map((t) => (
                 <option key={t.id} value={t.id}>
@@ -95,38 +96,43 @@ export default function AssignDialog({
           </div>
 
           <div>
-            <label className="mb-1.5 block text-[11px] font-bold text-ink-dim">Costo (crediti)</label>
+            <label className="mb-1 block text-label uppercase text-ink-3">Costo (crediti)</label>
             <input
               type="number"
               value={cost}
               onChange={(e) => setCost(Number(e.target.value))}
               min={0}
               required
-              className="w-full rounded-lg border border-border bg-surface-2 px-3 py-2.5 text-[13.5px]"
+              className="w-full rounded-md border border-line-strong bg-surface px-3 py-2 text-body transition-colors duration-fast ease-standard focus:border-accent focus:outline-none"
             />
           </div>
 
           {overBudget && (
-            <p className="rounded-lg bg-amber-soft px-2.5 py-2 text-xs font-medium text-amber">
-              Attenzione: costo superiore ai crediti residui della squadra.
-            </p>
+            <InlineError
+              title="Costo superiore ai crediti residui"
+              message={`${selectedTeam!.name} ha ${selectedTeam!.remainingCredits} crediti. Puoi confermare comunque, ma la squadra andrà in negativo.`}
+            />
           )}
           {roleFull && role && (
-            <p className="rounded-lg bg-coral-soft px-2.5 py-2 text-xs font-medium text-coral">
-              Limite raggiunto per ruolo {ROLE_LABELS[role]} ({selectedTeam!.roleCounts[role]}/
-              {roleLimits[role]}).
-            </p>
+            <InlineError
+              title={`Limite raggiunto per ${ROLE_LABELS[role]}`}
+              message={`${selectedTeam!.name} ha già ${selectedTeam!.roleCounts[role]} giocatori su ${roleLimits[role]}. Svincolane uno per assegnare ${player.name}.`}
+            />
           )}
-          {error && <p className="text-xs text-coral">{error}</p>}
+          {error && <InlineError message={error} />}
 
           <div className="flex justify-end gap-2">
-            <button type="button" onClick={() => onOpenChange(false)} className="text-sm text-ink-dim">
+            <button
+              type="button"
+              onClick={() => onOpenChange(false)}
+              className="text-small text-ink-2 transition-colors duration-fast ease-standard hover:text-ink"
+            >
               Annulla
             </button>
             <button
               type="submit"
               disabled={roleFull}
-              className="rounded-lg bg-indigo px-3.5 py-2 text-[12.5px] font-bold text-white disabled:opacity-40"
+              className="rounded-md bg-accent px-3 py-2 text-small font-semibold text-white transition-colors duration-fast ease-standard hover:bg-accent-hover disabled:opacity-40"
             >
               Conferma
             </button>
