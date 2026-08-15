@@ -12,7 +12,6 @@ export async function GET(req: NextRequest) {
     serieATeam: searchParams.get("serieATeam") ?? undefined,
     freeAgentOnly: searchParams.get("freeAgentOnly") === "true",
     starterOnly: searchParams.get("starterOnly") === "true",
-    watchlistOnly: searchParams.get("watchlistOnly") === "true",
     search: searchParams.get("search") ?? undefined,
     wishlistTier: parseTierParam(searchParams.get("wishlistTier")),
   });

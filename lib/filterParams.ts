@@ -7,7 +7,6 @@ export type PlayerFilterState = {
   serieATeam: string;
   freeAgentOnly: boolean;
   starterOnly: boolean;
-  watchlistOnly: boolean;
   wishlistTier: WishlistTier[];
 };
 
@@ -17,12 +16,11 @@ export const EMPTY_FILTER_STATE: PlayerFilterState = {
   serieATeam: "",
   freeAgentOnly: false,
   starterOnly: false,
-  watchlistOnly: false,
   wishlistTier: [],
 };
 
 /** Boolean params are the string "true" or absent. Nothing else is truthy. */
-const BOOLEAN_KEYS = ["freeAgentOnly", "starterOnly", "watchlistOnly"] as const;
+const BOOLEAN_KEYS = ["freeAgentOnly", "starterOnly"] as const;
 
 export function readFilterState(params: URLSearchParams): PlayerFilterState {
   return {
@@ -31,7 +29,6 @@ export function readFilterState(params: URLSearchParams): PlayerFilterState {
     serieATeam: params.get("serieATeam") ?? "",
     freeAgentOnly: params.get("freeAgentOnly") === "true",
     starterOnly: params.get("starterOnly") === "true",
-    watchlistOnly: params.get("watchlistOnly") === "true",
     wishlistTier: parseTierParam(params.get("wishlistTier")),
   };
 }

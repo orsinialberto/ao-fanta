@@ -16,7 +16,7 @@ describe("readFilterState", () => {
 
   it("reads every field", () => {
     const params = new URLSearchParams(
-      "search=lauta&role=A,C&serieATeam=Inter&freeAgentOnly=true&starterOnly=true&watchlistOnly=true"
+      "search=lauta&role=A,C&serieATeam=Inter&freeAgentOnly=true&starterOnly=true"
     );
     expect(readFilterState(params)).toEqual({
       search: "lauta",
@@ -24,7 +24,6 @@ describe("readFilterState", () => {
       serieATeam: "Inter",
       freeAgentOnly: true,
       starterOnly: true,
-      watchlistOnly: true,
       wishlistTier: [],
     });
   });
@@ -70,7 +69,6 @@ describe("writeFilterState", () => {
       serieATeam: "Inter",
       freeAgentOnly: true,
       starterOnly: false,
-      watchlistOnly: true,
       wishlistTier: [],
     };
     expect(readFilterState(new URLSearchParams(writeFilterState({ ...state, role: [...state.role] })))).toEqual({
@@ -105,7 +103,7 @@ describe("activeFilterCount", () => {
         ...EMPTY_FILTER_STATE,
         serieATeam: "Inter",
         freeAgentOnly: true,
-        watchlistOnly: true,
+        starterOnly: true,
       })
     ).toBe(3);
   });

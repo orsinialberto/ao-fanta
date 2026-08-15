@@ -14,7 +14,6 @@ export type PlayerWithTeam = {
   serieATeam: string;
   cost: number | null;
   starter: boolean;
-  watchlist: boolean;
   wishlistTier: string | null;
   fantasyTeam: { id: string; name: string } | null;
 };

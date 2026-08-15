@@ -58,7 +58,6 @@ export async function PATCH(
   }
   if (body.serieATeam !== undefined) data.serieATeam = body.serieATeam;
   if (body.starter !== undefined) data.starter = !!body.starter;
-  if (body.watchlist !== undefined) data.watchlist = !!body.watchlist;
   if (body.wishlistTier !== undefined) {
     // null clears the tier; anything outside A/B/C is a client bug, not a value
     // to silently coerce.

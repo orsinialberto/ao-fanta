@@ -7,7 +7,6 @@ export type PlayerFilters = {
   serieATeam?: string;
   freeAgentOnly?: boolean;
   starterOnly?: boolean;
-  watchlistOnly?: boolean;
   wishlistTier?: string[];
   search?: string;
 };
@@ -19,7 +18,6 @@ export async function getFilteredPlayers(filters: PlayerFilters) {
   if (filters.serieATeam) where.serieATeam = filters.serieATeam;
   if (filters.freeAgentOnly) where.fantasyTeamId = null;
   if (filters.starterOnly) where.starter = true;
-  if (filters.watchlistOnly) where.watchlist = true;
   if (filters.wishlistTier && filters.wishlistTier.length > 0) {
     where.wishlistTier = { in: filters.wishlistTier };
   }

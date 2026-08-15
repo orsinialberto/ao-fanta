@@ -193,7 +193,7 @@ export default function ListoneToolbar({
             ))}
           <button
             type="button"
-            onClick={() => push({ ...state, role: [], wishlistTier: [], serieATeam: "", freeAgentOnly: false, starterOnly: false, watchlistOnly: false })}
+            onClick={() => push({ ...state, role: [], wishlistTier: [], serieATeam: "", freeAgentOnly: false, starterOnly: false })}
             className="ml-2 text-small-dense font-semibold text-ink-3 transition-colors duration-fast ease-standard hover:text-danger"
           >
             Azzera tutto
