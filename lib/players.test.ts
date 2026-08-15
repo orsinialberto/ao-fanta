@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { prisma } from "@/lib/prisma";
-import { getRecentAcquisitions } from "@/lib/players";
+import { getRecentAcquisitions, getFilteredPlayers } from "@/lib/players";
 
 let teamId: string;
 const playerIds: string[] = [];
@@ -20,7 +20,13 @@ beforeAll(async () => {
   const unassigned = await prisma.player.create({
     data: { name: "__unassigned__", role: "C", serieATeam: "Test" },
   });
-  playerIds.push(older.id, newer.id, unassigned.id);
+  const tierA = await prisma.player.create({
+    data: { name: "__tier_a__", role: "A", serieATeam: "Test", wishlistTier: "A" },
+  });
+  const tierC = await prisma.player.create({
+    data: { name: "__tier_c__", role: "A", serieATeam: "Test", wishlistTier: "C" },
+  });
+  playerIds.push(older.id, newer.id, unassigned.id, tierA.id, tierC.id);
 });
 
 afterAll(async () => {
@@ -41,5 +47,27 @@ describe("getRecentAcquisitions", () => {
     const recent = await getRecentAcquisitions(1);
     expect(recent.length).toBe(1);
     expect(recent[0].name).toBe("__newer__");
+  });
+});
+
+describe("getFilteredPlayers, wishlistTier", () => {
+  it("returns only players in the requested tiers", async () => {
+    const players = await getFilteredPlayers({ wishlistTier: ["A"] });
+    const names = players.map((p) => p.name);
+    expect(names).toContain("__tier_a__");
+    expect(names).not.toContain("__tier_c__");
+    expect(names).not.toContain("__unassigned__");
+  });
+
+  it("accepts several tiers at once", async () => {
+    const players = await getFilteredPlayers({ wishlistTier: ["A", "C"] });
+    const names = players.map((p) => p.name);
+    expect(names).toContain("__tier_a__");
+    expect(names).toContain("__tier_c__");
+  });
+
+  it("ignores an empty tier list rather than returning nothing", async () => {
+    const players = await getFilteredPlayers({ wishlistTier: [] });
+    expect(players.map((p) => p.name)).toContain("__unassigned__");
   });
 });

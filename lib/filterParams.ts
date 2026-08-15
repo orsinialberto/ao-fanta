@@ -1,4 +1,5 @@
 import { parseRoleParam, type Role } from "@/lib/roles";
+import { parseTierParam, type WishlistTier } from "@/lib/wishlist";
 
 export type PlayerFilterState = {
   search: string;
@@ -7,6 +8,7 @@ export type PlayerFilterState = {
   freeAgentOnly: boolean;
   starterOnly: boolean;
   watchlistOnly: boolean;
+  wishlistTier: WishlistTier[];
 };
 
 export const EMPTY_FILTER_STATE: PlayerFilterState = {
@@ -16,6 +18,7 @@ export const EMPTY_FILTER_STATE: PlayerFilterState = {
   freeAgentOnly: false,
   starterOnly: false,
   watchlistOnly: false,
+  wishlistTier: [],
 };
 
 /** Boolean params are the string "true" or absent. Nothing else is truthy. */
@@ -29,6 +32,7 @@ export function readFilterState(params: URLSearchParams): PlayerFilterState {
     freeAgentOnly: params.get("freeAgentOnly") === "true",
     starterOnly: params.get("starterOnly") === "true",
     watchlistOnly: params.get("watchlistOnly") === "true",
+    wishlistTier: parseTierParam(params.get("wishlistTier")),
   };
 }
 
@@ -43,6 +47,7 @@ export function writeFilterState(state: PlayerFilterState): string {
   if (state.search) params.set("search", state.search);
   if (state.role.length > 0) params.set("role", state.role.join(","));
   if (state.serieATeam) params.set("serieATeam", state.serieATeam);
+  if (state.wishlistTier.length > 0) params.set("wishlistTier", state.wishlistTier.join(","));
   for (const key of BOOLEAN_KEYS) {
     if (state[key]) params.set(key, "true");
   }
@@ -67,6 +72,10 @@ export function toggleRole(roles: Role[], role: Role): Role[] {
   return roles.includes(role) ? roles.filter((r) => r !== role) : [...roles, role];
 }
 
+export function toggleTier(tiers: WishlistTier[], tier: WishlistTier): WishlistTier[] {
+  return tiers.includes(tier) ? tiers.filter((t) => t !== tier) : [...tiers, tier];
+}
+
 /**
  * How many filter chips to show. Search is excluded: it has its own always
  * visible input, so echoing it as a removable chip would be redundant.
@@ -74,6 +83,7 @@ export function toggleRole(roles: Role[], role: Role): Role[] {
 export function activeFilterCount(state: PlayerFilterState): number {
   return (
     state.role.length +
+    state.wishlistTier.length +
     (state.serieATeam ? 1 : 0) +
     BOOLEAN_KEYS.filter((key) => state[key]).length
   );
