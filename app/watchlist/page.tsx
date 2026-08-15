@@ -1,9 +1,11 @@
 import { getFilteredPlayers } from "@/lib/players";
-import { getTeamsWithRoster } from "@/lib/teams";
+import { getTeamsWithRoster, getDistinctSerieATeams } from "@/lib/teams";
 import { getLeagueSettings, getRoleLimit } from "@/lib/leagueSettings";
-import { ROLE_ORDER, parseRoleParam, type Role } from "@/lib/roles";
+import { ROLE_ORDER, type Role } from "@/lib/roles";
+import { readSearchParams } from "@/lib/filterParams";
+import PageHeader from "@/app/components/PageHeader";
+import ListoneToolbar from "../players/ListoneToolbar";
 import PlayersTable from "../players/PlayersTable";
-import RoleFilter from "./RoleFilter";
 
 export const dynamic = "force-dynamic";
 
@@ -13,11 +15,18 @@ export default async function WatchlistPage({
   searchParams: Promise<{ [key: string]: string | undefined }>;
 }) {
   const params = await searchParams;
-  const role = parseRoleParam(params.role);
+  const filters = readSearchParams(params);
 
-  const [players, teams, leagueSettings] = await Promise.all([
-    getFilteredPlayers({ watchlistOnly: true, freeAgentOnly: true, role }),
+  const [players, teams, serieATeams, leagueSettings] = await Promise.all([
+    // The route is the filter: only free agents, only watchlisted, always.
+    getFilteredPlayers({
+      ...filters,
+      watchlistOnly: true,
+      freeAgentOnly: true,
+      starterOnly: false,
+    }),
     getTeamsWithRoster(),
+    getDistinctSerieATeams(),
     getLeagueSettings(),
   ]);
 
@@ -26,11 +35,16 @@ export default async function WatchlistPage({
   ) as Record<Role, number>;
 
   return (
-    <div className="space-y-4">
-      <div>
-        <h1 className="text-[22px] font-extrabold">Wishlist</h1>
-      </div>
-      <RoleFilter />
+    <>
+      <PageHeader
+        title="Wishlist"
+        subtitle="Solo svincolati. Togli la stella per rimuoverli."
+      />
+      <ListoneToolbar
+        serieATeams={serieATeams}
+        resultCount={players.length}
+        showStatusToggles={false}
+      />
       <PlayersTable
         players={players}
         teams={teams.map((t) => ({
@@ -42,6 +56,6 @@ export default async function WatchlistPage({
         roleLimits={roleLimits}
         showCost={false}
       />
-    </div>
+    </>
   );
 }
