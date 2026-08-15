@@ -357,7 +357,7 @@ Expected: all three pass. A build failure naming an unknown utility means an ali
 npm run dev
 ```
 
-Visit `/`, `/players`, `/teams`, `/watchlist`, `/settings`. Every page must look **the same as before this task** apart from two intended shifts: text is slightly lighter (weight 400 now exists) and colours are slightly deeper (the desaturated role palette). Nothing may be unstyled, mispositioned, or missing a background.
+Visit `/`, `/players`, `/teams`, `/watchlist`, `/settings`. Every page must look **the same as before this task** apart from four intended shifts: text is slightly lighter (weight 400 now exists), colours are slightly deeper (the desaturated role palette), corner radii are slightly tighter (`rounded-lg/md/sm` move from 16/14/12px to 14/10/6px), and card/dialog shadows switch from the old tinted values to Tailwind's stock shadow (`--shadow-overlay` is the only shadow token this task defines; unmigrated `shadow-sm/md/lg` classes fall back to Tailwind's generic values until their route task removes them). Unlike colours, radius and shadow utility class names are unchanged between the old and new scale, so there is no alias that can hold two pixel values under one class name — this delta is accepted for the routes that haven't been migrated yet, and disappears as each route task (4–9) lands. Nothing may be unstyled, mispositioned, or missing a background.
 
 - [ ] **Step 9: Commit**
 
