@@ -6,13 +6,15 @@ import { ChevronDown, ChevronUp, Star } from "lucide-react";
 import type { PlayerWithTeam, TeamSummary } from "@/lib/types";
 import { errorMessage } from "@/lib/http";
 import type { Role } from "@/lib/roles";
+import { tierSortWeight, type WishlistTier } from "@/lib/wishlist";
+import WishlistTierCell from "./WishlistTierCell";
 import AssignDialog from "@/app/components/AssignDialog";
 import RoleBadge from "@/app/components/RoleBadge";
 import EmptyState from "@/app/components/EmptyState";
 import InlineError from "@/app/components/InlineError";
 import { Users } from "lucide-react";
 
-type SortKey = "name" | "role" | "serieATeam" | "starter" | "fantasyTeam" | "cost" | "watchlist";
+type SortKey = "name" | "role" | "serieATeam" | "starter" | "fantasyTeam" | "cost" | "wishlistTier";
 type SortState = { key: SortKey; dir: "asc" | "desc" };
 
 const ALL_COLUMNS: { key: SortKey; label: string }[] = [
@@ -22,7 +24,7 @@ const ALL_COLUMNS: { key: SortKey; label: string }[] = [
   { key: "starter", label: "Titolare" },
   { key: "fantasyTeam", label: "Stato" },
   { key: "cost", label: "Costo" },
-  { key: "watchlist", label: "Wish" },
+  { key: "wishlistTier", label: "Wish" },
 ];
 
 export default function PlayersTable({
@@ -76,9 +78,9 @@ export default function PlayersTable({
           aVal = a.cost ?? 0;
           bVal = b.cost ?? 0;
           break;
-        case "watchlist":
-          aVal = a.watchlist ? 1 : 0;
-          bVal = b.watchlist ? 1 : 0;
+        case "wishlistTier":
+          aVal = tierSortWeight(a.wishlistTier);
+          bVal = tierSortWeight(b.wishlistTier);
           break;
       }
 
@@ -105,11 +107,11 @@ export default function PlayersTable({
     return <Icon size={10} className="ml-[3px] inline-block align-[-1px] text-accent" />;
   }
 
-  async function toggleWatchlist(player: PlayerWithTeam) {
+  async function setTier(player: PlayerWithTeam, tier: WishlistTier | null) {
     const res = await fetch(`/api/players/${player.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ watchlist: !player.watchlist }),
+      body: JSON.stringify({ wishlistTier: tier }),
     });
     if (!res.ok) {
       setError(await errorMessage(res));
@@ -194,16 +196,10 @@ export default function PlayersTable({
                   </td>
                 )}
                 <td className="h-11 border-b border-line px-3 align-middle">
-                  <button
-                    type="button"
-                    onClick={() => toggleWatchlist(p)}
-                    title="Wishlist"
-                    className={`inline-flex items-center rounded-md p-[3px] hover:bg-surface-sunk hover:text-ink ${
-                      p.watchlist ? "text-role-c" : "text-ink-3"
-                    }`}
-                  >
-                    <Star size={16} fill={p.watchlist ? "currentColor" : "none"} />
-                  </button>
+                  <WishlistTierCell
+                    value={p.wishlistTier}
+                    onChange={(tier) => setTier(p, tier)}
+                  />
                 </td>
                 <td className="h-11 w-px whitespace-nowrap border-b border-line px-3 text-right align-middle">
                   {p.fantasyTeam ? (
