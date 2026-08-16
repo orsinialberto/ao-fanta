@@ -48,7 +48,7 @@ export default function LeagueRulesCard({ settings }: { settings: LeagueSettings
       hint={`rosa da ${form.limitP + form.limitD + form.limitC + form.limitA}`}
       description="Limiti per ruolo e crediti assegnati a ogni squadra nuova."
     >
-      <div className="mb-4 grid grid-cols-4 gap-2.5">
+      <div className="mb-4 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
         {LIMIT_FIELDS.map(({ field, label, dot }) => (
           <div key={field} className="flex flex-col gap-1.5">
             <label className="flex items-center gap-1.5 text-label">

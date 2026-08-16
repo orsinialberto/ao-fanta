@@ -90,7 +90,7 @@ export default function AstaSearch({
           }
           className="w-full bg-transparent text-h3 font-normal placeholder:text-ink-3 focus:outline-none"
         />
-        <span className="shrink-0 rounded-sm border border-line px-2 py-px font-mono text-small-dense text-ink-3">
+        <span className="hidden shrink-0 rounded-sm border border-line px-2 py-px font-mono text-small-dense text-ink-3 md:inline-block">
           ↑↓ · ⏎ assegna · esc
         </span>
       </div>
