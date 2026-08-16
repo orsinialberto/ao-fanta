@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Gavel, List, Users, Star, Settings, Menu, X } from "lucide-react";
+import { Gavel, List, Users, Star, Settings, Menu, Volleyball, X } from "lucide-react";
 import { spendPercent } from "@/lib/credits";
 
 const PRIMARY_LINKS = [
@@ -91,9 +91,7 @@ export default function Sidebar({
         >
           <Menu size={18} strokeWidth={1.7} />
         </button>
-        <span className="shrink-0 text-[20px] leading-none" aria-hidden="true">
-          ⚽
-        </span>
+        <Volleyball className="shrink-0 text-ink" size={18} strokeWidth={1.7} aria-hidden="true" />
         <span className="text-h3">ao-fanta</span>
       </header>
 
@@ -115,9 +113,12 @@ export default function Sidebar({
         }`}
       >
         <div className="flex items-center gap-2 px-2">
-          <span className="shrink-0 text-[20px] leading-none" aria-hidden="true">
-          ⚽
-        </span>
+          <Volleyball
+            className="shrink-0 text-ink"
+            size={18}
+            strokeWidth={1.7}
+            aria-hidden="true"
+          />
           <span className="text-h3">ao-fanta</span>
           <button
             type="button"
