@@ -196,9 +196,9 @@ export default function PlayersTable({
 
             <div className="mt-1.5 flex items-center gap-1.5 text-small text-ink-2">
               <span className="truncate">{p.serieATeam}</span>
-              <span className="text-ink-3">·</span>
+              {/* ml-auto incolla lo stato al bordo destro, sotto Assegna/Svincola. */}
               <span
-                className={`flex shrink-0 items-center gap-1 ${p.starter ? "text-role-c" : "text-ink-3"}`}
+                className={`ml-auto flex shrink-0 items-center gap-1 ${p.starter ? "text-role-c" : "text-ink-3"}`}
               >
                 <Star size={13} fill={p.starter ? "currentColor" : "none"} />
                 {p.starter ? "Titolare" : "Riserva"}
