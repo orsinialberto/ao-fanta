@@ -91,7 +91,9 @@ export default function Sidebar({
         >
           <Menu size={18} strokeWidth={1.7} />
         </button>
-        <div className="h-5 w-5 shrink-0 rounded-sm bg-accent" />
+        <span className="shrink-0 text-[20px] leading-none" aria-hidden="true">
+          ⚽
+        </span>
         <span className="text-h3">ao-fanta</span>
       </header>
 
@@ -113,7 +115,9 @@ export default function Sidebar({
         }`}
       >
         <div className="flex items-center gap-2 px-2">
-          <div className="h-5 w-5 shrink-0 rounded-sm bg-accent" />
+          <span className="shrink-0 text-[20px] leading-none" aria-hidden="true">
+          ⚽
+        </span>
           <span className="text-h3">ao-fanta</span>
           <button
             type="button"
