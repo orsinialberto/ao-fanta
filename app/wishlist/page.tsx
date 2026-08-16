@@ -7,6 +7,7 @@ import { readSearchParams } from "@/lib/filterParams";
 import PageHeader from "@/app/components/PageHeader";
 import ListoneToolbar from "../players/ListoneToolbar";
 import PlayersTable from "../players/PlayersTable";
+import ResetWishlistButtons from "./ResetWishlistButtons";
 
 export const dynamic = "force-dynamic";
 
@@ -57,6 +58,9 @@ export default async function WishlistPage({
         resultCount={players.length}
         showStatusToggles={false}
       />
+      <div className="mt-3 flex justify-end">
+        <ResetWishlistButtons />
+      </div>
       {TIER_ORDER.map((tier) => (
         <section key={tier} className="mt-8">
           <div className="mb-2 flex items-baseline justify-between">

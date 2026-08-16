@@ -46,7 +46,8 @@ export default function AssignDialog({
   const selectedTeam = teams.find((t) => t.id === teamId);
   const overBudget = selectedTeam ? cost > selectedTeam.remainingCredits : false;
   const role = isValidRole(player.role) ? player.role : null;
-  const tier = isValidTier(player.wishlistTier ?? "") ? player.wishlistTier : null;
+  const playerTier = player.wishlistTier ?? "";
+  const tier = isValidTier(playerTier) ? playerTier : null;
   const roleFull = selectedTeam && role ? selectedTeam.roleCounts[role] >= roleLimits[role] : false;
 
   async function handleSubmit(e: React.FormEvent) {
