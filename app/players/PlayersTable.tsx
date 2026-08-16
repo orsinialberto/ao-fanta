@@ -150,13 +150,13 @@ export default function PlayersTable({
                 <th
                   key={col.key}
                   onClick={() => toggleSort(col.key)}
-                  className="sticky top-0 z-10 cursor-pointer select-none whitespace-nowrap border-b border-line bg-paper px-3 py-3 text-left text-label uppercase text-ink-3 transition-colors duration-fast ease-standard hover:text-ink-2"
+                  className="sticky top-14 z-10 cursor-pointer select-none whitespace-nowrap border-b border-line bg-paper px-3 py-3 text-left text-label uppercase text-ink-3 transition-colors duration-fast ease-standard hover:text-ink-2 md:top-0"
                 >
                   {col.label}
                   <SortIcon column={col.key} />
                 </th>
               ))}
-              <th className="sticky top-0 z-10 border-b border-line bg-paper px-3 py-3" />
+              <th className="sticky top-14 z-10 border-b border-line bg-paper px-3 py-3 md:top-0" />
             </tr>
           </thead>
           <tbody className="[&>tr:last-child>td]:border-b-0">
