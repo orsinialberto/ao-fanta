@@ -142,21 +142,122 @@ export default function PlayersTable({
           <InlineError message={error} />
         </div>
       )}
-      <div className="overflow-x-auto">
+      <div className="flex gap-2 sm:hidden">
+        <select
+          value={sort?.key ?? ""}
+          onChange={(e) => toggleSort(e.target.value as SortKey)}
+          className="w-full rounded-md border border-line-strong bg-surface px-3 py-1.5 text-small text-ink-2"
+        >
+          {COLUMNS.map((col) => (
+            <option key={col.key} value={col.key}>
+              Ordina per {col.label}
+            </option>
+          ))}
+        </select>
+        <button
+          type="button"
+          onClick={() => sort && toggleSort(sort.key)}
+          aria-label="Inverti ordine"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-line-strong bg-surface text-ink-2"
+        >
+          {sort?.dir === "desc" ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
+        </button>
+      </div>
+
+      <div className="flex flex-col sm:hidden">
+        {sortedPlayers.map((p) => (
+          <div key={p.id} className="border-b border-line py-3 last:border-b-0">
+            {/* Il badge ruolo apre ogni riga così le card condividono la stessa
+                colonna d'attacco a sinistra; il resto si allinea a quella. */}
+            <div className="flex items-center gap-2">
+              <RoleBadge role={p.role} size="sm" />
+              <span className="min-w-0 flex-1 truncate font-semibold">{p.name}</span>
+              {p.fantasyTeam ? (
+                <button
+                  type="button"
+                  onClick={() => unassign(p)}
+                  className="shrink-0 text-small-dense font-semibold text-ink-3"
+                >
+                  Svincola
+                </button>
+              ) : teams.length > 0 ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAssigning(p);
+                    setAssignOpen(true);
+                  }}
+                  className="shrink-0 text-small-dense font-semibold text-accent"
+                >
+                  Assegna
+                </button>
+              ) : null}
+            </div>
+
+            <div className="mt-1.5 flex items-center gap-1.5 text-small text-ink-2">
+              <span className="truncate">{p.serieATeam}</span>
+              <span className="text-ink-3">·</span>
+              <span
+                className={`flex shrink-0 items-center gap-1 ${p.starter ? "text-role-c" : "text-ink-3"}`}
+              >
+                <Star size={13} fill={p.starter ? "currentColor" : "none"} />
+                {p.starter ? "Titolare" : "Riserva"}
+              </span>
+            </div>
+
+            <div className="mt-2 flex items-center gap-2">
+              <span
+                className={`shrink-0 rounded-full px-2 py-px text-small-dense font-medium ${
+                  p.fantasyTeam
+                    ? "bg-accent-bg text-accent"
+                    : "border border-line bg-surface-sunk text-ink-3"
+                }`}
+              >
+                {p.fantasyTeam ? p.fantasyTeam.name : "Svincolato"}
+              </span>
+              {showCost && (
+                <span className="font-mono text-small font-medium tabular-nums text-ink-2">
+                  {p.cost ?? "—"}
+                </span>
+              )}
+              <div className="ml-auto">
+                <WishlistTierCell value={p.wishlistTier} onChange={(tier) => setTier(p, tier)} />
+              </div>
+            </div>
+          </div>
+        ))}
+        {sortedPlayers.length === 0 && (
+          <EmptyState
+            icon={Users}
+            title="Nessun giocatore da mostrare"
+            description="Nessun risultato per questi filtri. Prova ad azzerarli o a importare il listone da Impostazioni."
+          />
+        )}
+      </div>
+
+      {/* Lo sticky degli <th> si àncora allo scroll container più vicino, non
+          al viewport: finché questo div era solo overflow-x-auto (che fa
+          computare overflow-y ad auto) era lui lo scrollport, senza overflow
+          verticale, e l'header non agganciava mai. Con max-h il box scrolla
+          anche in verticale e lo sticky ha una corsa vera. */}
+      <div className="hidden max-h-[calc(100dvh-12rem)] overflow-auto sm:block">
         <table className="w-full min-w-[640px] border-collapse text-small">
           <thead>
             <tr>
+              {/* Riga di stacco come inset shadow e non border-b: con
+                  border-collapse il bordo appartiene alla tabella, non alla
+                  cella, quindi non segue l'header quando è agganciato. */}
               {COLUMNS.map((col) => (
                 <th
                   key={col.key}
                   onClick={() => toggleSort(col.key)}
-                  className="sticky top-14 z-10 cursor-pointer select-none whitespace-nowrap border-b border-line bg-paper px-3 py-3 text-left text-label uppercase text-ink-3 transition-colors duration-fast ease-standard hover:text-ink-2 md:top-0"
+                  className="sticky top-0 z-10 cursor-pointer select-none whitespace-nowrap bg-paper px-3 py-3 text-left text-label uppercase text-ink-3 shadow-[inset_0_-1px_0_var(--color-line)] transition-colors duration-fast ease-standard hover:text-ink-2"
                 >
                   {col.label}
                   <SortIcon column={col.key} />
                 </th>
               ))}
-              <th className="sticky top-14 z-10 border-b border-line bg-paper px-3 py-3 md:top-0" />
+              <th className="sticky top-0 z-10 bg-paper px-3 py-3 shadow-[inset_0_-1px_0_var(--color-line)]" />
             </tr>
           </thead>
           <tbody className="[&>tr:last-child>td]:border-b-0">
