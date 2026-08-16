@@ -10,6 +10,7 @@ export type PlayerFilterState = {
   wishlistTier: WishlistTier[];
 };
 
+/** Filters with everything, including freeAgentOnly, explicitly turned off. */
 export const EMPTY_FILTER_STATE: PlayerFilterState = {
   search: "",
   role: [],
@@ -17,6 +18,12 @@ export const EMPTY_FILTER_STATE: PlayerFilterState = {
   freeAgentOnly: false,
   starterOnly: false,
   wishlistTier: [],
+};
+
+/** What a fresh visit to the listone starts on: only free agents shown. */
+export const DEFAULT_FILTER_STATE: PlayerFilterState = {
+  ...EMPTY_FILTER_STATE,
+  freeAgentOnly: true,
 };
 
 /** Boolean params are the string "true" or absent. Nothing else is truthy. */
@@ -27,7 +34,10 @@ export function readFilterState(params: URLSearchParams): PlayerFilterState {
     search: params.get("search") ?? "",
     role: parseRoleParam(params.get("role")),
     serieATeam: params.get("serieATeam") ?? "",
-    freeAgentOnly: params.get("freeAgentOnly") === "true",
+    // Defaults to true when the URL says nothing at all, so a fresh visit to
+    // the listone starts on free agents. Once the user explicitly toggles it
+    // off, writeFilterState pins "false" in the URL so it stays off.
+    freeAgentOnly: params.has("freeAgentOnly") ? params.get("freeAgentOnly") === "true" : true,
     starterOnly: params.get("starterOnly") === "true",
     wishlistTier: parseTierParam(params.get("wishlistTier")),
   };
@@ -45,9 +55,10 @@ export function writeFilterState(state: PlayerFilterState): string {
   if (state.role.length > 0) params.set("role", state.role.join(","));
   if (state.serieATeam) params.set("serieATeam", state.serieATeam);
   if (state.wishlistTier.length > 0) params.set("wishlistTier", state.wishlistTier.join(","));
-  for (const key of BOOLEAN_KEYS) {
-    if (state[key]) params.set(key, "true");
-  }
+  // freeAgentOnly defaults to true when absent, so "off" must be written
+  // explicitly or it would read back as the default "on".
+  if (!state.freeAgentOnly) params.set("freeAgentOnly", "false");
+  if (state.starterOnly) params.set("starterOnly", "true");
   return params.toString();
 }
 

@@ -7,11 +7,16 @@ import {
   toggleTier,
   activeFilterCount,
   EMPTY_FILTER_STATE,
+  DEFAULT_FILTER_STATE,
 } from "@/lib/filterParams";
 
 describe("readFilterState", () => {
-  it("returns the empty state for an empty query string", () => {
-    expect(readFilterState(new URLSearchParams())).toEqual(EMPTY_FILTER_STATE);
+  it("returns the default state (free agents only) for an empty query string", () => {
+    expect(readFilterState(new URLSearchParams())).toEqual(DEFAULT_FILTER_STATE);
+  });
+
+  it("returns freeAgentOnly: false once it's explicitly turned off in the URL", () => {
+    expect(readFilterState(new URLSearchParams("freeAgentOnly=false")).freeAgentOnly).toBe(false);
   });
 
   it("reads every field", () => {
@@ -40,7 +45,7 @@ describe("readFilterState", () => {
 describe("readSearchParams", () => {
   it("reads Next's searchParams shape", () => {
     expect(readSearchParams({ role: "A,C", serieATeam: "Inter" })).toEqual({
-      ...EMPTY_FILTER_STATE,
+      ...DEFAULT_FILTER_STATE,
       role: ["A", "C"],
       serieATeam: "Inter",
     });
@@ -54,12 +59,16 @@ describe("readSearchParams", () => {
 });
 
 describe("writeFilterState", () => {
-  it("omits empty and false fields so the URL stays clean", () => {
-    expect(writeFilterState(EMPTY_FILTER_STATE)).toBe("");
+  it("omits empty fields and the default freeAgentOnly so the URL stays clean", () => {
+    expect(writeFilterState(DEFAULT_FILTER_STATE)).toBe("");
+  });
+
+  it("writes freeAgentOnly=false explicitly, since it differs from the default", () => {
+    expect(writeFilterState(EMPTY_FILTER_STATE)).toBe("freeAgentOnly=false");
   });
 
   it("serialises roles as a comma-separated list", () => {
-    expect(writeFilterState({ ...EMPTY_FILTER_STATE, role: ["A", "C"] })).toBe("role=A%2CC");
+    expect(writeFilterState({ ...DEFAULT_FILTER_STATE, role: ["A", "C"] })).toBe("role=A%2CC");
   });
 
   it("round-trips through readFilterState", () => {
@@ -91,6 +100,10 @@ describe("toggleRole", () => {
 describe("activeFilterCount", () => {
   it("is 0 for the empty state", () => {
     expect(activeFilterCount(EMPTY_FILTER_STATE)).toBe(0);
+  });
+
+  it("counts the default freeAgentOnly filter", () => {
+    expect(activeFilterCount(DEFAULT_FILTER_STATE)).toBe(1);
   });
 
   it("counts each selected role separately", () => {
@@ -133,7 +146,7 @@ describe("wishlistTier filtering", () => {
   });
 
   it("serialises tiers as a comma-separated list", () => {
-    expect(writeFilterState({ ...EMPTY_FILTER_STATE, wishlistTier: ["A", "C"] })).toBe(
+    expect(writeFilterState({ ...DEFAULT_FILTER_STATE, wishlistTier: ["A", "C"] })).toBe(
       "wishlistTier=A%2CC"
     );
   });
