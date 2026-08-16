@@ -42,6 +42,7 @@ export default async function AstaPage() {
 
       <div className="grid grid-cols-1 items-start gap-8 text-body-dense lg:grid-cols-[1fr_296px]">
         <div>
+          <h2 className="mb-3 text-label uppercase text-ink-3">Ricerca Giocatore</h2>
           <AstaSearch
             teams={teams.map((t) => ({
               id: t.id,

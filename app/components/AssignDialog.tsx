@@ -11,6 +11,7 @@ import RoleBadge from "@/app/components/RoleBadge";
 import InlineError from "@/app/components/InlineError";
 import { errorMessage } from "@/lib/http";
 import { ROLE_LABELS, isValidRole, type Role } from "@/lib/roles";
+import { TIER_LABELS, isValidTier } from "@/lib/wishlist";
 import type { PlayerWithTeam, TeamSummary } from "@/lib/types";
 
 export default function AssignDialog({
@@ -45,6 +46,7 @@ export default function AssignDialog({
   const selectedTeam = teams.find((t) => t.id === teamId);
   const overBudget = selectedTeam ? cost > selectedTeam.remainingCredits : false;
   const role = isValidRole(player.role) ? player.role : null;
+  const tier = isValidTier(player.wishlistTier ?? "") ? player.wishlistTier : null;
   const roleFull = selectedTeam && role ? selectedTeam.roleCounts[role] >= roleLimits[role] : false;
 
   async function handleSubmit(e: React.FormEvent) {
@@ -72,8 +74,19 @@ export default function AssignDialog({
           <div className="flex items-center gap-3">
             <RoleBadge role={player.role} size="lg" />
             <div>
-              <DialogTitle>Assegna {player.name}</DialogTitle>
-              <p className="text-small text-ink-3">{player.serieATeam}</p>
+              <DialogTitle>{player.name}</DialogTitle>
+              <p className="mt-1.5 flex items-center gap-1.5 text-small text-ink-3">
+                {player.serieATeam}
+                {tier && <span>—</span>}
+                {tier && (
+                  <span
+                    title={`Lista ${tier} — ${TIER_LABELS[tier]}`}
+                    className="flex h-5 w-5 items-center justify-center rounded-sm border border-accent bg-accent-bg font-mono text-small-dense font-semibold text-accent"
+                  >
+                    {tier}
+                  </span>
+                )}
+              </p>
             </div>
           </div>
         </DialogHeader>

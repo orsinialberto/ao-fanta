@@ -118,7 +118,18 @@ export default function ImportPage() {
         subtitle="Carica un file CSV o Excel, associa le colonne e conferma l'importazione."
       />
       <div className="max-w-xl space-y-4">
-        <input type="file" accept=".csv,.xlsx,.xls" onChange={handleFileSelect} />
+        <div className="flex items-center gap-3">
+          <label className="cursor-pointer rounded-md border border-line px-3 py-1.5 text-small transition-colors duration-fast ease-standard hover:bg-surface-sunk">
+            Scegli file
+            <input
+              type="file"
+              accept=".csv,.xlsx,.xls"
+              onChange={handleFileSelect}
+              className="hidden"
+            />
+          </label>
+          <span className="text-small text-ink-3">{file ? file.name : "Nessun file selezionato"}</span>
+        </div>
 
         {headers.length > 0 && !preview && (
           <div className="space-y-2 rounded-lg border border-line p-4">
