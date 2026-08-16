@@ -21,7 +21,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="it" className={`${manrope.variable} ${jetbrainsMono.variable}`}>
       <body className="flex bg-paper text-ink font-sans">
         <Sidebar assignedCount={assigned} totalCount={total} />
-        <main className="w-full max-w-[1240px] flex-1 px-12 pb-16 pt-10">
+        {/* min-w-0 annulla il min-width:auto implicito dei flex item. Senza,
+            l'overflow-x-auto di PlayersTable non contiene niente e la tabella
+            allarga la pagina. */}
+        <main className="w-full min-w-0 max-w-[1240px] flex-1 px-4 pb-16 pt-6 md:px-12 md:pt-10">
           {children}
         </main>
       </body>
