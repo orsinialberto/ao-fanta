@@ -66,6 +66,18 @@ export default function Sidebar({
     };
   }, [open]);
 
+  // Se il viewport supera md mentre il drawer è aperto, l'hamburger e la X
+  // spariscono (md:hidden) e nient'altro potrebbe più chiuderlo: senza
+  // questo lo scroll-lock del body resterebbe attivo per sempre.
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 48rem)");
+    const onChange = () => {
+      if (mq.matches) setOpen(false);
+    };
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+
   return (
     <>
       <header className="fixed inset-x-0 top-0 z-30 flex h-14 items-center gap-3 border-b border-line bg-paper px-4 md:hidden">
@@ -96,7 +108,7 @@ export default function Sidebar({
           desktop, dove il drawer non esiste come concetto. */}
       <aside
         id="sidebar-nav"
-        className={`fixed left-0 top-0 z-50 flex h-screen w-[220px] flex-col gap-6 border-r border-line bg-paper p-4 transition-transform duration-base ease-standard md:sticky md:z-auto md:visible md:translate-x-0 ${
+        className={`fixed left-0 top-0 z-50 flex h-screen w-[220px] flex-col gap-6 overflow-y-auto border-r border-line bg-paper p-4 transition-transform duration-base ease-standard md:sticky md:z-auto md:visible md:translate-x-0 md:left-auto ${
           open ? "visible translate-x-0" : "invisible -translate-x-full"
         }`}
       >
