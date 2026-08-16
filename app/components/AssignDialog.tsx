@@ -29,26 +29,31 @@ export default function AssignDialog({
   onOpenChange: (open: boolean) => void;
   onAssigned: () => void;
 }) {
-  const [teamId, setTeamId] = useState(teams[0]?.id ?? "");
+  const role = isValidRole(player?.role ?? "") ? (player!.role as Role) : null;
+  const availableTeams = role
+    ? teams.filter((t) => t.roleCounts[role] < roleLimits[role])
+    : teams;
+
+  const [teamId, setTeamId] = useState(availableTeams[0]?.id ?? "");
   const [cost, setCost] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (open) {
-      setTeamId(teams[0]?.id ?? "");
+      setTeamId(availableTeams[0]?.id ?? "");
       setCost(0);
       setError(null);
     }
-  }, [open, teams]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, player]);
 
   if (!player) return null;
 
-  const selectedTeam = teams.find((t) => t.id === teamId);
+  const selectedTeam = availableTeams.find((t) => t.id === teamId);
   const overBudget = selectedTeam ? cost > selectedTeam.remainingCredits : false;
-  const role = isValidRole(player.role) ? player.role : null;
   const playerTier = player.wishlistTier ?? "";
   const tier = isValidTier(playerTier) ? playerTier : null;
-  const roleFull = selectedTeam && role ? selectedTeam.roleCounts[role] >= roleLimits[role] : false;
+  const noTeamsAvailable = availableTeams.length === 0;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -99,9 +104,10 @@ export default function AssignDialog({
               value={teamId}
               onChange={(e) => setTeamId(e.target.value)}
               required
-              className="w-full rounded-md border border-line-strong bg-surface px-3 py-2 text-body transition-colors duration-fast ease-standard focus:border-accent focus:outline-none"
+              disabled={noTeamsAvailable}
+              className="w-full rounded-md border border-line-strong bg-surface px-3 py-2 text-body transition-colors duration-fast ease-standard focus:border-accent focus:outline-none disabled:opacity-40"
             >
-              {teams.map((t) => (
+              {availableTeams.map((t) => (
                 <option key={t.id} value={t.id}>
                   {t.name} (residui: {t.remainingCredits})
                 </option>
@@ -127,10 +133,10 @@ export default function AssignDialog({
               message={`${selectedTeam!.name} ha ${selectedTeam!.remainingCredits} crediti. Puoi confermare comunque, ma la squadra andrà in negativo.`}
             />
           )}
-          {roleFull && role && (
+          {noTeamsAvailable && role && (
             <InlineError
-              title={`Limite raggiunto per ${ROLE_LABELS[role]}`}
-              message={`${selectedTeam!.name} ha già ${selectedTeam!.roleCounts[role]} giocatori su ${roleLimits[role]}. Svincolane uno per assegnare ${player.name}.`}
+              title={`Nessuna squadra ha posti liberi per ${ROLE_LABELS[role]}`}
+              message={`Svincola un giocatore in questo ruolo da una squadra per poter assegnare ${player.name}.`}
             />
           )}
           {error && <InlineError message={error} />}
@@ -145,7 +151,7 @@ export default function AssignDialog({
             </button>
             <button
               type="submit"
-              disabled={roleFull}
+              disabled={noTeamsAvailable}
               className="rounded-md bg-accent px-3 py-2 text-small font-semibold text-white transition-colors duration-fast ease-standard hover:bg-accent-hover disabled:opacity-40"
             >
               Conferma
