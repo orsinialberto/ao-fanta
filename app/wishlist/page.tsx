@@ -8,6 +8,7 @@ import PageHeader from "@/app/components/PageHeader";
 import ListoneToolbar from "../players/ListoneToolbar";
 import PlayersTable from "../players/PlayersTable";
 import ResetWishlistButtons from "./ResetWishlistButtons";
+import TierSection from "./TierSection";
 
 export const dynamic = "force-dynamic";
 
@@ -62,15 +63,12 @@ export default async function WishlistPage({
         <ResetWishlistButtons />
       </div>
       {TIER_ORDER.map((tier) => (
-        <section key={tier} className="mt-8">
-          <div className="mb-2 flex items-baseline justify-between">
-            <h2 className="text-h2">
-              Lista {tier} — {TIER_LABELS[tier]}
-            </h2>
-            <span className="font-mono text-small-dense tabular-nums text-ink-3">
-              {groups[tier].length} giocatori
-            </span>
-          </div>
+        <TierSection
+          key={tier}
+          tier={tier}
+          title={`Lista ${tier} — ${TIER_LABELS[tier]}`}
+          count={groups[tier].length}
+        >
           {groups[tier].length === 0 ? (
             // Empty sections stay on the page so its shape does not depend on
             // the data. EmptyState is too heavy to repeat three times here.
@@ -85,7 +83,7 @@ export default async function WishlistPage({
               showCost={false}
             />
           )}
-        </section>
+        </TierSection>
       ))}
     </>
   );
