@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { ChevronDown, ChevronUp, Star } from "lucide-react";
 import type { PlayerWithTeam, TeamSummary } from "@/lib/types";
 import { errorMessage } from "@/lib/http";
-import type { Role } from "@/lib/roles";
+import { roleSortWeight, type Role } from "@/lib/roles";
 import { tierSortWeight, type WishlistTier } from "@/lib/wishlist";
 import WishlistTierCell from "./WishlistTierCell";
 import AssignDialog from "@/app/components/AssignDialog";
@@ -42,7 +42,7 @@ export default function PlayersTable({
   const router = useRouter();
   const [assigning, setAssigning] = useState<PlayerWithTeam | null>(null);
   const [assignOpen, setAssignOpen] = useState(false);
-  const [sort, setSort] = useState<SortState | null>(null);
+  const [sort, setSort] = useState<SortState | null>({ key: "role", dir: "asc" });
   const [error, setError] = useState<string | null>(null);
 
   const sortedPlayers = useMemo(() => {
@@ -59,8 +59,8 @@ export default function PlayersTable({
           bVal = b.name.toLowerCase();
           break;
         case "role":
-          aVal = a.role;
-          bVal = b.role;
+          aVal = roleSortWeight(a.role);
+          bVal = roleSortWeight(b.role);
           break;
         case "serieATeam":
           aVal = a.serieATeam.toLowerCase();

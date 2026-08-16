@@ -16,3 +16,9 @@ export function parseRoleParam(value?: string | null): Role[] {
   if (!value) return [];
   return value.split(",").filter(isValidRole);
 }
+
+/** Sort weight following ROLE_ORDER (P, D, C, A) instead of alphabetical. */
+export function roleSortWeight(role: string): number {
+  const i = (ROLE_ORDER as readonly string[]).indexOf(role);
+  return i === -1 ? ROLE_ORDER.length : i;
+}
