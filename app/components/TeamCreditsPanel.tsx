@@ -19,7 +19,10 @@ export default function TeamCreditsPanel({
   roleLimits: Record<Role, number>;
 }) {
   return (
-    <aside className="sticky top-10">
+    <>
+      {/* Sotto lg il pannello è impilato in fondo alla pagina, dove restare
+          incollato in alto non vuol dire niente. */}
+      <aside className="static lg:sticky lg:top-10">
       <div className="mb-3 flex items-baseline justify-between">
         <h2 className="text-label uppercase text-ink-3">Crediti squadre</h2>
         <span className="font-mono font-medium text-small-dense tabular-nums text-ink-3">{teams.length}</span>
@@ -67,5 +70,6 @@ export default function TeamCreditsPanel({
         ))}
       </div>
     </aside>
+    </>
   );
 }

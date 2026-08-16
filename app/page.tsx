@@ -40,7 +40,7 @@ export default async function AstaPage() {
         } squadre in gioco`}
       />
 
-      <div className="grid grid-cols-[1fr_296px] items-start gap-8 text-body-dense">
+      <div className="grid grid-cols-1 items-start gap-8 text-body-dense lg:grid-cols-[1fr_296px]">
         <div>
           <AstaSearch
             teams={teams.map((t) => ({
