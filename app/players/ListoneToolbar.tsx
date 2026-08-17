@@ -72,6 +72,16 @@ export default function ListoneToolbar({
             placeholder="Cerca per nome…"
             className="w-full bg-transparent text-small placeholder:text-ink-3 focus:outline-none"
           />
+          {search && (
+            <button
+              type="button"
+              onClick={() => setSearch("")}
+              aria-label="Svuota ricerca"
+              className="shrink-0 text-ink-3 transition-colors duration-fast ease-standard hover:text-ink"
+            >
+              <X size={13} />
+            </button>
+          )}
         </div>
 
         <div className="flex gap-1">
