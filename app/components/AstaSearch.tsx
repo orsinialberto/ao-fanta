@@ -105,9 +105,6 @@ export default function AstaSearch({
             <X size={16} />
           </button>
         )}
-        <span className="hidden shrink-0 rounded-sm border border-line px-2 py-px font-mono text-small-dense text-ink-3 md:inline-block">
-          ↑↓ · ⏎ assegna · esc
-        </span>
       </div>
 
       {dropdownOpen && (

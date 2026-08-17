@@ -24,7 +24,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         {/* min-w-0 annulla il min-width:auto implicito dei flex item. Senza,
             l'overflow-x-auto di PlayersTable non contiene niente e la tabella
             allarga la pagina. */}
-        <main className="w-full min-w-0 max-w-[1240px] flex-1 px-4 pb-16 pt-20 md:px-12 md:pt-10">
+        <main className="mx-auto w-full min-w-0 max-w-[1240px] flex-1 px-4 pb-16 pt-20 md:px-12 md:pt-10">
           {children}
         </main>
       </body>
