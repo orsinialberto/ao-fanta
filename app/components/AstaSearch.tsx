@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Search } from "lucide-react";
+import { Search, X } from "lucide-react";
 import AssignDialog from "@/app/components/AssignDialog";
 import AddPlayerDialog from "@/app/components/AddPlayerDialog";
 import RoleBadge from "@/app/components/RoleBadge";
@@ -26,6 +26,7 @@ export default function AstaSearch({
   const [addOpen, setAddOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!query.trim()) {
@@ -78,6 +79,7 @@ export default function AstaSearch({
         <Search className="pointer-events-none shrink-0 text-ink-3" size={17} />
         <input
           autoFocus
+          ref={inputRef}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
@@ -90,6 +92,19 @@ export default function AstaSearch({
           }
           className="w-full bg-transparent text-h3 font-normal placeholder:text-ink-3 focus:outline-none"
         />
+        {query && (
+          <button
+            type="button"
+            onClick={() => {
+              setQuery("");
+              inputRef.current?.focus();
+            }}
+            aria-label="Svuota ricerca"
+            className="shrink-0 text-ink-3 transition-colors duration-fast ease-standard hover:text-ink"
+          >
+            <X size={16} />
+          </button>
+        )}
         <span className="hidden shrink-0 rounded-sm border border-line px-2 py-px font-mono text-small-dense text-ink-3 md:inline-block">
           ↑↓ · ⏎ assegna · esc
         </span>
