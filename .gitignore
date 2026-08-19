@@ -1,4 +1,5 @@
 node_modules/
+.worktrees/
 .next/
 prisma/dev.db
 prisma/dev.db-journal
