@@ -14,10 +14,22 @@ import EmptyState from "@/app/components/EmptyState";
 import InlineError from "@/app/components/InlineError";
 import { Users } from "lucide-react";
 
-type SortKey = "name" | "role" | "serieATeam" | "starter" | "fantasyTeam" | "cost" | "wishlistTier";
+type SortKey =
+  | "name"
+  | "role"
+  | "serieATeam"
+  | "starter"
+  | "fantasyTeam"
+  | "cost"
+  | "wishlistTier"
+  | "mediaVoto"
+  | "fantaMedia"
+  | "goals"
+  | "assists"
+  | "appearances";
 type SortState = { key: SortKey; dir: "asc" | "desc" };
 
-const ALL_COLUMNS: { key: SortKey; label: string }[] = [
+const ALL_COLUMNS: { key: SortKey; label: string; title?: string }[] = [
   { key: "name", label: "Nome" },
   { key: "role", label: "Ruolo" },
   { key: "serieATeam", label: "Squadra Serie A" },
@@ -25,6 +37,11 @@ const ALL_COLUMNS: { key: SortKey; label: string }[] = [
   { key: "fantasyTeam", label: "Stato" },
   { key: "cost", label: "Costo" },
   { key: "wishlistTier", label: "Wish" },
+  { key: "mediaVoto", label: "Mv", title: "Media voto" },
+  { key: "fantaMedia", label: "Fm", title: "Fantamedia" },
+  { key: "goals", label: "Gol" },
+  { key: "assists", label: "Ass", title: "Assist" },
+  { key: "appearances", label: "Pv", title: "Presenze" },
 ];
 
 export default function PlayersTable({
@@ -81,6 +98,26 @@ export default function PlayersTable({
         case "wishlistTier":
           aVal = tierSortWeight(a.wishlistTier);
           bVal = tierSortWeight(b.wishlistTier);
+          break;
+        case "mediaVoto":
+          aVal = a.mediaVoto ?? 0;
+          bVal = b.mediaVoto ?? 0;
+          break;
+        case "fantaMedia":
+          aVal = a.fantaMedia ?? 0;
+          bVal = b.fantaMedia ?? 0;
+          break;
+        case "goals":
+          aVal = a.goals ?? 0;
+          bVal = b.goals ?? 0;
+          break;
+        case "assists":
+          aVal = a.assists ?? 0;
+          bVal = b.assists ?? 0;
+          break;
+        case "appearances":
+          aVal = a.appearances ?? 0;
+          bVal = b.appearances ?? 0;
           break;
       }
 
@@ -224,6 +261,12 @@ export default function PlayersTable({
                 <WishlistTierCell value={p.wishlistTier} onChange={(tier) => setTier(p, tier)} />
               </div>
             </div>
+
+            {(p.mediaVoto != null || p.fantaMedia != null || p.appearances != null) && (
+              <div className="mt-1.5 font-mono text-small-dense tabular-nums text-ink-3">
+                Mv {p.mediaVoto ?? "—"} · Fm {p.fantaMedia ?? "—"} · {p.goals ?? 0}G {p.assists ?? 0}A · {p.appearances ?? 0} pres.
+              </div>
+            )}
           </div>
         ))}
         {sortedPlayers.length === 0 && (
@@ -251,6 +294,7 @@ export default function PlayersTable({
                 <th
                   key={col.key}
                   onClick={() => toggleSort(col.key)}
+                  title={col.title}
                   className="sticky top-0 z-10 cursor-pointer select-none whitespace-nowrap bg-paper px-3 py-3 text-left text-label uppercase text-ink-3 shadow-[inset_0_-1px_0_var(--color-line)] transition-colors duration-fast ease-standard hover:text-ink-2"
                 >
                   {col.label}
@@ -301,6 +345,21 @@ export default function PlayersTable({
                     value={p.wishlistTier}
                     onChange={(tier) => setTier(p, tier)}
                   />
+                </td>
+                <td className="h-11 border-b border-line px-3 align-middle font-mono tabular-nums text-ink-2">
+                  {p.mediaVoto ?? "—"}
+                </td>
+                <td className="h-11 border-b border-line px-3 align-middle font-mono tabular-nums text-ink-2">
+                  {p.fantaMedia ?? "—"}
+                </td>
+                <td className="h-11 border-b border-line px-3 align-middle font-mono tabular-nums text-ink-2">
+                  {p.goals ?? "—"}
+                </td>
+                <td className="h-11 border-b border-line px-3 align-middle font-mono tabular-nums text-ink-2">
+                  {p.assists ?? "—"}
+                </td>
+                <td className="h-11 border-b border-line px-3 align-middle font-mono tabular-nums text-ink-2">
+                  {p.appearances ?? "—"}
                 </td>
                 <td className="h-11 w-px whitespace-nowrap border-b border-line px-3 text-right align-middle">
                   {p.fantasyTeam ? (

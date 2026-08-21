@@ -2,6 +2,14 @@ import { prisma } from "@/lib/prisma";
 import type { Prisma } from "@prisma/client";
 import { normalize } from "@/lib/normalize";
 
+export type AttendanceFilter = "25" | "50" | "75";
+
+export const ATTENDANCE_PCT: Record<AttendanceFilter, number> = {
+  "25": 0.25,
+  "50": 0.5,
+  "75": 0.75,
+};
+
 export type PlayerFilters = {
   role?: string[];
   serieATeam?: string;
@@ -9,6 +17,7 @@ export type PlayerFilters = {
   starterOnly?: boolean;
   wishlistTier?: string[];
   search?: string;
+  presenze?: AttendanceFilter | "";
 };
 
 export async function getFilteredPlayers(filters: PlayerFilters) {
@@ -20,6 +29,14 @@ export async function getFilteredPlayers(filters: PlayerFilters) {
   if (filters.starterOnly) where.starter = true;
   if (filters.wishlistTier && filters.wishlistTier.length > 0) {
     where.wishlistTier = { in: filters.wishlistTier };
+  }
+  if (filters.presenze) {
+    // Relative to the max appearances among ALL players, not just the
+    // filtered set — so the threshold reflects how far the season has
+    // progressed regardless of which other filters are active.
+    const { _max } = await prisma.player.aggregate({ _max: { appearances: true } });
+    const max = _max.appearances ?? 0;
+    where.appearances = { gt: max * ATTENDANCE_PCT[filters.presenze] };
   }
   // Note: `search` is deliberately NOT added to the Prisma `where` clause.
   // SQLite's LIKE (used by Prisma's `contains`) folds ASCII case but not

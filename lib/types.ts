@@ -15,5 +15,10 @@ export type PlayerWithTeam = {
   cost: number | null;
   starter: boolean;
   wishlistTier: string | null;
+  mediaVoto: number | null;
+  fantaMedia: number | null;
+  goals: number | null;
+  assists: number | null;
+  appearances: number | null;
   fantasyTeam: { id: string; name: string } | null;
 };

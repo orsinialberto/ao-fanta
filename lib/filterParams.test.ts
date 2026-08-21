@@ -30,6 +30,7 @@ describe("readFilterState", () => {
       freeAgentOnly: true,
       starterOnly: true,
       wishlistTier: [],
+      presenze: "",
     });
   });
 
@@ -79,6 +80,7 @@ describe("writeFilterState", () => {
       freeAgentOnly: true,
       starterOnly: false,
       wishlistTier: [],
+      presenze: "50" as const,
     };
     expect(readFilterState(new URLSearchParams(writeFilterState({ ...state, role: [...state.role] })))).toEqual({
       ...state,
@@ -158,6 +160,28 @@ describe("wishlistTier filtering", () => {
 
   it("counts each selected tier as its own active filter", () => {
     expect(activeFilterCount({ ...EMPTY_FILTER_STATE, wishlistTier: ["A", "B"] })).toBe(2);
+  });
+});
+
+describe("presenze filtering", () => {
+  it("reads a valid value from the query string", () => {
+    expect(readFilterState(new URLSearchParams("presenze=50")).presenze).toBe("50");
+  });
+
+  it("drops an invalid value", () => {
+    expect(readFilterState(new URLSearchParams("presenze=90")).presenze).toBe("");
+  });
+
+  it("defaults to no filter", () => {
+    expect(EMPTY_FILTER_STATE.presenze).toBe("");
+  });
+
+  it("serialises when set", () => {
+    expect(writeFilterState({ ...DEFAULT_FILTER_STATE, presenze: "25" })).toBe("presenze=25");
+  });
+
+  it("counts as an active filter when set", () => {
+    expect(activeFilterCount({ ...EMPTY_FILTER_STATE, presenze: "75" })).toBe(1);
   });
 });
 

@@ -1,5 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { parseAndValidateRows, computeReconcile } from "@/lib/importReconcile";
+import {
+  parseAndValidateRows,
+  computeReconcile,
+  parseAndValidateStatsRows,
+  computeStatsReconcile,
+} from "@/lib/importReconcile";
 
 describe("parseAndValidateRows", () => {
   const mapping = { name: "Nome", role: "Ruolo", serieATeam: "Squadra" };
@@ -133,5 +138,103 @@ describe("computeReconcile", () => {
     const existing = [{ id: "1", name: "Osimhen", role: "A", serieATeam: "Napoli" }];
     const result = computeReconcile(valid, existing);
     expect(result.toDeleteIds).toEqual(["1"]);
+  });
+});
+
+describe("parseAndValidateStatsRows", () => {
+  const mapping = {
+    name: "Nome",
+    mediaVoto: "Mv",
+    fantaMedia: "Fm",
+    goals: "Gf",
+    assists: "Ass",
+    appearances: "Pv",
+  };
+
+  it("extracts valid stats rows using the column mapping", () => {
+    const { valid, errors } = parseAndValidateStatsRows(
+      [{ Nome: "Osimhen", Mv: 6.36, Fm: 7.58, Gf: 12, Ass: 3, Pv: 30 }],
+      mapping
+    );
+    expect(valid).toEqual([
+      { name: "Osimhen", mediaVoto: 6.36, fantaMedia: 7.58, goals: 12, assists: 3, appearances: 30 },
+    ]);
+    expect(errors).toEqual([]);
+  });
+
+  it("reports a missing name with the 1-indexed-plus-header row number", () => {
+    const { valid, errors } = parseAndValidateStatsRows(
+      [{ Nome: "", Mv: 6.36, Fm: 7.58, Gf: 12, Ass: 3, Pv: 30 }],
+      mapping
+    );
+    expect(valid).toEqual([]);
+    expect(errors).toEqual(["Riga 2: nome mancante"]);
+  });
+
+  it("treats a blank stat cell as null rather than an error", () => {
+    const { valid, errors } = parseAndValidateStatsRows(
+      [{ Nome: "Osimhen", Mv: "", Fm: 7.58, Gf: 12, Ass: 3, Pv: 30 }],
+      mapping
+    );
+    expect(valid).toEqual([
+      { name: "Osimhen", mediaVoto: null, fantaMedia: 7.58, goals: 12, assists: 3, appearances: 30 },
+    ]);
+    expect(errors).toEqual([]);
+  });
+
+  it("reports a non-numeric stat cell", () => {
+    const { valid, errors } = parseAndValidateStatsRows(
+      [{ Nome: "Osimhen", Mv: "n/d", Fm: 7.58, Gf: 12, Ass: 3, Pv: 30 }],
+      mapping
+    );
+    expect(valid).toEqual([]);
+    expect(errors).toEqual(['Riga 2: valore non numerico per "mediaVoto"']);
+  });
+
+  it("accepts comma decimal separators", () => {
+    const { valid } = parseAndValidateStatsRows(
+      [{ Nome: "Osimhen", Mv: "6,36", Fm: 7.58, Gf: 12, Ass: 3, Pv: 30 }],
+      mapping
+    );
+    expect(valid[0].mediaVoto).toBe(6.36);
+  });
+});
+
+describe("computeStatsReconcile", () => {
+  it("matches a file row to an existing player by name and updates their stats", () => {
+    const existing = [{ id: "1", name: "Osimhen" }];
+    const validRows = [
+      { name: "Osimhen", mediaVoto: 6.36, fantaMedia: 7.58, goals: 12, assists: 3, appearances: 30 },
+    ];
+    const result = computeStatsReconcile(validRows, existing);
+    expect(result.toUpdate).toEqual([
+      { id: "1", name: "Osimhen", mediaVoto: 6.36, fantaMedia: 7.58, goals: 12, assists: 3, appearances: 30 },
+    ]);
+    expect(result.notFoundNames).toEqual([]);
+  });
+
+  it("matches names case/accent-insensitively", () => {
+    const existing = [{ id: "1", name: "Vlahović" }];
+    const validRows = [
+      { name: "vlahovic", mediaVoto: 6, fantaMedia: 6, goals: 0, assists: 0, appearances: 10 },
+    ];
+    const result = computeStatsReconcile(validRows, existing);
+    expect(result.toUpdate[0].id).toBe("1");
+  });
+
+  it("reports a file row with no matching existing player as not found, without creating it", () => {
+    const validRows = [
+      { name: "Sconosciuto", mediaVoto: 6, fantaMedia: 6, goals: 0, assists: 0, appearances: 5 },
+    ];
+    const result = computeStatsReconcile(validRows, []);
+    expect(result.toUpdate).toEqual([]);
+    expect(result.notFoundNames).toEqual(["Sconosciuto"]);
+  });
+
+  it("leaves an existing player untouched when the file has no row for them", () => {
+    const existing = [{ id: "1", name: "SenzaStat" }];
+    const result = computeStatsReconcile([], existing);
+    expect(result.toUpdate).toEqual([]);
+    expect(result.notFoundNames).toEqual([]);
   });
 });

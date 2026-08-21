@@ -6,6 +6,7 @@ import { Search, X } from "lucide-react";
 import { ROLE_ORDER, type Role } from "@/lib/roles";
 import { ROLE_CHIP_ON } from "@/lib/roleStyles";
 import { TIER_ORDER, TIER_LABELS } from "@/lib/wishlist";
+import type { AttendanceFilter } from "@/lib/players";
 import {
   readFilterState,
   writeFilterState,
@@ -22,6 +23,13 @@ const BOOLEAN_LABELS = {
 } as const;
 
 type BooleanKey = keyof typeof BOOLEAN_LABELS;
+
+const PRESENZE_OPTIONS: { value: AttendanceFilter | ""; label: string }[] = [
+  { value: "", label: "Tutte le presenze" },
+  { value: "25", label: "Presenze >25%" },
+  { value: "50", label: "Presenze >50%" },
+  { value: "75", label: "Presenze >75%" },
+];
 
 export default function ListoneToolbar({
   serieATeams,
@@ -146,6 +154,18 @@ export default function ListoneToolbar({
           ))}
         </select>
 
+        <select
+          value={state.presenze}
+          onChange={(e) => push({ ...state, presenze: e.target.value as AttendanceFilter | "" })}
+          className="rounded-md border border-line-strong bg-surface px-3 py-1.5 text-small text-ink-2 transition-colors duration-fast ease-standard hover:border-ink-3"
+        >
+          {PRESENZE_OPTIONS.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+
         {showStatusToggles && (
           <div className="flex gap-4">
             {(Object.keys(BOOLEAN_LABELS) as BooleanKey[]).map((key) => (
@@ -192,6 +212,12 @@ export default function ListoneToolbar({
               onRemove={() => push({ ...state, serieATeam: "" })}
             />
           )}
+          {state.presenze && (
+            <Chip
+              label={PRESENZE_OPTIONS.find((o) => o.value === state.presenze)!.label}
+              onRemove={() => push({ ...state, presenze: "" })}
+            />
+          )}
           {(Object.keys(BOOLEAN_LABELS) as BooleanKey[])
             .filter((key) => state[key])
             .map((key) => (
@@ -203,7 +229,17 @@ export default function ListoneToolbar({
             ))}
           <button
             type="button"
-            onClick={() => push({ ...state, role: [], wishlistTier: [], serieATeam: "", freeAgentOnly: false, starterOnly: false })}
+            onClick={() =>
+              push({
+                ...state,
+                role: [],
+                wishlistTier: [],
+                serieATeam: "",
+                presenze: "",
+                freeAgentOnly: false,
+                starterOnly: false,
+              })
+            }
             className="ml-2 text-small-dense font-semibold text-ink-3 transition-colors duration-fast ease-standard hover:text-danger"
           >
             Azzera tutto

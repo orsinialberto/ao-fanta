@@ -27,6 +27,11 @@ model Player {
   starter       Boolean  @default(false)
   wishlistTier  String?
   assignedAt    DateTime?
+  mediaVoto     Float?
+  fantaMedia    Float?
+  goals         Int?
+  assists       Int?
+  appearances   Int?
   createdAt    DateTime @default(now())
 
   @@index([fantasyTeamId])
