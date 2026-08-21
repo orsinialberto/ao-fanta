@@ -7,32 +7,27 @@
      variabili: nessun colore nasce dentro un blocco @media o [data-theme],
      altrimenti nello stato non marcato la pagina resterebbe scoperta. */
 
-  /* Neutri d'acciaio: grigi freddi con una punta di blu, senza deriva di
-     tinta. La pagina è la cosa più chiara e le superfici ci si appoggiano
-     sopra più scure — vassoi su una scrivania bianca, non fogli su un tavolo
-     grigio. Il sistema vieta le ombre sulle card, quindi la profondità la
-     deve fare la luminanza: 1.16 fra pagina e riquadro. Il sunk scende di un
-     altro gradino, perché è incassato dentro il riquadro. */
-  --color-paper: #fcfdfe;
-  --color-surface: #e7edf1;
-  --color-surface-sunk: #dae3ea;
-  --color-ink: #101519;
-  --color-ink-2: #48535c;
-  --color-ink-3: #77838e;
-  --color-line: #cbd6de;
-  --color-line-strong: #b3c1cc;
-  /* Verderame: rame ossidato, non indaco. L'indaco faceva sembrare l'app un
-     documento; questo la fa sembrare uno strumento. È più profondo
-     dell'ottanio del mockup perché lì il contrasto su carta era 5.45, sotto
-     l'indaco che sostituiva; a #0a5566 risale a 7.11. */
-  --color-accent: #0a5566;
-  --color-accent-hover: #083f4d;
-  --color-accent-bg: #d3e6ec;
-  /* I fondi soft scendono insieme al surface: su un riquadro a #e7edf1 i
-     vecchi valori quasi bianchi galleggiavano invece di posarsi. */
-  --color-danger: #a8243a;
-  --color-danger-bg: #f6e3e7;
-  --color-danger-line: #e2c2c9;
+  /* Neutri con sottotono freddo: la carta tira al ghiaccio, i bordi al lilla.
+     Il fondo sta 1.18 sotto la superficie. Il sistema vieta le ombre sulle
+     card, quindi la profondità la deve fare la luminanza: con paper a #fafbff
+     il salto era 1.03, cioè nessuno, e la tabella non si staccava dalla
+     pagina. */
+  --color-paper: #eaecf6;
+  --color-surface: #ffffff;
+  --color-surface-sunk: #eff1f9;
+  --color-ink: #16161f;
+  --color-ink-2: #52526b;
+  --color-ink-3: #8a8a9e;
+  --color-line: #dcdfef;
+  --color-line-strong: #c8cce2;
+  --color-accent: #3b3a8f;
+  --color-accent-hover: #2f2e77;
+  --color-accent-bg: #e2e2f4;
+  /* Cremisi invece di rosso-arancio: il pericolo deve restare caldo per farsi
+     leggere come tale, ma la ruggine sul fondo lilla vira al marrone. */
+  --color-danger: #b32642;
+  --color-danger-bg: #fbeef1;
+  --color-danger-line: #eecdd5;
 
   /* Testo e icone sopra un riempimento pieno. Esistono come token perché nel
      tema scuro i riempimenti sono chiari e vogliono testo scuro: un
@@ -43,24 +38,23 @@
 
   /* Tendine. Nel tema scuro --color-ink è chiaro, quindi `bg-ink/40`
      produrrebbe un velo bianco: servono token propri. */
-  --color-scrim: rgb(16 21 25 / 0.4);
-  --color-scrim-strong: rgb(16 21 25 / 0.44);
+  --color-scrim: rgb(22 22 31 / 0.4);
+  --color-scrim-strong: rgb(16 17 25 / 0.44);
 
-  /* Quattro famiglie, quattro angoli della ruota. Portando l'accento sul
-     verderame si libera lo slot indaco, quindi il D torna al suo colore
-     storico: la vecchia collisione a sette gradi fra accento e difensore si
-     risolve spostando l'accento invece del ruolo, e non c'è niente da
-     riapprendere. Il portiere invece deve uscire dal verde-azzurro, che
-     all'accento nuovo resterebbe a 36°: diventa un verde d'erba. Distanza
-     minima fra le cinque tinte codificanti: 39°. */
-  --color-role-p: #2b7742;
-  --color-role-p-soft: #e3f1e7;
-  --color-role-d: #3d4eac;
-  --color-role-d-soft: #e4e8f5;
+  /* Quattro famiglie, quattro angoli della ruota: le stesse di prima ruotate
+     verso il freddo. Il C era ocra, l'unico caldo del sistema; prugna lo tiene
+     dentro la palette. Il D era #3f4fb5, a sette gradi di tinta dall'accento:
+     nel listone il badge del difensore e la pill della squadra finiscono sulla
+     stessa riga con lo stesso blu-viola. Spostandolo all'azzurro acciaio la
+     distanza minima fra le cinque tinte codificanti passa da 7° a 31°. */
+  --color-role-p: #0d7a6b;
+  --color-role-p-soft: #e3f2ef;
+  --color-role-d: #0d6f9e;
+  --color-role-d-soft: #e4eef4;
   --color-role-c: #7d4f9c;
-  --color-role-c-soft: #ede5f3;
-  --color-role-a: #b53f2a;
-  --color-role-a-soft: #f6e8e4;
+  --color-role-c-soft: #f2ecf7;
+  --color-role-a: #b93848;
+  --color-role-a-soft: #f9e9ed;
 
   /* ── typography ───────────────────────────────────────── */
   --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
@@ -106,8 +100,8 @@
   /* Cards use a hairline, never a shadow. This is for things that
      genuinely float: dialogs and dropdowns. */
   --shadow-overlay:
-    0 1px 2px rgb(16 21 25 / 0.06),
-    0 16px 40px -12px rgb(16 21 25 / 0.22);
+    0 1px 2px rgb(22 22 31 / 0.06),
+    0 16px 40px -12px rgb(22 22 31 / 0.22);
 
   /* ── motion ───────────────────────────────────────────── */
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
@@ -129,13 +123,10 @@
   }
 }
 
-/* ── tema scuro «Grafite Verderame» ────────────────────────
-   Stesso rapporto del tema giorno, ribaltato di segno: la pagina è la
-   superficie più chiara e i riquadri ci si appoggiano sopra più scuri, con
-   1.18 di stacco. Segue l'identità verderame del giorno, così l'accento resta
-   riconoscibile passando dall'uno all'altro. I colori dei ruoli qui sono più
-   leggibili che nel tema chiaro — da 6.2 a 9.1 contro 4.5–6.2 — ed è il
-   motivo per cui questo tema esiste: l'asta si fa di sera.
+/* ── tema scuro «Grafite» ──────────────────────────────────
+   Stessa profondità del chiaro: 1.18 fra superficie e fondo. I colori dei
+   ruoli qui sono più leggibili che nel tema chiaro — da 6.0 a 8.9 contro
+   4.5–6.0 — ed è il motivo per cui questo tema esiste: l'asta si fa di sera.
 
    La palette è scritta due volte, una per la scelta esplicita e una per la
    preferenza di sistema, perché in CSS puro non si può condividere un blocco
@@ -143,37 +134,37 @@
    due copie restino identiche lo verifica app/globals.test.ts.
    ──────────────────────────────────────────────────────── */
 :root[data-theme="dark"] {
-  --color-paper: #1d272d;
-  --color-surface: #10181d;
-  --color-surface-sunk: #05090b;
-  --color-ink: #e6edf2;
-  --color-ink-2: #9aa8b3;
-  --color-ink-3: #6f7e8a;
-  --color-line: #3a4a54;
-  --color-line-strong: #50626d;
-  --color-accent: #4ec4d8;
+  --color-paper: #101216;
+  --color-surface: #1e222b;
+  --color-surface-sunk: #171a21;
+  --color-ink: #e9ecf2;
+  --color-ink-2: #a4abb8;
+  --color-ink-3: #78818f;
+  --color-line: #2c313b;
+  --color-line-strong: #3e4653;
+  --color-accent: #9b8cf5;
   /* Su fondo scuro un hover più cupo legge come disabilitato: schiarisce. */
-  --color-accent-hover: #6fd4e5;
-  --color-accent-bg: #0d3742;
+  --color-accent-hover: #b0a4f8;
+  --color-accent-bg: #282350;
   --color-danger: #f0757f;
-  --color-danger-bg: #2e161c;
-  --color-danger-line: #4d242c;
+  --color-danger-bg: #33191f;
+  --color-danger-line: #54282f;
 
-  --color-on-accent: #10181d;
-  --color-on-role: #10181d;
-  --color-on-danger: #10181d;
+  --color-on-accent: #101216;
+  --color-on-role: #101216;
+  --color-on-danger: #101216;
 
   --color-scrim: rgb(0 0 0 / 0.62);
   --color-scrim-strong: rgb(0 0 0 / 0.7);
 
-  --color-role-p: #5fce7e;
-  --color-role-p-soft: #0f2a18;
-  --color-role-d: #8496ff;
-  --color-role-d-soft: #161c3a;
+  --color-role-p: #3ec7a4;
+  --color-role-p-soft: #122e29;
+  --color-role-d: #4fb3e8;
+  --color-role-d-soft: #172742;
   --color-role-c: #d68ae0;
-  --color-role-c-soft: #291a2f;
+  --color-role-c-soft: #2e1f35;
   --color-role-a: #f8808e;
-  --color-role-a-soft: #31171c;
+  --color-role-a-soft: #361c21;
 
   /* Un'ombra al 6% su fondo grafite non esiste: serve nero pieno e più stacco. */
   --shadow-overlay:
@@ -186,36 +177,36 @@
    l'OS in entrambe le direzioni. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --color-paper: #1d272d;
-    --color-surface: #10181d;
-    --color-surface-sunk: #05090b;
-    --color-ink: #e6edf2;
-    --color-ink-2: #9aa8b3;
-    --color-ink-3: #6f7e8a;
-    --color-line: #3a4a54;
-    --color-line-strong: #50626d;
-    --color-accent: #4ec4d8;
-    --color-accent-hover: #6fd4e5;
-    --color-accent-bg: #0d3742;
+    --color-paper: #101216;
+    --color-surface: #1e222b;
+    --color-surface-sunk: #171a21;
+    --color-ink: #e9ecf2;
+    --color-ink-2: #a4abb8;
+    --color-ink-3: #78818f;
+    --color-line: #2c313b;
+    --color-line-strong: #3e4653;
+    --color-accent: #9b8cf5;
+    --color-accent-hover: #b0a4f8;
+    --color-accent-bg: #282350;
     --color-danger: #f0757f;
-    --color-danger-bg: #2e161c;
-    --color-danger-line: #4d242c;
+    --color-danger-bg: #33191f;
+    --color-danger-line: #54282f;
 
-    --color-on-accent: #10181d;
-    --color-on-role: #10181d;
-    --color-on-danger: #10181d;
+    --color-on-accent: #101216;
+    --color-on-role: #101216;
+    --color-on-danger: #101216;
 
     --color-scrim: rgb(0 0 0 / 0.62);
     --color-scrim-strong: rgb(0 0 0 / 0.7);
 
-    --color-role-p: #5fce7e;
-    --color-role-p-soft: #0f2a18;
-    --color-role-d: #8496ff;
-    --color-role-d-soft: #161c3a;
+    --color-role-p: #3ec7a4;
+    --color-role-p-soft: #122e29;
+    --color-role-d: #4fb3e8;
+    --color-role-d-soft: #172742;
     --color-role-c: #d68ae0;
-    --color-role-c-soft: #291a2f;
+    --color-role-c-soft: #2e1f35;
     --color-role-a: #f8808e;
-    --color-role-a-soft: #31171c;
+    --color-role-a-soft: #361c21;
 
     --shadow-overlay:
       0 1px 2px rgb(0 0 0 / 0.4),

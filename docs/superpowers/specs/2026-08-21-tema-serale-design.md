@@ -114,88 +114,63 @@ sui badge ruolo, un token unico bloccherebbe la scelta.
 `--shadow-overlay` ha una variante scura più profonda: su fondo grafite
 un'ombra al 6% è invisibile.
 
-### Il modello di profondità, ribaltato
+### Palette chiara — «Ghiaccio profondo»
 
-La pagina è la superficie **più chiara**; card, tabelle e pannelli ci si
-appoggiano sopra **più scuri**. Vassoi su una scrivania bianca, non fogli su
-un tavolo grigio. Il `surface-sunk` scende di un altro gradino, perché è
-incassato dentro il riquadro.
+La tinta lilla resta identica. Cambiano la profondità e il ruolo D.
 
-Il verso conta meno del salto: quello che risolve il difetto 1 è che ci *sia*
-uno stacco misurabile, 1.16 nel tema giorno e 1.18 nel tema sera, senza
-introdurre una sola ombra.
+| Token | Da | A | Perché |
+|---|---|---|---|
+| `--color-paper` | `#fafbff` | `#eaecf6` | profondità 1.03 → 1.18 |
+| `--color-surface-sunk` | `#f2f3fa` | `#eff1f9` | resta incassato rispetto a `surface` |
+| `--color-line` | `#e4e5f0` | `#dcdfef` | deve leggersi su entrambi i fondi |
+| `--color-line-strong` | `#d2d4e4` | `#c8cce2` | idem |
+| `--color-ink-2` | `#5a5a6b` | `#52526b` | il fondo più scuro toglie contrasto |
+| `--color-ink-3` | `#9797a8` | `#8a8a9e` | idem |
+| `--color-accent-bg` | `#eae9f8` | `#e2e2f4` | deve restare distinguibile da `paper` |
+| `--color-role-d` | `#3f4fb5` | `#0d6f9e` | difetto 2 |
+| `--color-role-d-soft` | `#e9ecf9` | `#e4eef4` | segue il ruolo D |
 
-### Palette giorno — «Acciaio & Verderame»
+Tutti gli altri token restano quelli in produzione, prugna del ruolo C incluso.
 
-Grigi freddi d'acciaio, senza deriva di tinta, e un accento verderame — rame
-ossidato — al posto dell'indaco.
+**Scelta del nuovo D.** Sono state misurate tre strade, tutte in OKLCH:
 
-```
---color-paper          #fcfdfe     la pagina, la cosa più chiara
---color-surface        #e7edf1     i riquadri, 1.16 sotto la pagina
---color-surface-sunk   #dae3ea
---color-ink            #101519
---color-ink-2          #48535c
---color-ink-3          #77838e
---color-line           #cbd6de
---color-line-strong    #b3c1cc
---color-accent         #0a5566
---color-accent-hover   #083f4d
---color-accent-bg      #d3e6ec
---color-danger         #a8243a
---color-danger-bg      #f6e3e7
---color-danger-line    #e2c2c9
---color-role-p         #2b7742    --color-role-p-soft  #e3f1e7
---color-role-d         #3d4eac    --color-role-d-soft  #e4e8f5
---color-role-c         #7d4f9c    --color-role-c-soft  #ede5f3
---color-role-a         #b53f2a    --color-role-a-soft  #f6e8e4
-```
+- spostare D verso un blu più puro → arriva al massimo a 16–21° dall'accento,
+  insufficiente;
+- spostare l'accento verso il viola profondo → finisce a 9° dal prugna del
+  ruolo C, peggio di prima;
+- spostare D verso l'azzurro acciaio → **41° dall'accento**.
 
-**Come si risolve il difetto 2.** Portando l'accento sul verderame (216°) si
-libera lo slot indaco, quindi il ruolo D **torna al suo colore storico**
-`#3d4eac`: la collisione a 7° si scioglie spostando l'accento invece del
-ruolo, e per chi usa l'app non c'è niente da riapprendere sul difensore.
+Con `#0d6f9e` la distanza minima fra le cinque tinte codificanti passa da 7°
+(accento/D) a 31° (accento/C), 4,4 volte meglio. La coppia più stretta diventa
+accento e prugna, che sono già oggi a 31° e convivono.
 
-Il prezzo è che il portiere deve muoversi: il suo verde-azzurro `#0d7a6b`
-resterebbe a 36° dall'accento nuovo. Diventa un verde d'erba `#2b7742`, a 62°.
-
-Distanza minima fra le cinque tinte codificanti: **39°** (D/C), contro i 7°
-di partenza.
-
-Sull'accento: l'ottanio `#0e6d80` del mockup faceva 5.45 di contrasto sulla
-pagina, meno dell'indaco che sostituiva. Approfondito a `#0a5566` risale a
-8.23, quindi la direzione non costa più contrasto — che nel banco di prova era
-il suo unico difetto misurato.
-
-### Palette sera — «Grafite Verderame»
-
-Stesso rapporto ribaltato di segno: pagina grafite chiara, riquadri quasi neri.
+### Palette scura — «Grafite»
 
 ```
---color-paper          #1d272d     la pagina
---color-surface        #10181d     i riquadri, 1.18 sotto la pagina
---color-surface-sunk   #05090b
---color-ink            #e6edf2
---color-ink-2          #9aa8b3
---color-ink-3          #6f7e8a
---color-line           #3a4a54
---color-line-strong    #50626d
---color-accent         #4ec4d8
---color-accent-hover   #6fd4e5
---color-accent-bg      #0d3742
+--color-paper          #101216
+--color-surface        #1e222b     profondità 1.18, identica al chiaro
+--color-surface-sunk   #171a21
+--color-ink            #e9ecf2
+--color-ink-2          #a4abb8
+--color-ink-3          #78818f
+--color-line           #2c313b
+--color-line-strong    #3e4653
+--color-accent         #9b8cf5
+--color-accent-hover   #b0a4f8
+--color-accent-bg      #282350
 --color-danger         #f0757f
---color-danger-bg      #2e161c
---color-danger-line    #4d242c
---color-role-p         #5fce7e    --color-role-p-soft  #0f2a18
---color-role-d         #8496ff    --color-role-d-soft  #161c3a
---color-role-c         #d68ae0    --color-role-c-soft  #291a2f
---color-role-a         #f8808e    --color-role-a-soft  #31171c
+--color-danger-bg      #33191f
+--color-danger-line    #54282f
+--color-role-p         #3ec7a4    --color-role-p-soft  #122e29
+--color-role-d         #4fb3e8    --color-role-d-soft  #172742
+--color-role-c         #d68ae0    --color-role-c-soft  #2e1f35
+--color-role-a         #f8808e    --color-role-a-soft  #361c21
 ```
 
-L'accento resta verderame anche di sera, schiarito: è quello che rende i due
-temi la stessa app. I ruoli passano da 4,5–6,2 di contrasto a 6,2–9,1 — sono
-più leggibili che di giorno, ed è il motivo ergonomico per cui il tema esiste.
-Distanza minima di tinta: **48°**, più larga che nel giorno.
+Sul fondo grafite i ruoli passano da 4,5–6,0 di contrasto a 6,0–8,9: sono più
+leggibili che nel tema chiaro, che è il motivo ergonomico per cui il tema
+esiste. Le distanze di tinta nello scuro sono più larghe che nel chiaro
+(minimo 32°, accento/D).
 
 `--color-accent-hover` nel tema scuro **schiarisce** invece di scurire: su
 fondo scuro un hover più cupo legge come disabilitato.
@@ -261,8 +236,7 @@ scuro.
 - La regola "card con hairline, mai ombra": la profondità arriva dal salto di
   luminanza, non da ombre nuove.
 - Il fondo resta tinta unita in entrambi i temi: nessun gradiente.
-- Il prugna del ruolo C e l'indaco del ruolo D, che torna al suo valore
-  storico.
+- Il prugna del ruolo C, l'indaco dell'accento chiaro, i ruoli P, C, A.
 - Nessuna dipendenza aggiunta.
 
 ## Verifica
