@@ -92,7 +92,7 @@ export default function Sidebar({
         >
           <Menu size={18} strokeWidth={1.7} />
         </button>
-        <Image src="/ball.png" alt="" width={20} height={20} className="shrink-0" priority />
+        <Image src="/ball.png" alt="" width={20} height={20} className="shrink-0 dark:invert" priority />
         <span className="text-h3">ao-fanta</span>
       </header>
 
@@ -114,7 +114,7 @@ export default function Sidebar({
         }`}
       >
         <div className="flex items-center gap-2 px-2">
-          <Image src="/ball.png" alt="" width={20} height={20} className="shrink-0" priority />
+          <Image src="/ball.png" alt="" width={20} height={20} className="shrink-0 dark:invert" priority />
           <span className="text-h3">ao-fanta</span>
           <button
             type="button"
