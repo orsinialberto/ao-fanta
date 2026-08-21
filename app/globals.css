@@ -2,29 +2,59 @@
 
 @theme {
   /* ── colour ───────────────────────────────────────────── */
-  --color-paper: #fbfbfa;
+  /* Questi sono i valori del tema chiaro e la sorgente unica da cui Tailwind
+     genera le utility. Il tema scuro più in basso ridefinisce le stesse
+     variabili: nessun colore nasce dentro un blocco @media o [data-theme],
+     altrimenti nello stato non marcato la pagina resterebbe scoperta. */
+
+  /* Neutri con sottotono freddo: la carta tira al ghiaccio, i bordi al lilla.
+     Il fondo sta 1.18 sotto la superficie. Il sistema vieta le ombre sulle
+     card, quindi la profondità la deve fare la luminanza: con paper a #fafbff
+     il salto era 1.03, cioè nessuno, e la tabella non si staccava dalla
+     pagina. */
+  --color-paper: #eaecf6;
   --color-surface: #ffffff;
-  --color-surface-sunk: #f4f4f2;
-  --color-ink: #16161a;
-  --color-ink-2: #5c5c66;
-  --color-ink-3: #9a9aa3;
-  --color-line: #e6e6e2;
-  --color-line-strong: #d4d4ce;
+  --color-surface-sunk: #eff1f9;
+  --color-ink: #16161f;
+  --color-ink-2: #52526b;
+  --color-ink-3: #8a8a9e;
+  --color-line: #dcdfef;
+  --color-line-strong: #c8cce2;
   --color-accent: #3b3a8f;
   --color-accent-hover: #2f2e77;
-  --color-accent-bg: #eae9f5;
-  --color-danger: #b3261e;
-  --color-danger-bg: #fbefed;
-  --color-danger-line: #e9cdc9;
+  --color-accent-bg: #e2e2f4;
+  /* Cremisi invece di rosso-arancio: il pericolo deve restare caldo per farsi
+     leggere come tale, ma la ruggine sul fondo lilla vira al marrone. */
+  --color-danger: #b32642;
+  --color-danger-bg: #fbeef1;
+  --color-danger-line: #eecdd5;
 
-  --color-role-p: #0f7b62;
-  --color-role-p-soft: #e7f2ee;
-  --color-role-d: #3d4eac;
-  --color-role-d-soft: #eaecf7;
-  --color-role-c: #a66a11;
-  --color-role-c-soft: #f7efe2;
-  --color-role-a: #c2452d;
-  --color-role-a-soft: #f9eae6;
+  /* Testo e icone sopra un riempimento pieno. Esistono come token perché nel
+     tema scuro i riempimenti sono chiari e vogliono testo scuro: un
+     `text-white` scritto a mano lì diventa illeggibile (2.23 di contrasto). */
+  --color-on-accent: #ffffff;
+  --color-on-role: #ffffff;
+  --color-on-danger: #ffffff;
+
+  /* Tendine. Nel tema scuro --color-ink è chiaro, quindi `bg-ink/40`
+     produrrebbe un velo bianco: servono token propri. */
+  --color-scrim: rgb(22 22 31 / 0.4);
+  --color-scrim-strong: rgb(16 17 25 / 0.44);
+
+  /* Quattro famiglie, quattro angoli della ruota: le stesse di prima ruotate
+     verso il freddo. Il C era ocra, l'unico caldo del sistema; prugna lo tiene
+     dentro la palette. Il D era #3f4fb5, a sette gradi di tinta dall'accento:
+     nel listone il badge del difensore e la pill della squadra finiscono sulla
+     stessa riga con lo stesso blu-viola. Spostandolo all'azzurro acciaio la
+     distanza minima fra le cinque tinte codificanti passa da 7° a 31°. */
+  --color-role-p: #0d7a6b;
+  --color-role-p-soft: #e3f2ef;
+  --color-role-d: #0d6f9e;
+  --color-role-d-soft: #e4eef4;
+  --color-role-c: #7d4f9c;
+  --color-role-c-soft: #f2ecf7;
+  --color-role-a: #b93848;
+  --color-role-a-soft: #f9e9ed;
 
   /* ── typography ───────────────────────────────────────── */
   --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
@@ -70,13 +100,118 @@
   /* Cards use a hairline, never a shadow. This is for things that
      genuinely float: dialogs and dropdowns. */
   --shadow-overlay:
-    0 1px 2px rgb(22 22 26 / 0.06),
-    0 16px 40px -12px rgb(22 22 26 / 0.22);
+    0 1px 2px rgb(22 22 31 / 0.06),
+    0 16px 40px -12px rgb(22 22 31 / 0.22);
 
   /* ── motion ───────────────────────────────────────────── */
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
   --duration-fast: 120ms;
   --duration-base: 180ms;
+}
+
+/* Copre due casi: il tema marcato a mano sull'elemento root, e — per chi ha
+   JavaScript disattivato, unico caso in cui lo script inline non marca
+   niente — la preferenza di sistema. */
+@custom-variant dark {
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme="light"]) *) {
+      @slot;
+    }
+  }
+}
+
+/* ── tema scuro «Grafite» ──────────────────────────────────
+   Stessa profondità del chiaro: 1.18 fra superficie e fondo. I colori dei
+   ruoli qui sono più leggibili che nel tema chiaro — da 6.0 a 8.9 contro
+   4.5–6.0 — ed è il motivo per cui questo tema esiste: l'asta si fa di sera.
+
+   La palette è scritta due volte, una per la scelta esplicita e una per la
+   preferenza di sistema, perché in CSS puro non si può condividere un blocco
+   di dichiarazioni fra un selettore e un altro dentro una media query. Che le
+   due copie restino identiche lo verifica app/globals.test.ts.
+   ──────────────────────────────────────────────────────── */
+:root[data-theme="dark"] {
+  --color-paper: #101216;
+  --color-surface: #1e222b;
+  --color-surface-sunk: #171a21;
+  --color-ink: #e9ecf2;
+  --color-ink-2: #a4abb8;
+  --color-ink-3: #78818f;
+  --color-line: #2c313b;
+  --color-line-strong: #3e4653;
+  --color-accent: #9b8cf5;
+  /* Su fondo scuro un hover più cupo legge come disabilitato: schiarisce. */
+  --color-accent-hover: #b0a4f8;
+  --color-accent-bg: #282350;
+  --color-danger: #f0757f;
+  --color-danger-bg: #33191f;
+  --color-danger-line: #54282f;
+
+  --color-on-accent: #101216;
+  --color-on-role: #101216;
+  --color-on-danger: #101216;
+
+  --color-scrim: rgb(0 0 0 / 0.62);
+  --color-scrim-strong: rgb(0 0 0 / 0.7);
+
+  --color-role-p: #3ec7a4;
+  --color-role-p-soft: #122e29;
+  --color-role-d: #4fb3e8;
+  --color-role-d-soft: #172742;
+  --color-role-c: #d68ae0;
+  --color-role-c-soft: #2e1f35;
+  --color-role-a: #f8808e;
+  --color-role-a-soft: #361c21;
+
+  /* Un'ombra al 6% su fondo grafite non esiste: serve nero pieno e più stacco. */
+  --shadow-overlay:
+    0 1px 2px rgb(0 0 0 / 0.4),
+    0 16px 40px -12px rgb(0 0 0 / 0.7);
+}
+
+/* Stessi valori per chi non ha ancora scelto e ha il sistema in scuro. Il
+   :not([data-theme="light"]) serve perché una scelta esplicita deve battere
+   l'OS in entrambe le direzioni. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-paper: #101216;
+    --color-surface: #1e222b;
+    --color-surface-sunk: #171a21;
+    --color-ink: #e9ecf2;
+    --color-ink-2: #a4abb8;
+    --color-ink-3: #78818f;
+    --color-line: #2c313b;
+    --color-line-strong: #3e4653;
+    --color-accent: #9b8cf5;
+    --color-accent-hover: #b0a4f8;
+    --color-accent-bg: #282350;
+    --color-danger: #f0757f;
+    --color-danger-bg: #33191f;
+    --color-danger-line: #54282f;
+
+    --color-on-accent: #101216;
+    --color-on-role: #101216;
+    --color-on-danger: #101216;
+
+    --color-scrim: rgb(0 0 0 / 0.62);
+    --color-scrim-strong: rgb(0 0 0 / 0.7);
+
+    --color-role-p: #3ec7a4;
+    --color-role-p-soft: #122e29;
+    --color-role-d: #4fb3e8;
+    --color-role-d-soft: #172742;
+    --color-role-c: #d68ae0;
+    --color-role-c-soft: #2e1f35;
+    --color-role-a: #f8808e;
+    --color-role-a-soft: #361c21;
+
+    --shadow-overlay:
+      0 1px 2px rgb(0 0 0 / 0.4),
+      0 16px 40px -12px rgb(0 0 0 / 0.7);
+  }
 }
 
 /* Il pannello di assegnazione entra dal bordo della barra di ricerca, sulla
@@ -110,6 +245,15 @@
     font-size: var(--text-body);
     line-height: 1.55;
     -webkit-font-smoothing: antialiased;
+  }
+
+  /* Al cambio di tema ogni elemento con una transition sul colore partirebbe
+     insieme: 180 ms di poltiglia. Durante lo switch le transizioni si
+     spengono, e l'attributo viene tolto al frame dopo. */
+  [data-theme-switching] *,
+  [data-theme-switching] *::before,
+  [data-theme-switching] *::after {
+    transition: none !important;
   }
 
   h1,
