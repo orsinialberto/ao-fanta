@@ -79,6 +79,20 @@
   --duration-base: 180ms;
 }
 
+/* Il pannello di assegnazione entra dal bordo della barra di ricerca, sulla
+   stessa traiettoria su cui esce. Solo opacità e transform: niente animazione
+   di altezza, che con statistiche mancanti farebbe ballare il layout. */
+@keyframes assign-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @layer base {
   /* v4 changed the default border colour to currentColor. Without this the
      bare `border` class in the shadcn components would draw in the text

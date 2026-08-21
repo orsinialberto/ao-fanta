@@ -1,4 +1,4 @@
-import { getRecentAcquisitions } from "@/lib/players";
+import { getFreeAgentRoleStats, getRecentAcquisitions } from "@/lib/players";
 import { getTeamsWithRoster } from "@/lib/teams";
 import { getLeagueSettings, getRoleLimit } from "@/lib/leagueSettings";
 import { ROLE_ORDER, type Role } from "@/lib/roles";
@@ -13,10 +13,11 @@ import { Gavel } from "lucide-react";
 export const dynamic = "force-dynamic";
 
 export default async function AstaPage() {
-  const [teams, leagueSettings, recent] = await Promise.all([
+  const [teams, leagueSettings, recent, roleStats] = await Promise.all([
     getTeamsWithRoster(),
     getLeagueSettings(),
     getRecentAcquisitions(8),
+    getFreeAgentRoleStats(),
   ]);
 
   const roleLimits = Object.fromEntries(
@@ -51,6 +52,7 @@ export default async function AstaPage() {
               roleCounts: t.roleCounts,
             }))}
             roleLimits={roleLimits}
+            roleStats={roleStats}
           />
 
           <section className="mt-6">

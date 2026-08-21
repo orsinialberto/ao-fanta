@@ -3,9 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Search, X } from "lucide-react";
-import AssignDialog from "@/app/components/AssignDialog";
+import AssignPanel from "@/app/components/AssignPanel";
 import AddPlayerDialog from "@/app/components/AddPlayerDialog";
 import RoleBadge from "@/app/components/RoleBadge";
+import type { RoleStats } from "@/lib/roleStats";
 import type { PlayerWithTeam, TeamSummary } from "@/lib/types";
 import type { Role } from "@/lib/roles";
 
@@ -14,15 +15,16 @@ const DEBOUNCE_MS = 200;
 export default function AstaSearch({
   teams,
   roleLimits,
+  roleStats,
 }: {
   teams: TeamSummary[];
   roleLimits: Record<Role, number>;
+  roleStats: Record<Role, RoleStats>;
 }) {
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<PlayerWithTeam[]>([]);
-  const [assigning, setAssigning] = useState<PlayerWithTeam | null>(null);
-  const [assignOpen, setAssignOpen] = useState(false);
+  const [selected, setSelected] = useState<PlayerWithTeam | null>(null);
   const [addOpen, setAddOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -44,21 +46,30 @@ export default function AstaSearch({
     return () => clearTimeout(timer.current);
   }, [query]);
 
-  function openAssign(player: PlayerWithTeam) {
-    setAssigning(player);
-    setAssignOpen(true);
+  // Il pannello prende il posto della lista: chiuderlo riporta ai risultati con
+  // la ricerca intatta, così un giocatore scelto per sbaglio costa un Esc.
+  function closePanel() {
+    setSelected(null);
+    inputRef.current?.focus();
   }
 
-  const dropdownOpen = query.trim().length > 0;
+  function clearSearch() {
+    setSelected(null);
+    setQuery("");
+    inputRef.current?.focus();
+  }
+
+  const resultsOpen = query.trim().length > 0 && !selected;
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (!dropdownOpen) return;
-
     if (e.key === "Escape") {
       e.preventDefault();
-      setQuery("");
+      if (selected) closePanel();
+      else if (query) setQuery("");
       return;
     }
+    if (!resultsOpen) return;
+
     if (e.key === "ArrowDown" || e.key === "ArrowUp") {
       e.preventDefault();
       if (results.length === 0) return;
@@ -69,7 +80,7 @@ export default function AstaSearch({
     if (e.key === "Enter") {
       e.preventDefault();
       if (results.length === 0) setAddOpen(true);
-      else if (results[activeIndex]) openAssign(results[activeIndex]);
+      else if (results[activeIndex]) setSelected(results[activeIndex]);
     }
   }
 
@@ -81,24 +92,26 @@ export default function AstaSearch({
           autoFocus
           ref={inputRef}
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => {
+            // Riscrivere la ricerca vuol dire cambiare giocatore: il pannello
+            // lascia il posto ai risultati aggiornati.
+            setSelected(null);
+            setQuery(e.target.value);
+          }}
           onKeyDown={handleKeyDown}
           placeholder="Cerca per nome giocatore…"
           role="combobox"
-          aria-expanded={dropdownOpen}
+          aria-expanded={resultsOpen}
           aria-controls="asta-search-results"
           aria-activedescendant={
-            dropdownOpen && results[activeIndex] ? `asta-result-${results[activeIndex].id}` : undefined
+            resultsOpen && results[activeIndex] ? `asta-result-${results[activeIndex].id}` : undefined
           }
           className="w-full bg-transparent text-h3 font-normal placeholder:text-ink-3 focus:outline-none"
         />
         {query && (
           <button
             type="button"
-            onClick={() => {
-              setQuery("");
-              inputRef.current?.focus();
-            }}
+            onClick={clearSearch}
             aria-label="Svuota ricerca"
             className="shrink-0 text-ink-3 transition-colors duration-fast ease-standard hover:text-ink"
           >
@@ -107,7 +120,7 @@ export default function AstaSearch({
         )}
       </div>
 
-      {dropdownOpen && (
+      {resultsOpen && (
         <div id="asta-search-results" role="listbox" className="border-t border-line p-1">
           {results.map((p, i) => (
             <button
@@ -116,7 +129,7 @@ export default function AstaSearch({
               role="option"
               aria-selected={i === activeIndex}
               onMouseEnter={() => setActiveIndex(i)}
-              onClick={() => openAssign(p)}
+              onClick={() => setSelected(p)}
               className={`flex w-full items-center gap-3 rounded-md px-3 py-2 text-left transition-colors duration-fast ease-standard ${
                 i === activeIndex ? "bg-surface-sunk" : ""
               }`}
@@ -137,18 +150,21 @@ export default function AstaSearch({
         </div>
       )}
 
-      <AssignDialog
-        player={assigning}
-        teams={teams}
-        roleLimits={roleLimits}
-        open={assignOpen}
-        onOpenChange={setAssignOpen}
-        onAssigned={() => {
-          setAssignOpen(false);
-          setQuery("");
-          router.refresh();
-        }}
-      />
+      {selected && (
+        <AssignPanel
+          key={selected.id}
+          player={selected}
+          teams={teams}
+          roleLimits={roleLimits}
+          roleStats={roleStats}
+          onClose={closePanel}
+          onAssigned={() => {
+            clearSearch();
+            router.refresh();
+          }}
+        />
+      )}
+
       <AddPlayerDialog
         open={addOpen}
         onOpenChange={setAddOpen}
