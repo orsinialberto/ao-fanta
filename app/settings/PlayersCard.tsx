@@ -14,7 +14,7 @@ export default function PlayersCard() {
     >
       <button
         onClick={() => setOpen(true)}
-        className="h-8 self-start rounded-md bg-accent px-3 text-small font-semibold text-white transition-colors duration-fast ease-standard hover:bg-accent-hover"
+        className="h-8 self-start rounded-md bg-accent px-3 text-small font-semibold text-on-accent transition-colors duration-fast ease-standard hover:bg-accent-hover"
       >
         Aggiungi giocatore
       </button>

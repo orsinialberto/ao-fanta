@@ -98,7 +98,7 @@ export default function ConfirmDialog({
               type="button"
               disabled={!unlocked || pending}
               onClick={handleConfirm}
-              className="rounded-md bg-danger px-3 py-2 text-small font-semibold text-white transition-opacity duration-fast ease-standard disabled:opacity-40"
+              className="rounded-md bg-danger px-3 py-2 text-small font-semibold text-on-danger transition-opacity duration-fast ease-standard disabled:opacity-40"
             >
               {confirmLabel}
             </button>

@@ -105,7 +105,7 @@ export default function AddPlayerDialog({
             </button>
             <button
               type="submit"
-              className="rounded-md bg-accent px-3 py-2 text-small font-semibold text-white transition-colors duration-fast ease-standard hover:bg-accent-hover"
+              className="rounded-md bg-accent px-3 py-2 text-small font-semibold text-on-accent transition-colors duration-fast ease-standard hover:bg-accent-hover"
             >
               Salva
             </button>

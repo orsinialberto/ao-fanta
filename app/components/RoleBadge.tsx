@@ -18,7 +18,7 @@ export default function RoleBadge({
 
   return (
     <span
-      className={`inline-flex shrink-0 items-center justify-center font-mono font-semibold text-white ${SIZES[size]} ${bg}`}
+      className={`inline-flex shrink-0 items-center justify-center font-mono font-semibold text-on-role ${SIZES[size]} ${bg}`}
     >
       {role}
     </span>

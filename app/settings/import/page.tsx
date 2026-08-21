@@ -280,7 +280,7 @@ export default function ImportPage() {
             <button
               onClick={handlePreview}
               disabled={loading || !mappingComplete}
-              className="rounded-md bg-accent px-3 py-1.5 text-small font-semibold text-white transition-colors duration-fast ease-standard hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-40"
+              className="rounded-md bg-accent px-3 py-1.5 text-small font-semibold text-on-accent transition-colors duration-fast ease-standard hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-40"
             >
               {loading ? "Analisi..." : "Anteprima modifiche"}
             </button>
@@ -414,7 +414,7 @@ function PreviewActions({
       <button
         onClick={onConfirm}
         disabled={loading}
-        className="rounded-md bg-accent px-3 py-1.5 text-small font-semibold text-white transition-colors duration-fast ease-standard hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-40"
+        className="rounded-md bg-accent px-3 py-1.5 text-small font-semibold text-on-accent transition-colors duration-fast ease-standard hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-40"
       >
         {loading ? "Importazione..." : "Conferma import"}
       </button>

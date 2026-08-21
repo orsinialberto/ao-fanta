@@ -43,7 +43,7 @@ export default function ResetWishlistButtons() {
         <button
           type="button"
           onClick={resetAll}
-          className="rounded-md border border-danger-line px-3 py-1.5 text-small-dense font-bold text-danger hover:bg-danger hover:text-white"
+          className="rounded-md border border-danger-line px-3 py-1.5 text-small-dense font-bold text-danger hover:bg-danger hover:text-on-danger"
         >
           Resetta tutto
         </button>

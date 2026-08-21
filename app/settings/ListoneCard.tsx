@@ -14,7 +14,7 @@ export default async function ListoneCard() {
     >
       <Link
         href="/settings/import"
-        className="inline-flex h-8 items-center gap-2 rounded-md bg-accent px-3 text-small font-semibold text-white transition-colors duration-fast ease-standard hover:bg-accent-hover"
+        className="inline-flex h-8 items-center gap-2 rounded-md bg-accent px-3 text-small font-semibold text-on-accent transition-colors duration-fast ease-standard hover:bg-accent-hover"
       >
         <Upload size={14} strokeWidth={1.8} />
         Importa CSV/Excel

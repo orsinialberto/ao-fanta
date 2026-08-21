@@ -256,7 +256,7 @@ export default function AssignPanel({
             <button
               type="submit"
               disabled={noTeamsAvailable || submitting}
-              className="ml-auto rounded-sm bg-accent px-3.5 py-2 text-small font-semibold text-white transition-colors duration-fast ease-standard hover:bg-accent-hover disabled:opacity-40"
+              className="ml-auto rounded-sm bg-accent px-3.5 py-2 text-small font-semibold text-on-accent transition-colors duration-fast ease-standard hover:bg-accent-hover disabled:opacity-40"
             >
               Conferma <span className="ml-1.5 font-mono text-[10.5px] opacity-70">↵</span>
             </button>

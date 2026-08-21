@@ -13,7 +13,7 @@ export default function WipePlayersButton({ playerCount }: { playerCount: number
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="h-8 shrink-0 rounded-md border border-danger-line bg-surface px-3 text-small font-semibold text-danger transition-colors duration-fast ease-standard hover:bg-danger hover:text-white"
+        className="h-8 shrink-0 rounded-md border border-danger-line bg-surface px-3 text-small font-semibold text-danger transition-colors duration-fast ease-standard hover:bg-danger hover:text-on-danger"
       >
         Svuota
       </button>

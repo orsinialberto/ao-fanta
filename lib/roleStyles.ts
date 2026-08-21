@@ -18,10 +18,10 @@ export const ROLE_PILL_BG: Record<Role, string> = {
 
 /** Filled role colours, for a pill whose role has reached its limit. */
 export const ROLE_PILL_FULL: Record<Role, string> = {
-  P: "bg-role-p text-white",
-  D: "bg-role-d text-white",
-  C: "bg-role-c text-white",
-  A: "bg-role-a text-white",
+  P: "bg-role-p text-on-role",
+  D: "bg-role-d text-on-role",
+  C: "bg-role-c text-on-role",
+  A: "bg-role-a text-on-role",
 };
 
 /** An active role filter chip. */

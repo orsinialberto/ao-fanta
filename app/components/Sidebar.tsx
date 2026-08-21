@@ -100,7 +100,7 @@ export default function Sidebar({
         <div
           onClick={() => setOpen(false)}
           aria-hidden="true"
-          className="fixed inset-0 z-40 bg-ink/40 md:hidden"
+          className="fixed inset-0 z-40 bg-scrim md:hidden"
         />
       )}
 

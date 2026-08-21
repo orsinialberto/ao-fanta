@@ -152,7 +152,7 @@ export default function AssignDialog({
             <button
               type="submit"
               disabled={noTeamsAvailable}
-              className="rounded-md bg-accent px-3 py-2 text-small font-semibold text-white transition-colors duration-fast ease-standard hover:bg-accent-hover disabled:opacity-40"
+              className="rounded-md bg-accent px-3 py-2 text-small font-semibold text-on-accent transition-colors duration-fast ease-standard hover:bg-accent-hover disabled:opacity-40"
             >
               Conferma
             </button>

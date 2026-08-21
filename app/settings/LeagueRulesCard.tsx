@@ -82,7 +82,7 @@ export default function LeagueRulesCard({ settings }: { settings: LeagueSettings
       <button
         onClick={handleSave}
         disabled={saving}
-        className="h-8 self-start rounded-md bg-accent px-3 text-small font-semibold text-white transition-colors duration-fast ease-standard hover:bg-accent-hover disabled:opacity-40"
+        className="h-8 self-start rounded-md bg-accent px-3 text-small font-semibold text-on-accent transition-colors duration-fast ease-standard hover:bg-accent-hover disabled:opacity-40"
       >
         {saving ? "Salvataggio…" : "Salva modifiche"}
       </button>

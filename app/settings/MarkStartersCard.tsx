@@ -53,7 +53,7 @@ export default function MarkStartersCard() {
           const file = e.target.files?.[0];
           if (file) handleFile(file);
         }}
-        className="text-small text-ink-2 file:mr-3 file:h-8 file:rounded-md file:border-0 file:bg-accent file:px-3 file:text-small file:font-semibold file:text-white file:transition-colors file:duration-fast file:ease-standard hover:file:bg-accent-hover"
+        className="text-small text-ink-2 file:mr-3 file:h-8 file:rounded-md file:border-0 file:bg-accent file:px-3 file:text-small file:font-semibold file:text-on-accent file:transition-colors file:duration-fast file:ease-standard hover:file:bg-accent-hover"
       />
 
       {result && (

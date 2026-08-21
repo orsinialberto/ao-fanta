@@ -46,7 +46,7 @@ export default function TeamForm({
     return (
       <button
         onClick={() => setOpen(true)}
-        className="rounded-lg bg-accent px-3 py-1.5 text-small-dense font-bold text-white"
+        className="rounded-lg bg-accent px-3 py-1.5 text-small-dense font-bold text-on-accent"
       >
         {mode === "create" ? "Nuova squadra" : "Modifica"}
       </button>
@@ -77,7 +77,7 @@ export default function TeamForm({
         required
         className="w-24 rounded-lg border border-line px-2 py-1 text-small-dense"
       />
-      <button type="submit" className="rounded-lg bg-role-p px-3 py-1 text-small-dense font-bold text-white">
+      <button type="submit" className="rounded-lg bg-role-p px-3 py-1 text-small-dense font-bold text-on-role">
         Salva
       </button>
       <button type="button" onClick={() => setOpen(false)} className="text-small-dense font-semibold text-ink-2">
