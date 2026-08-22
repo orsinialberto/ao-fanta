@@ -7,27 +7,27 @@
      variabili: nessun colore nasce dentro un blocco @media o [data-theme],
      altrimenti nello stato non marcato la pagina resterebbe scoperta. */
 
-  /* Neutri con sottotono freddo: la carta tira al ghiaccio, i bordi al lilla.
-     Il fondo sta 1.18 sotto la superficie. Il sistema vieta le ombre sulle
-     card, quindi la profondità la deve fare la luminanza: con paper a #fafbff
-     il salto era 1.03, cioè nessuno, e la tabella non si staccava dalla
-     pagina. */
-  --color-paper: #eaecf6;
+  /* Palette «Pastello & viola»: neutro quasi acromatico (off-white, non più
+     lilla) con un solo accento saturo — viola intenso — a fare tutto il
+     lavoro cromatico dell'azione primaria. Scelta nel mockup confrontando
+     sette proposte fianco a fianco su listone/sidebar/scheda squadra reali;
+     vedi la nota progetto per le altre sei scartate. */
+  --color-paper: #fafafa;
   --color-surface: #ffffff;
-  --color-surface-sunk: #eff1f9;
-  --color-ink: #16161f;
-  --color-ink-2: #52526b;
-  --color-ink-3: #8a8a9e;
-  --color-line: #dcdfef;
-  --color-line-strong: #c8cce2;
-  --color-accent: #3b3a8f;
-  --color-accent-hover: #2f2e77;
-  --color-accent-bg: #e2e2f4;
-  /* Cremisi invece di rosso-arancio: il pericolo deve restare caldo per farsi
-     leggere come tale, ma la ruggine sul fondo lilla vira al marrone. */
-  --color-danger: #b32642;
-  --color-danger-bg: #fbeef1;
-  --color-danger-line: #eecdd5;
+  --color-surface-sunk: #f2f2f5;
+  --color-ink: #23252b;
+  --color-ink-2: #565964;
+  --color-ink-3: #8d8f99;
+  --color-line: #e4e4ea;
+  --color-line-strong: #cfd0d8;
+  --color-accent: #7c3aed;
+  --color-accent-hover: #6425d1;
+  --color-accent-bg: #ece3fb;
+  /* Corallo invece del cremisi di prima: la stessa famiglia calda del
+     richiesto «accenti… corallo», riusata qui come colore di pericolo. */
+  --color-danger: #c73f19;
+  --color-danger-bg: #fbe6dd;
+  --color-danger-line: #f3c9b3;
 
   /* Testo e icone sopra un riempimento pieno. Esistono come token perché nel
      tema scuro i riempimenti sono chiari e vogliono testo scuro: un
@@ -38,23 +38,24 @@
 
   /* Tendine. Nel tema scuro --color-ink è chiaro, quindi `bg-ink/40`
      produrrebbe un velo bianco: servono token propri. */
-  --color-scrim: rgb(22 22 31 / 0.4);
-  --color-scrim-strong: rgb(16 17 25 / 0.44);
+  --color-scrim: rgb(35 37 43 / 0.4);
+  --color-scrim-strong: rgb(24 25 30 / 0.44);
 
-  /* Quattro famiglie, quattro angoli della ruota: le stesse di prima ruotate
-     verso il freddo. Il C era ocra, l'unico caldo del sistema; prugna lo tiene
-     dentro la palette. Il D era #3f4fb5, a sette gradi di tinta dall'accento:
-     nel listone il badge del difensore e la pill della squadra finiscono sulla
-     stessa riga con lo stesso blu-viola. Spostandolo all'azzurro acciaio la
-     distanza minima fra le cinque tinte codificanti passa da 7° a 31°. */
-  --color-role-p: #0d7a6b;
-  --color-role-p-soft: #e3f2ef;
-  --color-role-d: #0d6f9e;
-  --color-role-d-soft: #e4eef4;
-  --color-role-c: #7d4f9c;
-  --color-role-c-soft: #f2ecf7;
-  --color-role-a: #b93848;
-  --color-role-a-soft: #f9e9ed;
+  /* I quattro secondari richiesti («lavanda, rosa freddo, giallo burro, verde
+     menta») diventano i quattro ruoli, per uso reale invece che decorativo:
+     P verde menta, D azzurro acceso (scurito da #2f8fe0 per reggere il testo
+     bianco del badge pieno), C lavanda, A rosa freddo. Il giallo burro resta
+     fuori — libero per i livelli wishlist, che già hanno bisogno di un quinto
+     colore. Le tinte sono a 163°/209°/257°/330°: distanza minima 46°, contro
+     i 31° della palette precedente. */
+  --color-role-p: #0f7a5c;
+  --color-role-p-soft: #dcf3ea;
+  --color-role-d: #1a6bb8;
+  --color-role-d-soft: #dcedf9;
+  --color-role-c: #6a4fae;
+  --color-role-c-soft: #e6def7;
+  --color-role-a: #a23d70;
+  --color-role-a-soft: #f9e1ea;
 
   /* ── typography ───────────────────────────────────────── */
   --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;

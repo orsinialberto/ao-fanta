@@ -13,7 +13,7 @@ export const metadata = {
 // striscia chiara sopra una pagina scura.
 export const viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#eaecf6" },
+    { media: "(prefers-color-scheme: light)", color: "#fafafa" },
     { media: "(prefers-color-scheme: dark)", color: "#101216" },
   ],
 };
