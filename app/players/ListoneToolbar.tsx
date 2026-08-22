@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { Search, X } from "lucide-react";
 import { ROLE_ORDER, type Role } from "@/lib/roles";
@@ -44,18 +44,37 @@ export default function ListoneToolbar({
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const state = readFilterState(new URLSearchParams(searchParams.toString()));
-  const [search, setSearch] = useState(state.search);
+  const urlState = readFilterState(new URLSearchParams(searchParams.toString()));
+  const [search, setSearch] = useState(urlState.search);
+  // Other filter handlers below spread `state` into push(): if it carried
+  // urlState.search (last debounced-committed value) instead of the live
+  // input, clicking a role/tier/team chip mid-typing would push the stale
+  // search back into the URL and the back/forward-sync effect would then
+  // blank whatever the user had typed since.
+  const state = { ...urlState, search };
 
-  // Keep the input in step with back/forward navigation.
+  // What we last wrote to the URL ourselves (or started on). searchParams
+  // gets a new reference on every router.replace/refresh, not just on real
+  // back/forward navigation, so the sync effect below must compare against
+  // this instead of firing unconditionally — otherwise any refresh elsewhere
+  // on the page (or our own debounced push) races with in-flight typing and
+  // blanks the input.
+  const committedSearch = useRef(urlState.search);
+
+  // Keep the input in step with back/forward navigation only — ignore
+  // reference changes that don't actually move the search value.
   useEffect(() => {
-    setSearch(readFilterState(new URLSearchParams(searchParams.toString())).search);
+    const urlSearch = readFilterState(new URLSearchParams(searchParams.toString())).search;
+    if (urlSearch === committedSearch.current) return;
+    committedSearch.current = urlSearch;
+    setSearch(urlSearch);
   }, [searchParams]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       const current = readFilterState(new URLSearchParams(window.location.search));
       if (current.search === search) return;
+      committedSearch.current = search;
       push({ ...current, search });
     }, DEBOUNCE_MS);
     return () => clearTimeout(timer);
